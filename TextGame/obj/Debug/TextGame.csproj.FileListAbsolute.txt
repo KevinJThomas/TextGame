@@ -1,0 +1,1 @@
+c:\users\kevint\documents\visual studio 2015\Projects\TextGame\TextGame\bin\Debug\TextGame.exe.config
