@@ -24,7 +24,7 @@ namespace TextGame
             string text1 = "Welcome to 'w/e the game name is'!";
             string text2 = "You are about to start out on a string of wild and bizarre adventures.";
             string text3 = "But first... What is you name?";
-            string text5 = "I won't keep you here any longer... Your first edventure starts now!";
+            string text5 = "I won't keep you here any longer... Your first adventure starts now!";
             
             ScrollText(text1, 1500);
             ScrollText(text2, 1500);
@@ -102,10 +102,11 @@ namespace TextGame
         //Will have to move this method into scenario class if we move the above intro text
         public static void ScrollText(string text, int delay = 0) //delay set to a default of 0 so if you don't want a delay you don't have to specify anything
         {
-            foreach(char character in text)
+            Random rand = new Random();     //Randomizing the thread sleep so typing looks more natural
+            foreach (char character in text)
             {
                 Console.Write(character);
-                System.Threading.Thread.Sleep(50);
+                System.Threading.Thread.Sleep(rand.Next(20, 75));
             }
             System.Threading.Thread.Sleep(delay);
             Console.WriteLine("");        //Since before this line is called the console is ending with a console.write, it is still on the above line
