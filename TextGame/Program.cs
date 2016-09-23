@@ -18,9 +18,46 @@ namespace TextGame
 
         public static void PlayAgain()
         {
-            //Asks the user if they would like to play again
-            //If yes, a new game object will be created and they start again at level one - can add checkpoints later on if we get there
-            //If no, the program will exit
+            string text1 = "Would you like to play again? (y/n)";
+            string text2 = "Thanks for playing!\nPress any key to exit. . .";
+            string text3 = "Invalid input. Please try again.\n";
+
+            string answer;
+
+            foreach (var character in text1)
+            {
+                Console.Write(character);
+                System.Threading.Thread.Sleep(50);
+            }
+            Console.Write("\n");
+            Console.Write("> ");
+
+            answer = Console.ReadLine();
+
+            if (answer == "yes" || answer == "y")
+            {
+                Game newGame = new Game();
+                newGame.Intro();
+            }
+            else if (answer == "no" || answer == "n")
+            {
+                foreach (var character in text2)
+                {
+                    Console.Write(character);
+                    System.Threading.Thread.Sleep(50);
+                }
+                Console.ReadKey();
+                Environment.Exit(0);
+            }
+            else
+            {
+                foreach (var character in text3)
+                {
+                    Console.Write(character);
+                    System.Threading.Thread.Sleep(50);
+                }
+                PlayAgain();
+            }
         }
     }
 }

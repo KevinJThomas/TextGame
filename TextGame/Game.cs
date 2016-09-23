@@ -10,7 +10,7 @@ namespace TextGame
     {
         public int CurrentLevel { get; set; } //Keeps track of what level the game is on
 
-        Player player; //Since it is single player this object will always be the person playing
+        Player player = new Player(""); //Since it is single player this object will always be the person playing
         //Possibly will either have to make player objects for npc's to battle or make a new class 'npc' or 'minion' etc. 
 
         //By default all games will start on level one unless a different level is specified
@@ -21,7 +21,40 @@ namespace TextGame
 
         public void Intro()
         {
-            PlayLevelOne();
+            string text1 = "Welcome to 'w/e the game name is'!";
+            string text2 = "You are about to start out on a string of wild and bizarre adventures.";
+            string text3 = "But first... What is you name?";
+            string text5 = "I won't keep you here any longer... Your first edventure starts now!";
+            
+            ScrollText(text1, 1500);
+            ScrollText(text2, 1500);
+            ScrollText(text3);
+
+            Console.Write("> ");
+            string name = Console.ReadLine();
+            player.Name = name;
+
+            string text4 = ("Great! Nice to meet you " + player.Name + ".");
+
+            ScrollText(text4, 1500);
+            ScrollText(text5, 3500);
+
+            Console.Clear();
+
+            System.Threading.Thread.Sleep(1000);
+
+            switch (CurrentLevel)
+            {
+                case 1:
+                    PlayLevelOne();
+                    break;
+                default:
+                    Console.WriteLine("ERROR: Game.Intro(): Game.CurrentLevel OutOfBounds = {0}", CurrentLevel);
+                    Console.WriteLine("The game will now crash. . .Press any key to exit");
+                    Console.ReadKey();
+                    Environment.Exit(0);
+                    break;
+            }
 
             //Could start out by asking the player for his name
             //Probably a switch statement that will call the correct next method depending on what level the game is
@@ -30,71 +63,21 @@ namespace TextGame
 
         public void PlayLevelOne()
         {
-            //All of this might be in the wrong place. Not entirely sure. 
+            //We might want to put all of this into Scenario.BurningBuilding since it is specific to that scenario. It'll run either way for testing so it's
+            //not that important atm. I think this method (PlayLevelOne()) is going to end up being just a few lines of code.
             string introText1 = "You awaken lying on the floor of an unfamiliar room. Smoke billows all around\nyou and alarms can be heard blaring nearby.";
             string introText2 = "You stand up...";
             string introText3 = "You quickly take in your surroundings. The only entrance to the room is a single metal door. Within the room there is a desk, a folding chair, a tall lamp, and a rug on the floor.";
-            foreach (var character in introText1)
-            {
-                Console.Write(character);                   //Scrolling text because why not. I think it looks nicer than abruptly writing entire lines or
-                System.Threading.Thread.Sleep(50);          //paragraphs all at once.
 
-            }
-            System.Threading.Thread.Sleep(2000);
-            Console.WriteLine(" ");                     //Why doesn't this print a blank line? Same with lines 42, 50, and 53. 
+            //Anytime where you're repeating code a method usually will save you time/space
+            ScrollText(introText1, 2000);              
+            ScrollText(introText2, 2000);
+            ScrollText(introText3, 2000);
 
-            foreach (var character in introText2)
-            {
-                Console.Write(character);
-                System.Threading.Thread.Sleep(50);
-            }
-            System.Threading.Thread.Sleep(2000);
-            Console.WriteLine(" ");
-
-            foreach (var character in introText3)
-            {
-                Console.Write(character);
-                System.Threading.Thread.Sleep(50);
-
-            }
-
-        firstRoom:
-            Console.WriteLine(" ");
-            System.Threading.Thread.Sleep(2000);
-            Console.WriteLine("What would you like to do?");
-            Console.WriteLine(" ");
-            Console.WriteLine("1 - Open door");
-            Console.WriteLine("2 - Examine desk");
-            Console.WriteLine("3 - Examine chair");
-            Console.WriteLine("4 - Examine lamp");
-            Console.WriteLine("5 - Examine rug");
-
-            int decisionOne;
-            string roomOne = Console.ReadLine();
-            Int32.TryParse(roomOne, out decisionOne);
-
-            switch (decisionOne)
-            {
-                case 1:
-                    Console.WriteLine("The door handle is too hot. You burn yourself.");
-                    goto firstRoom;
-                case 2:
-                    Console.WriteLine("");
-                    break;
-                case 3:
-                    Console.WriteLine("");
-                    break;
-                case 4:
-                    Console.WriteLine("");
-                    break;
-                case 5:
-                    Console.WriteLine("");
-                    break;
-
-
-            }
-            Scenario scenario = new Scenario();
-            scenario.BurningBuilding();
+            //If we're going to be making multiple scenarios each one should be its own subclass of scenario.cs otherwise scenario.cs will get HUGE cause it will contain
+            //the majority of the code for the entire game..if you don't know about parent/child classes I think kudvenkat has a vid on it
+            BurningBuilding burningBuilding = new BurningBuilding(); 
+            burningBuilding.Start();
 
             //Maybe scenario.BurningBuilding() can return a boolean for whether the player beat the scenario?
             //If they passed, call Advance(). If not, GameOver()
@@ -116,6 +99,17 @@ namespace TextGame
             Program.PlayAgain();
         }
 
-        
+        //Will have to move this method into scenario class if we move the above intro text
+        public static void ScrollText(string text, int delay = 0) //delay set to a default of 0 so if you don't want a delay you don't have to specify anything
+        {
+            foreach(char character in text)
+            {
+                Console.Write(character);
+                System.Threading.Thread.Sleep(50);
+            }
+            System.Threading.Thread.Sleep(delay);
+            Console.WriteLine("");        //Since before this line is called the console is ending with a console.write, it is still on the above line
+                                          //Console.WriteLine will bring it down to a new line, but if you want an empty line try Console.WriteLine("\n")
+        }
     }
 }

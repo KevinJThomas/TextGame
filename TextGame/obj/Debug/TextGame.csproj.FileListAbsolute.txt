@@ -1,1 +1,6 @@
 c:\users\kevint\documents\visual studio 2015\Projects\TextGame\TextGame\bin\Debug\TextGame.exe.config
+C:\Users\kevint\Documents\Visual Studio 2015\Projects\TextGame\TextGame\obj\Debug\TextGame.exe
+C:\Users\kevint\Documents\Visual Studio 2015\Projects\TextGame\TextGame\obj\Debug\TextGame.pdb
+C:\Users\kevint\Documents\Visual Studio 2015\Projects\TextGame\TextGame\bin\Debug\TextGame.exe
+C:\Users\kevint\Documents\Visual Studio 2015\Projects\TextGame\TextGame\bin\Debug\TextGame.pdb
+C:\Users\kevint\Documents\Visual Studio 2015\Projects\TextGame\TextGame\obj\Debug\TextGame.csprojResolveAssemblyReference.cache
