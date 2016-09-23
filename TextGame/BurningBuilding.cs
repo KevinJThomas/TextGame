@@ -10,9 +10,9 @@ namespace TextGame
     {
         //Since this is a child class of Scenario, it will automatically have Location as a property - we don't have to write it again here
 
-        public BurningBuilding()
+        public BurningBuilding(Player player) : base(player)
         {
-
+            _player = player;
         }
 
         public void Start()
@@ -61,6 +61,11 @@ namespace TextGame
                         RoomOne();
                         break;
                 }
+            }
+            else
+            {
+                Console.WriteLine("Invalid input. Please try again.");
+                RoomOne();
             }
         }
     }

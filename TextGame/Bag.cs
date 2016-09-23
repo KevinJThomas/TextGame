@@ -22,7 +22,15 @@ namespace TextGame
 
         public void PrintBag()
         {
-            //Prints out the contents of the bag - this would probably be called whenever the user types in a certain cmd such as 'bag', 'help', etc.
+            int num = 1;
+
+            Console.WriteLine("Your bag contains:");
+
+            foreach(Item item in items)
+            {
+                Console.WriteLine("{0}) {1}", num, item.Name);
+                num++;
+            }
         }
     }
 }

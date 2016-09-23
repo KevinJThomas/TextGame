@@ -23,7 +23,7 @@ namespace TextGame
         {
             string text1 = "Welcome to 'w/e the game name is'!";
             string text2 = "You are about to start out on a string of wild and bizarre adventures.";
-            string text3 = "But first... What is you name?";
+            string text3 = "But first... What is your name?";
             string text5 = "I won't keep you here any longer... Your first adventure starts now!";
             
             ScrollText(text1, 1500);
@@ -32,6 +32,12 @@ namespace TextGame
 
             Console.Write("> ");
             string name = Console.ReadLine();
+
+            if (name == "Kristin" || name == "kristin")
+            {
+                name = "kristen";
+            }
+
             player.Name = name;
 
             string text4 = ("Great! Nice to meet you " + player.Name + ".");
@@ -76,7 +82,7 @@ namespace TextGame
 
             //If we're going to be making multiple scenarios each one should be its own subclass of scenario.cs otherwise scenario.cs will get HUGE cause it will contain
             //the majority of the code for the entire game..if you don't know about parent/child classes I think kudvenkat has a vid on it
-            BurningBuilding burningBuilding = new BurningBuilding(); 
+            BurningBuilding burningBuilding = new BurningBuilding(player); 
             burningBuilding.Start();
 
             //Maybe scenario.BurningBuilding() can return a boolean for whether the player beat the scenario?

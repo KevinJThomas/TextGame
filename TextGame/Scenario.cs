@@ -10,20 +10,23 @@ namespace TextGame
     class Scenario
     {
         public string Location { get; set; } //Used to track the player's location within a specific scenario - ie. Room 1/Room 2/Basement/Roof/etc.
+        protected Player _player;
 
-        public Scenario()
+        public Scenario(Player player)
         {
-
+            _player = player;
         }
 
-        public void BurningBuilding()
+        public void ScrollText(string text, int delay = 0)
         {
-            //The code for playing through the burning building
-        }
-
-        public void AssassinateTarget()
-        {
-            //The code for playing through another possible scenario down the line
+            Random rand = new Random();
+            foreach (char character in text)
+            {
+                Console.Write(character);
+                System.Threading.Thread.Sleep(rand.Next(20, 75));
+            }
+            System.Threading.Thread.Sleep(delay);
+            Console.WriteLine("");
         }
     }
 }
