@@ -28,5 +28,36 @@ namespace TextGame
             System.Threading.Thread.Sleep(delay);
             Console.WriteLine("");
         }
+
+        public void InspectBag()
+        {
+            try
+            {
+                _player.Bag.PrintBag();
+
+                int input;
+                string bagInput = Console.ReadLine();
+
+                if (Int32.TryParse(bagInput, out input))
+                {
+                    _player.Bag.GetContents()[input - 1].UseItem();
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("I think you bag is empty! " + ex.Message);
+            }
+
+        }
+
+        public void Help()
+        {
+            Console.WriteLine("Other than selecting one of the listed options for your current location, you may also use:");
+            Console.WriteLine("bag - lists the items in your bag and allows you to use an item of your choice");
+        }
     }
 }

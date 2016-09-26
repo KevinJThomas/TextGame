@@ -12,12 +12,14 @@ namespace TextGame
         public int Health { get; set; }
         public int Attack { get; set; } //not sure if we want these or if we'll do combat some other way?
         public int Defense { get; set; } //not sure if we want these or if we'll do combat some other way?
-
-        Bag bag = new Bag(); //This is where all of the player's items will be stored
+        public Bag Bag { get; set; }
 
         public Player(string name)
         {
             Name = name;
+            Health = 10;
+
+            Bag = new Bag();
         }
 
         public void Atk(Player target) //note: if a new 'npc' class is made for enemies, the parameter type of this method needs to change from 'Player' to 'npc'
@@ -30,13 +32,13 @@ namespace TextGame
         //Used to add one item into the player's bag
         public void Add(Item item)
         {
-            bag.Add(item);
+            Bag.Add(item);
         }
 
         //Used to add multiple items into the player's bag
         public void Add(List<Item> items)
         {
-            bag.Add(items);
+            Bag.Add(items);
         }
     }
 }

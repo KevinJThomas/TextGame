@@ -20,9 +20,24 @@ namespace TextGame
             Name = name;
         }
 
+        //Probably a better way to do this.. Could not even have this method at all and just put logic for items in each scenario
         public void UseItem()
         {
-            //Probably a giant switch statement that looks at the item's name and then decided what it is does?
+            switch(Name)
+            {
+                case "Gun":
+                    Console.WriteLine("Using Gun");
+                    break;
+                case "Knife":
+                    Console.WriteLine("Using Knife");
+                    break;
+                case "Twine":
+                    Console.WriteLine("Using Twine");
+                    break;
+                default:
+                    Console.WriteLine("ERROR: Item.UseItem(). . .Do not recognize '{0}' as an item", Name);
+                    break;
+            }
         }
     }
 }

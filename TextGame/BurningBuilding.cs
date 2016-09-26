@@ -23,6 +23,7 @@ namespace TextGame
 
         public void RoomOne()
         {
+            Location = "Room One";
             Console.WriteLine(" ");
             System.Threading.Thread.Sleep(2000);
             Console.WriteLine("What would you like to do?");

@@ -49,22 +49,7 @@ namespace TextGame
 
             System.Threading.Thread.Sleep(1000);
 
-            switch (CurrentLevel)
-            {
-                case 1:
-                    PlayLevelOne();
-                    break;
-                default:
-                    Console.WriteLine("ERROR: Game.Intro(): Game.CurrentLevel OutOfBounds = {0}", CurrentLevel);
-                    Console.WriteLine("The game will now crash. . .Press any key to exit");
-                    Console.ReadKey();
-                    Environment.Exit(0);
-                    break;
-            }
-
-            //Could start out by asking the player for his name
-            //Probably a switch statement that will call the correct next method depending on what level the game is
-            //ie. if CurrentLevel == 1, PlayLevelOne() will be called
+            StartLevel();
         }
 
         public void PlayLevelOne()
@@ -85,8 +70,12 @@ namespace TextGame
             BurningBuilding burningBuilding = new BurningBuilding(player); 
             burningBuilding.Start();
 
-            //Maybe scenario.BurningBuilding() can return a boolean for whether the player beat the scenario?
-            //If they passed, call Advance(). If not, GameOver()
+        }
+
+        public void PlayLevelTwo()
+        {
+            Assassination assassination = new Assassination(player);
+            assassination.Start();
         }
 
         //Advances the user to the next level
@@ -95,17 +84,39 @@ namespace TextGame
             //Could reset certain varialbes like health etc.
             //Add/remove items from bag depending on what they are allowed for the upcoming scenario - some items could carry over?
             CurrentLevel++;
-            //Call the method to start the next scenario.. basically the same thing as Intro() except doesn't ask the user for their name
+            StartLevel();
         }
 
         public void GameOver()
         {
-            //Tells the user that they have lost
-            //Could possibly display information like how far they/etc?
+            string text1 = "Game Over";
+            string text2 = "You made it through " + (CurrentLevel - 1) + " levels.";
+
+            ScrollText(text1, 1000);
+            ScrollText(text2, 1000);
+
             Program.PlayAgain();
         }
 
-        //Will have to move this method into scenario class if we move the above intro text
+        public void StartLevel()
+        {
+            switch (CurrentLevel)
+            {
+                case 1:
+                    PlayLevelOne();
+                    break;
+                case 2:
+                    PlayLevelTwo();
+                    break;
+                default:
+                    Console.WriteLine("ERROR: Game.StartLevel(): Game.CurrentLevel OutOfBounds = {0}", CurrentLevel);
+                    Console.WriteLine("The game will now crash. . .Press any key to exit");
+                    Console.ReadKey();
+                    Environment.Exit(0);
+                    break;
+            }
+        }
+        
         public static void ScrollText(string text, int delay = 0) //delay set to a default of 0 so if you don't want a delay you don't have to specify anything
         {
             Random rand = new Random();     //Randomizing the thread sleep so typing looks more natural

@@ -13,11 +13,10 @@ namespace TextGame
         public int CurrentSize { get; set; } //Holds how many items are actually in the bag
 
         List<Item> items = new List<Item>(); //Holds all of the contents of the bag
-
-        //I don't think anything needs to be in the constructor
-        public Bag()
+        
+        public Bag(int maxSize = 10)
         {
-
+            MaxSize = maxSize;
         }
 
         public void PrintBag()
@@ -41,6 +40,11 @@ namespace TextGame
             {
                 items.Add(item);
             }
+        }
+
+        public List<Item> GetContents()
+        {
+            return items;
         }
     }
 }
