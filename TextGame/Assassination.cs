@@ -33,14 +33,14 @@ namespace TextGame
             string text7 = "In your bag you are carrying a handgun, knife, and 3 feet of twine.";
             string text8 = "Find and kill Bodrov Ilyich. Your life depends on it.";
 
-            ScrollText(text1, 2000);
-            ScrollText(text2, 2000);
-            ScrollText(text3, 2000);
-            ScrollText(text4, 2000);
-            ScrollText(text5, 2000);
-            ScrollText(text6, 2000);
-            ScrollText(text7, 2000);
-            ScrollText(text8, 3500);
+            Services.ScrollText(text1, 2000);
+            Services.ScrollText(text2, 2000);
+            Services.ScrollText(text3, 2000);
+            Services.ScrollText(text4, 2000);
+            Services.ScrollText(text5, 2000);
+            Services.ScrollText(text6, 2000);
+            Services.ScrollText(text7, 2000);
+            Services.ScrollText(text8, 3500);
 
             RedSquareEnterance();
         }
@@ -63,15 +63,15 @@ namespace TextGame
                 switch (decision)
                 {
                     case 1:
-                        ScrollText("You scan around you, but you see nothing of interest.", 500);
+                        Services.ScrollText("You scan around you, but you see nothing of interest.", 500);
                         RedSquareEnterance();
                         break;
                     case 2:
-                        ScrollText("You walk over to the front of the stage.", 500);
+                        Services.ScrollText("You walk over to the front of the stage.", 500);
                         Stage();
                         break;
                     case 3:
-                        ScrollText("You walk into the hotel bordering the square", 500);
+                        Services.ScrollText("You walk into the hotel bordering the square", 500);
                         Hotel();
                         break;
                     default:

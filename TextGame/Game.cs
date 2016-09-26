@@ -61,9 +61,9 @@ namespace TextGame
             string introText3 = "You quickly take in your surroundings. The only entrance to the room is a single metal door. Within the room there is a desk, a folding chair, a tall lamp, and a rug on the floor.";
 
             //Anytime where you're repeating code a method usually will save you time/space
-            ScrollText(introText1, 2000);              
-            ScrollText(introText2, 2000);
-            ScrollText(introText3, 2000);
+            Services.ScrollText(introText1, 2000);
+            Services.ScrollText(introText2, 2000);
+            Services.ScrollText(introText3, 2000);
 
             //If we're going to be making multiple scenarios each one should be its own subclass of scenario.cs otherwise scenario.cs will get HUGE cause it will contain
             //the majority of the code for the entire game..if you don't know about parent/child classes I think kudvenkat has a vid on it
@@ -92,8 +92,8 @@ namespace TextGame
             string text1 = "Game Over";
             string text2 = "You made it through " + (CurrentLevel - 1) + " levels.";
 
-            ScrollText(text1, 1000);
-            ScrollText(text2, 1000);
+            Services.ScrollText(text1, 1000);
+            Services.ScrollText(text2, 1000);
 
             Program.PlayAgain();
         }
@@ -115,19 +115,6 @@ namespace TextGame
                     Environment.Exit(0);
                     break;
             }
-        }
-        
-        public static void ScrollText(string text, int delay = 0) //delay set to a default of 0 so if you don't want a delay you don't have to specify anything
-        {
-            Random rand = new Random();     //Randomizing the thread sleep so typing looks more natural
-            foreach (char character in text)
-            {
-                Console.Write(character);
-                System.Threading.Thread.Sleep(rand.Next(20, 75));
-            }
-            System.Threading.Thread.Sleep(delay);
-            Console.WriteLine("");        //Since before this line is called the console is ending with a console.write, it is still on the above line
-                                          //Console.WriteLine will bring it down to a new line, but if you want an empty line try Console.WriteLine("\n")
         }
     }
 }
