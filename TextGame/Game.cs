@@ -26,9 +26,9 @@ namespace TextGame
             string text3 = "But first... What is your name?";
             string text5 = "I won't keep you here any longer... Your first adventure starts now!";
             
-            ScrollText(text1, 1500);
-            ScrollText(text2, 1500);
-            ScrollText(text3);
+            Services.ScrollText(text1, 1500);
+            Services.ScrollText(text2, 1500);
+            Services.ScrollText(text3);
 
             Console.Write("> ");
             string name = Console.ReadLine();
@@ -42,8 +42,8 @@ namespace TextGame
 
             string text4 = ("Great! Nice to meet you " + player.Name + ".");
 
-            ScrollText(text4, 1500);
-            ScrollText(text5, 3500);
+            Services.ScrollText(text4, 1500);
+            Services.ScrollText(text5, 3500);
 
             Console.Clear();
 
@@ -95,7 +95,7 @@ namespace TextGame
             Services.ScrollText(text1, 1000);
             Services.ScrollText(text2, 1000);
 
-            Program.PlayAgain();
+            Services.PlayAgain();
         }
 
         public void StartLevel()
