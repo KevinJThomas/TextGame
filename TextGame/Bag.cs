@@ -22,14 +22,24 @@ namespace TextGame
 
         public void PrintBag()
         {
-            int num = 1;
-
             Console.WriteLine("Your bag contains:");
 
             foreach(Item item in items)
             {
-                Console.WriteLine("{0}) {1}", num, item.Name);
-                num++;
+                Console.WriteLine("{0}) {1}", items.IndexOf(item) + 1, item.Name);
+            }
+        }
+
+        public void Add(Item item)
+        {
+            items.Add(item);
+        }
+
+        public void Add(List<Item> newItems)
+        {
+            foreach (Item item in newItems)
+            {
+                items.Add(item);
             }
         }
     }

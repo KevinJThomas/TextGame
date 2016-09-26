@@ -30,13 +30,13 @@ namespace TextGame
         //Used to add one item into the player's bag
         public void Add(Item item)
         {
-
+            bag.Add(item);
         }
 
         //Used to add multiple items into the player's bag
         public void Add(List<Item> items)
         {
-
+            bag.Add(items);
         }
     }
 }
