@@ -208,7 +208,7 @@ namespace TextGame
                 {
                     case 1:
                         Services.ScrollText("You walk over to the front desk in the lobby and strike up a conversation with the receptionist\n", 1500);
-                        Services.ScrollText("..Hello! Welcome to Hilton Hotels. What can I do for you?", 1500);
+                        Services.ScrollText("..Hello! Welcome to the Metropol Hotel. What can I do for you?", 1500);
                         Timer();
                         Receptionist();
                         break;
