@@ -8,6 +8,9 @@ namespace TextGame
 {
     class Game
     {
+        //Used for seeing whether the game is won or if the player should simply advance to the next level
+        public static int _totalNumberOfLevels = 2; //We will have to manually change this every time we add a new level
+
         public int CurrentLevel { get; set; } //Keeps track of what level the game is on
 
         Player player = new Player(""); //Since it is single player this object will always be the person playing
@@ -70,17 +73,21 @@ namespace TextGame
             BurningBuilding burningBuilding = new BurningBuilding(player); 
             burningBuilding.Start();
 
+            CheckSuccessful();
         }
 
         public void PlayLevelTwo()
         {
             Assassination assassination = new Assassination(player);
             assassination.Start();
+
+            CheckSuccessful();
         }
 
         //Advances the user to the next level
         public void Advance()
         {
+            player.LevelCompleted = false;
             //Could reset certain varialbes like health etc.
             //Add/remove items from bag depending on what they are allowed for the upcoming scenario - some items could carry over?
             CurrentLevel++;
@@ -115,6 +122,31 @@ namespace TextGame
                     Environment.Exit(0);
                     break;
             }
+        }
+
+        public void CheckSuccessful()
+        {
+            if (player.LevelCompleted == true)
+            {
+                if (CurrentLevel == _totalNumberOfLevels)
+                {
+                    Winner();
+                }
+                else
+                {
+                    Advance();
+                }
+            }
+            else
+            {
+                GameOver();
+            }
+        }
+
+        public void Winner()
+        {
+            Services.ScrollText("You win!");
+            Services.PlayAgain();
         }
     }
 }

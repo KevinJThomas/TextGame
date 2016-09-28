@@ -13,11 +13,14 @@ namespace TextGame
         public int Attack { get; set; } //not sure if we want these or if we'll do combat some other way?
         public int Defense { get; set; } //not sure if we want these or if we'll do combat some other way?
         public Bag Bag { get; set; }
+        public bool LevelCompleted { get; set; }
 
         public Player(string name)
         {
             Name = name;
             Health = 10;
+
+            LevelCompleted = false;
 
             Bag = new Bag();
         }

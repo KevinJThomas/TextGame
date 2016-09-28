@@ -42,6 +42,11 @@ namespace TextGame
             }
         }
 
+        public void Remove(Item item)
+        {
+            items.Remove(item);
+        }
+
         public List<Item> GetContents()
         {
             return items;
