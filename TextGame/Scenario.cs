@@ -93,7 +93,7 @@ namespace TextGame
             {
                 Look();
             }
-            else if (command.Length >= 5 && command.Substring(0, 3).ToLower() == "use" && Targets.Length > 0)
+            else if (command.Length >= 5 && command.Substring(0, 3).ToLower() == "use" && Targets.Length >= 1)
             {
                 foreach (Item item in _player.Bag.GetContents())
                 {
