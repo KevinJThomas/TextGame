@@ -36,11 +36,6 @@ namespace TextGame
             Console.Write("> ");
             string name = Console.ReadLine();
 
-            if (name == "Kristin" || name == "kristin")
-            {
-                name = "kristen";
-            }
-
             player.Name = name;
 
             string text4 = ("Great! Nice to meet you " + player.Name + ".");
