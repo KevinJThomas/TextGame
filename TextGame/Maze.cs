@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TextGame
 {
-    //TODO: Make room 2. Currently only completed array of actions - need to fill in its function and create functions for its examines
+    //TODO: Just finished room 3, work on 4/5/7 next
     class Maze: Scenario
     {
         //Arrays of available commands for each area/person
@@ -23,6 +23,8 @@ namespace TextGame
 
         //Targets for items for each area
         string[] roomOneTarget = new string[] { "West Door", "East Door", "Table", "Desk" };
+        string[] roomTwoTarget = new string[] { "North Door", "East Door", "South Door" };
+        string[] roomThreeTarget = new string[] { "North Door", "East Door", "South Door", "Light Switch", "Poster" };
 
         string[] noTargets = new string[0];
 
@@ -127,7 +129,7 @@ namespace TextGame
         public void RoomTwo()
         {
             Location = "a square room";
-            EnterArea(roomTwo, roomDesc, noTargets);
+            EnterArea(roomTwo, roomDesc, roomTwoTarget);
 
             int input;
             string decision = Console.ReadLine();
@@ -172,6 +174,66 @@ namespace TextGame
         }
 
         public void RoomThree()
+        {
+            Location = "a square room";
+            EnterArea(roomThree, roomDesc, roomThreeTarget);
+
+            int input;
+            string decision = Console.ReadLine();
+
+            if (Int32.TryParse(decision, out input))
+            {
+                switch (input)
+                {
+                    case 1:
+                        Services.ScrollText("Hmm, switching it on and off doesn't seem to do anything", 500);
+                        RoomThree();
+                        break;
+                    case 2:
+                        Services.ScrollText("It's a Metallica, but the 'c' is whited out..", 500);
+                        RoomThree();
+                        break;
+                    case 3:
+                        Services.ScrollText("You walk through the north door.", 500);
+                        RoomTwo();
+                        break;
+                    case 4:
+                        Services.ScrollText("You walk through the east door.", 500);
+                        RoomFive();
+                        break;
+                    case 5:
+                        Services.ScrollText("You walk through the south door.", 500);
+                        RoomFour();
+                        break;
+                    default:
+                        Console.WriteLine("Invalid input. Please try again.");
+                        RoomTwo();
+                        break;
+                }
+            }
+            else
+            {
+                ExamineCommand(decision);
+                if (Item != null && Target != null)
+                {
+                    Services.ScrollText("It's not very effective.", 500);
+                    Item = null;
+                    Target = null;
+                    RoomTwo();
+                }
+                else
+                {
+                    RoomTwo();
+                }
+            }
+        }
+
+        public void RoomFour()
+        {
+
+        }
+
+        public void RoomFive()
         {
 
         }
