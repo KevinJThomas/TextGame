@@ -51,6 +51,7 @@
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Riddles.cs" />
     <Compile Include="Scenario.cs" />
     <Compile Include="Services.cs" />
   </ItemGroup>

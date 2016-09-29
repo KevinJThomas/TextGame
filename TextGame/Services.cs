@@ -14,7 +14,7 @@ namespace TextGame
             foreach (char character in text)
             {
                 Console.Write(character);
-                System.Threading.Thread.Sleep(rand.Next(15, 60));
+                System.Threading.Thread.Sleep(rand.Next(2, 5));
             }
             System.Threading.Thread.Sleep(delay);
             Console.WriteLine("");

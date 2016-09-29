@@ -393,7 +393,6 @@ namespace TextGame
                             {
                                 Services.ScrollText("You sneak up behind Bodrov and quickly wrap the twine around his neck...", 1500);
                                 Services.ScrollText("After a brief struggle, he sits motionless on the couch in front of you.");
-                                Services.ScrollText("Congratulations! Your mission was a success");
                                 _player.LevelCompleted = true;
                             }
                         }

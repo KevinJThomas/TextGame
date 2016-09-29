@@ -9,7 +9,7 @@ namespace TextGame
     class Game
     {
         //Used for seeing whether the game is won or if the player should simply advance to the next level
-        public static int _totalNumberOfLevels = 2; //We will have to manually change this every time we add a new level
+        public static int _totalNumberOfLevels = 3; //We will have to manually change this every time we add a new level
 
         public int CurrentLevel { get; set; } //Keeps track of what level the game is on
 
@@ -79,13 +79,22 @@ namespace TextGame
             CheckSuccessful();
         }
 
+        public void PlayLevelThree()
+        {
+            Riddles riddles = new Riddles(player);
+            riddles.Start();
+
+            CheckSuccessful();
+        }
+
         //Advances the user to the next level
         public void Advance()
         {
             player.LevelCompleted = false;
-            //Could reset certain varialbes like health etc.
-            //Add/remove items from bag depending on what they are allowed for the upcoming scenario - some items could carry over?
             CurrentLevel++;
+            Console.WriteLine();
+            Services.ScrollText("Congratulations! Your successfully completed the level.", 750);
+            Services.ScrollText("Advancing to level " + CurrentLevel + ". . .", 3500);
             StartLevel();
         }
 
@@ -109,6 +118,9 @@ namespace TextGame
                     break;
                 case 2:
                     PlayLevelTwo();
+                    break;
+                case 3:
+                    PlayLevelThree();
                     break;
                 default:
                     Console.WriteLine("ERROR: Game.StartLevel(): Game.CurrentLevel OutOfBounds = {0}", CurrentLevel);
