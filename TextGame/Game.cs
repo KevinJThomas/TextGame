@@ -103,6 +103,7 @@ namespace TextGame
             Console.WriteLine();
             Services.ScrollText("Congratulations! You successfully completed the level.", 750);
             Services.ScrollText("Advancing to level " + CurrentLevel + ". . .", 3500);
+            Console.Clear();
             StartLevel();
         }
 
