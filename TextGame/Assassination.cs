@@ -511,6 +511,7 @@ namespace TextGame
                     case 2:
                         Services.ScrollText("\"" + guard[input - 1] + "\"\n", 1000);
                         Services.ScrollText("Oh. Well, umm... fine. Make it fast.", 1000);
+                        _talkToGuard = true;
                         StageBack();
                         break;
                     case 3:

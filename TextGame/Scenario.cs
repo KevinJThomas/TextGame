@@ -124,6 +124,10 @@ namespace TextGame
                                 Item = _player.Bag.GetContents()[index];
                                 Target = Targets[input - 1];
                             }
+                            else
+                            {
+                                Services.ScrollText("Invalid target");
+                            }
                         }
                     }
                 }
