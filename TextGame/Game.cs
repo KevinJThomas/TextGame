@@ -9,7 +9,7 @@ namespace TextGame
     class Game
     {
         //Used for seeing whether the game is won or if the player should simply advance to the next level
-        public static int _totalNumberOfLevels = 4; //We will have to manually change this every time we add a new level
+        public static int _totalNumberOfLevels = 5; //We will have to manually change this every time we add a new level
 
         public int CurrentLevel { get; set; } //Keeps track of what level the game is on
 
@@ -95,6 +95,14 @@ namespace TextGame
             CheckSuccessful();
         }
 
+        public void PlayLevelFive()
+        {
+            Maze maze = new Maze(player);
+            maze.Start();
+
+            CheckSuccessful();
+        }
+
         //Advances the user to the next level
         public void Advance()
         {
@@ -133,6 +141,9 @@ namespace TextGame
                     break;
                 case 4:
                     PlayLevelFour();
+                    break;
+                case 5:
+                    PlayLevelFive();
                     break;
                 default:
                     Console.WriteLine("ERROR: Game.StartLevel(): Game.CurrentLevel OutOfBounds = {0}", CurrentLevel);

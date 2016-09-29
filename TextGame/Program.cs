@@ -10,7 +10,7 @@ namespace TextGame
     {
         static void Main(string[] args)
         {
-            Game myGame = new Game();
+            Game myGame = new Game(5);
             myGame.Intro();
         }
     }
