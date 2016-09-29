@@ -6,12 +6,17 @@ using System.Threading.Tasks;
 
 namespace TextGame
 {
+    //TODO: Make room 2. Currently only completed array of actions - need to fill in its function and create functions for its examines
     class Maze: Scenario
     {
         //Arrays of available commands for each area/person
         string[] roomOne = new string[] { "Examine Desk", "Examine Table", "Use West Door", "Use East Door" };
         string[] deskOne = new string[] { "Examine Notebook", "Examine Paper", "Leave the Desk" };
         string[] tableOne = new string[] { "Pick up Key and Sledge Hammer", "Leave the Table" };
+
+        string[] roomTwo = new string[] { "Use North Door", "Use East Door", "Use South Door" };
+
+        string[] roomThree = new string[] { "Examine Light Switch", "Examine Poster", "Use North Door", "Use East Door", "Use South Door" };
 
         //Descriptions for each area
         string roomDesc = "A perfectly square room with white floors, ceilings, and walls.";
@@ -120,6 +125,58 @@ namespace TextGame
         }
 
         public void RoomTwo()
+        {
+            Location = "a square room";
+            EnterArea(roomTwo, roomDesc, noTargets);
+
+            int input;
+            string decision = Console.ReadLine();
+
+            if (Int32.TryParse(decision, out input))
+            {
+                switch (input)
+                {
+                    case 1:
+                        Services.ScrollText("You walk through the north door.", 500);
+                        RoomSeven();
+                        break;
+                    case 2:
+                        Services.ScrollText("You walk through the east door.", 500);
+                        RoomOne();
+                        break;
+                    case 3:
+                        Services.ScrollText("You walk through the south door.", 500);
+                        RoomThree();
+                        break;
+                    default:
+                        Console.WriteLine("Invalid input. Please try again.");
+                        RoomTwo();
+                        break;
+                }
+            }
+            else
+            {
+                ExamineCommand(decision);
+                if (Item != null && Target != null)
+                {
+                    Services.ScrollText("It's not very effective.", 500);
+                    Item = null;
+                    Target = null;
+                    RoomTwo();
+                }
+                else
+                {
+                    RoomTwo();
+                }
+            }
+        }
+
+        public void RoomThree()
+        {
+
+        }
+
+        public void RoomSeven()
         {
 
         }
