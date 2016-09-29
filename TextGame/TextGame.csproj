@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="Assassination.cs" />
     <Compile Include="Bag.cs" />
+    <Compile Include="Bomb.cs" />
     <Compile Include="BurningBuilding.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Item.cs" />
