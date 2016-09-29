@@ -69,21 +69,9 @@ namespace TextGame
 
         public void PlayLevelOne()
         {
-            //We might want to put all of this into Scenario.BurningBuilding since it is specific to that scenario. It'll run either way for testing so it's
-            //not that important atm. I think this method (PlayLevelOne()) is going to end up being just a few lines of code.
-            string introText1 = "You awaken lying on the floor of an unfamiliar room. Smoke billows all around\nyou and alarms can be heard blaring nearby.";
-            string introText2 = "You stand up...";
-            string introText3 = "You quickly take in your surroundings. The only entrance to the room is a single metal door. Within the room there is a desk, a folding chair, a tall lamp, and a rug on the floor.";
-
-            //Anytime where you're repeating code a method usually will save you time/space
-            ScrollText(introText1, 2000);              
-            ScrollText(introText2, 2000);
-            ScrollText(introText3, 2000);
-
-            //If we're going to be making multiple scenarios each one should be its own subclass of scenario.cs otherwise scenario.cs will get HUGE cause it will contain
-            //the majority of the code for the entire game..if you don't know about parent/child classes I think kudvenkat has a vid on it
+            
             BurningBuilding burningBuilding = new BurningBuilding(player); 
-            burningBuilding.Start();
+            burningBuilding.deskChoice();
 
             //Maybe scenario.BurningBuilding() can return a boolean for whether the player beat the scenario?
             //If they passed, call Advance(). If not, GameOver()

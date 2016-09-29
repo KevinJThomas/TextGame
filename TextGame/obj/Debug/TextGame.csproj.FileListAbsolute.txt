@@ -4,3 +4,9 @@ C:\Users\kevint\Documents\Visual Studio 2015\Projects\TextGame\TextGame\obj\Debu
 C:\Users\kevint\Documents\Visual Studio 2015\Projects\TextGame\TextGame\bin\Debug\TextGame.exe
 C:\Users\kevint\Documents\Visual Studio 2015\Projects\TextGame\TextGame\bin\Debug\TextGame.pdb
 C:\Users\kevint\Documents\Visual Studio 2015\Projects\TextGame\TextGame\obj\Debug\TextGame.csprojResolveAssemblyReference.cache
+V:\Users\Matt\Documents\Visual Studio 2015\Projects\textgame\TextGame\TextGame\bin\Debug\TextGame.exe.config
+V:\Users\Matt\Documents\Visual Studio 2015\Projects\textgame\TextGame\TextGame\obj\Debug\TextGame.exe
+V:\Users\Matt\Documents\Visual Studio 2015\Projects\textgame\TextGame\TextGame\obj\Debug\TextGame.pdb
+V:\Users\Matt\Documents\Visual Studio 2015\Projects\textgame\TextGame\TextGame\bin\Debug\TextGame.exe
+V:\Users\Matt\Documents\Visual Studio 2015\Projects\textgame\TextGame\TextGame\bin\Debug\TextGame.pdb
+V:\Users\Matt\Documents\Visual Studio 2015\Projects\textgame\TextGame\TextGame\obj\Debug\TextGame.csprojResolveAssemblyReference.cache
