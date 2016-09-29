@@ -119,7 +119,7 @@ namespace TextGame
 
                         if (Int32.TryParse(decision, out input))
                         {
-                            if (Targets.Length <= input)
+                            if (Targets.Length >= input)
                             {
                                 Item = _player.Bag.GetContents()[index];
                                 Target = Targets[input - 1];
