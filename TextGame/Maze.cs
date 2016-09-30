@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TextGame
 {
-    class Maze: Scenario
+    class Maze : Scenario
     {
         //Arrays of available commands for each area/person
         string[] roomOne = new string[] { "Examine Desk", "Examine Table", "Use West Door", "Use East Door" };
