@@ -11,6 +11,8 @@ namespace TextGame
         //Used for seeing whether the game is won or if the player should simply advance to the next level
         public static int _totalNumberOfLevels = 5; //We will have to manually change this every time we add a new level
 
+        string[] passwords = new string[] { "skip2", "skip3", "skip4", "skip5" };
+
         public int CurrentLevel { get; set; } //Keeps track of what level the game is on
 
         Player player = new Player(""); //Since it is single player this object will always be the person playing
@@ -35,6 +37,17 @@ namespace TextGame
 
             Console.Write("> ");
             string name = Console.ReadLine();
+
+            int check = CheckForSkip(name);
+            
+            if (check != 0)
+            {
+                CurrentLevel = check;
+                Services.ScrollText("You have skipped to level " + CurrentLevel + "!", 500);
+                Services.ScrollText("But I do still need to know your name..");
+                Console.Write("> ");
+                name = Console.ReadLine();
+            }
 
             player.Name = name;
 
@@ -177,6 +190,28 @@ namespace TextGame
         {
             Services.ScrollText("You win!");
             Services.PlayAgain();
+        }
+
+        public int CheckForSkip(string skip)
+        {
+            bool found = false;
+            int index = 0;
+            foreach(string pass in passwords)
+            {
+                if (pass == skip)
+                {
+                    found = true;
+                    index = Array.IndexOf(passwords, pass);
+                }
+            }
+            if (found)
+            {
+                return index + 2;
+            }
+            else
+            {
+                return 0;
+            }
         }
     }
 }
