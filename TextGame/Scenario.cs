@@ -24,6 +24,7 @@ namespace TextGame
             Item = null;
         }
 
+        //CURRENTLY NOT USING THIS METHOD
         public void InspectBag()
         {
             try
@@ -53,7 +54,7 @@ namespace TextGame
         {
             Console.WriteLine("\nYou are currently in " + Location);
             Console.WriteLine("Other than selecting one of the listed options for your current location, you may also use:");
-            Console.WriteLine("bag - lists the items in your bag and allows you to use an item of your choice");
+            Console.WriteLine("bag - lists the items in your bag");
             Console.WriteLine("look - gives you a better idea of the environment that you're in");
             Console.WriteLine("use *item name* - attempts to use whatever item you specify (you will be asked for a target)\n");
         }
@@ -83,7 +84,7 @@ namespace TextGame
         {
             if (command.ToLower() == "bag")
             {
-                InspectBag();
+                _player.Bag.PrintBag();
             }
             else if (command.ToLower() == "help")
             {
@@ -108,25 +109,33 @@ namespace TextGame
 
                     if (found == true)
                     {
-                        Services.ScrollText("Who/what would you like to use " + _player.Bag.GetContents()[index].Name + " on?", 500);
-                        foreach (string target in Targets)
+                        if (_player.Bag.GetContents()[index].Name == "Map")
                         {
-                            Services.ScrollText((Array.IndexOf(Targets, target) + 1) + " - " + target);
+                            Item = _player.Bag.GetContents()[index];
+                            Target = "Map";
                         }
-
-                        int input;
-                        string decision = Console.ReadLine();
-
-                        if (Int32.TryParse(decision, out input))
+                        else
                         {
-                            if (Targets.Length >= input)
+                            Services.ScrollText("Who/what would you like to use " + _player.Bag.GetContents()[index].Name + " on?", 500);
+                            foreach (string target in Targets)
                             {
-                                Item = _player.Bag.GetContents()[index];
-                                Target = Targets[input - 1];
+                                Services.ScrollText((Array.IndexOf(Targets, target) + 1) + " - " + target);
                             }
-                            else
+
+                            int input;
+                            string decision = Console.ReadLine();
+
+                            if (Int32.TryParse(decision, out input))
                             {
-                                Services.ScrollText("Invalid target");
+                                if (Targets.Length >= input)
+                                {
+                                    Item = _player.Bag.GetContents()[index];
+                                    Target = Targets[input - 1];
+                                }
+                                else
+                                {
+                                    Services.ScrollText("Invalid target");
+                                }
                             }
                         }
                     }

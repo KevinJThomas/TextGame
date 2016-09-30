@@ -21,12 +21,20 @@ namespace TextGame
 
         public void PrintBag()
         {
-            Console.WriteLine("Your bag contains:");
-
-            foreach(Item item in items)
+            if (items.Count > 0)
             {
-                Console.WriteLine("{0}) {1}", items.IndexOf(item) + 1, item.Name);
+                Services.ScrollText("Your bag contains:");
+
+                foreach (Item item in items)
+                {
+                    Services.ScrollText(items.IndexOf(item) + 1 + ") " + item.Name);
+                }
             }
+            else
+            {
+                Services.ScrollText("Your bag is empty");
+            }
+            
         }
 
         public void Add(Item item)

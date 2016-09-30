@@ -42,7 +42,7 @@ namespace TextGame
             Services.ScrollText("You are in the middle of a large, perfectly circular room.", 1000);
             Services.ScrollText("You are standing on an aged marble floor, and there is no ceiling above you; it is only sky.", 500);
             Services.ScrollText("Looking around, you see 2 large wooden doors as your only way out.", 500);
-            Services.ScrollText("There is an old man with a long white beard sitting on a decorated chair in front of the door.", 500);
+            Services.ScrollText("There is an old man with a long white beard sitting on a decorated chair in front of the doors.", 500);
             Services.ScrollText("There are 6 benches around the circle, and there is an old man sitting on each one of these as well.", 500);
             Services.ScrollText("These men look similar to the first man you saw, except their beards aren't quite as long.", 500);
             Services.ScrollText("Hmm.. What is going on?!", 500);
