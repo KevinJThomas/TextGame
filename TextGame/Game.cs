@@ -75,11 +75,8 @@ namespace TextGame
             Services.ScrollText(introText1, 2000);
             Services.ScrollText(introText2, 2000);
             Services.ScrollText(introText3, 2000);
-
-            //If we're going to be making multiple scenarios each one should be its own subclass of scenario.cs otherwise scenario.cs will get HUGE cause it will contain
-            //the majority of the code for the entire game..if you don't know about parent/child classes I think kudvenkat has a vid on it
             BurningBuilding burningBuilding = new BurningBuilding(player); 
-            burningBuilding.Start();
+            burningBuilding.DeskChoices();
 
             CheckSuccessful();
         }
