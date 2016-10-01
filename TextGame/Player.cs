@@ -12,8 +12,7 @@ namespace TextGame
         public int Health { get; set; }
         public int Attack { get; set; } //not sure if we want these or if we'll do combat some other way?
         public int Defense { get; set; } //not sure if we want these or if we'll do combat some other way?
-
-        Bag bag = new Bag(); //This is where all of the player's items will be stored
+        public Bag Bag { get; set; }
 
         public Player(string name)
         {

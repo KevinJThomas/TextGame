@@ -8,7 +8,7 @@ namespace TextGame
 {
     class BurningBuilding : Scenario
     {
-        //Since this is a child class of Scenario, it will automatically have Location as a property - we don't have to write it again here
+        Item theChairLeg = new Item("Chair Leg");
 
         public BurningBuilding(Player player) : base(player)
         {
@@ -76,6 +76,7 @@ namespace TextGame
                         {
                             ScrollText(text7, 2000);
                             ScrollText(text8, 2000);
+                            _player.Add(theChairLeg);
                         }
 
                         RoomOne();
@@ -124,6 +125,7 @@ namespace TextGame
                         break;
                     case 2:
                         ScrollText(text4, 2000);
+                        DeskChoices();
                         break;
                     case 3:
                         ScrollText(text9, 2000);

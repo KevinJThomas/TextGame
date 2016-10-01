@@ -71,7 +71,7 @@ namespace TextGame
         {
             
             BurningBuilding burningBuilding = new BurningBuilding(player); 
-            burningBuilding.deskChoice();
+            burningBuilding.DeskChoices();
 
             //Maybe scenario.BurningBuilding() can return a boolean for whether the player beat the scenario?
             //If they passed, call Advance(). If not, GameOver()
