@@ -9,6 +9,11 @@ namespace TextGame
     class BurningBuilding : Scenario
     {
         Item theChairLeg = new Item("Chair Leg");
+        Item rug = new Item("rug");
+        string[] roomonetargets = new string[] { "door", "desk", "lamp", "chair" };
+        string[] room1 = new string[] { "Open door", "Examine desk", "Examine chair", "Examine lamp", "Examine rug" };
+
+        bool rugPickedUp = false;
 
         public BurningBuilding(Player player) : base(player)
         {
@@ -37,18 +42,10 @@ namespace TextGame
         public void RoomOne()
         {
             Location = "Room One";
-            Console.WriteLine(" ");
-            System.Threading.Thread.Sleep(2000);
-            Console.WriteLine("What would you like to do?");
-            Console.WriteLine(" ");
-            Console.WriteLine("1 - Open door");
-            Console.WriteLine("2 - Examine desk");
-            Console.WriteLine("3 - Examine chair");
-            Console.WriteLine("4 - Examine lamp");
-            Console.WriteLine("5 - Examine rug");
+            EnterArea(room1, "moo", roomonetargets);
 
             string text1 = "You grab the door handle, but it is too hot. You burn yourself.";
-            string text2 = "Upon closer examination you see that the desk has a drawer. There is a paper on the top of the desk.";
+            string text2 = "\nUpon closer examination you see that the desk has a drawer. There is a paper on the top of the desk.";
             string text5 = "The chair is a simple folding chair made of wood. One of the legs is damaged.";
             string text6 = "Try to break off the leg?\n Yes or No.";
             string text7 = "You stomp on the leg of the chair and break it off.";
@@ -87,7 +84,23 @@ namespace TextGame
                         RoomOne();
                         break;
                     case 5:
-                        Console.WriteLine("");
+                        if (rugPickedUp == false)
+                        {
+                            Services.ScrollText("It's a rug. Would you like to pick it up? Yes or No", 2000);
+                            string floorRug = Console.ReadLine().ToUpper();
+                            if (floorRug == "YES" || floorRug == "Y")
+                            {
+                                Services.ScrollText("The rug has been added to your bag", 2000);
+                                _player.Add(rug);
+                                rugPickedUp = true;
+                                room1 = new string[] { "Open door", "Examine desk", "Examine chair", "Examine lamp" };
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid input. Please try again.");
+                        }
+                        RoomOne();
                         break;
                     default:
                         Console.WriteLine("Invalid input. Please try again.");
@@ -99,8 +112,32 @@ namespace TextGame
 
             else
             {
-                Console.WriteLine("Invalid input. Please try again.");
-                RoomOne();
+                ExamineCommand(roomOne);
+                if (Item != null && Target != null)
+                {
+                    if (Item.Name == "rug")
+                    {
+                        if(Target == "door")
+                        {
+                            Services.ScrollText("HELLO WORLD");
+                        }
+                        else
+                        {
+                            Services.ScrollText("It's not very effective.", 500);
+                        }
+                    }
+                    else
+                    {
+                        Services.ScrollText("It's not very effective.", 500);
+                        Item = null;
+                        Target = null;
+                    }
+                    RoomOne();
+                }
+                else
+                {
+                    RoomOne();
+                }
             }                 
         }
 
@@ -131,6 +168,9 @@ namespace TextGame
                     case 3:
                         Services.ScrollText(text9, 2000);
                         RoomOne();
+                        break;
+                    default:
+                        DeskChoices();
                         break;
                 }
             }
