@@ -16,6 +16,9 @@ namespace TextGame
         string[] roomtwotargets = new string[] { "" };
         string[] room2 = new string[] { "" };
 
+        string[] desk1 = new string[] { "Examine paper", "Open drawer", "Nothing" };
+        string[] desktargets = new string[] { "" };
+
         bool rugPickedUp = false;
         bool chairLegpickup = false;
         bool papertaken = false;
@@ -73,17 +76,12 @@ namespace TextGame
                         {
                             Services.ScrollText(text10, 2000);
                         }
-                        else
-                        {
-                            DeskChoices();
-                        }
-                        
+
                         DeskChoices();
                         break;                                         
                     case 3:
                         if (chairLegpickup == false)
                         {
-
                             Services.ScrollText(text5, 2000);
                             Services.ScrollText(text6);
                             string chairLeg = Console.ReadLine().ToUpper();
@@ -93,7 +91,6 @@ namespace TextGame
                                 Services.ScrollText(text8, 2000);
                                 _player.Add(theChairLeg);
                                 chairLegpickup = true;
-                                
                             }
                         }
                         else
@@ -160,9 +157,9 @@ namespace TextGame
                     else
                     {
                         Services.ScrollText("It's not very effective.", 500);
-                        Item = null;
-                        Target = null;
                     }
+                    Item = null;
+                    Target = null;
                     RoomOne();
                 }
                 else
@@ -177,8 +174,6 @@ namespace TextGame
             string text3 = "There is a number of the paper. 1738993";
             string text4 = "The drawer is empty.";
             string text9 = "\nYou step away from the desk";
-            string[] desk1 = new string[] { "Examine paper", "Open drawer", "Nothing"};
-            string[] desktargets = new string[] { "" };
 
             if (papertaken == true)
             {
