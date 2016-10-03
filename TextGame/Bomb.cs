@@ -1,13 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Media;
+using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace TextGame
 {
     class Bomb : Scenario
     {
+        Thread introThread = new Thread(PlayIntro);
+        Thread musicThread = new Thread(PlayMusic);
+        Thread musicThread2 = new Thread(PlayMusic2);
+
         string[] rules = new string[] { "You must cut the wires in the correct order", "There are two ways to identify a wire: color and length",
             "You know there are 3 wires you have to cut", "There are one of each color and length (red, blue, green) (short, medium, long)",
             "The long wire is cut after the short wire", "The green wire is cut before the red wire", "The medium wire is cut before the blue wire",
@@ -16,16 +23,50 @@ namespace TextGame
         public Bomb(Player player) : base(player)
         {
             _player = player;
+            introThread.Start();
+        }
+
+        public static void PlayIntro()
+        {
+            Assembly assembly;
+            SoundPlayer sp;
+            assembly = Assembly.GetExecutingAssembly();
+            sp = new SoundPlayer(assembly.GetManifestResourceStream
+                ("TextGame.audio.crowd.wav"));
+            sp.Stream.Position = 0;
+            sp.Play();
+        }
+
+        public static void PlayMusic()
+        {
+            Assembly assembly;
+            SoundPlayer sp;
+            assembly = Assembly.GetExecutingAssembly();
+            sp = new SoundPlayer(assembly.GetManifestResourceStream
+                ("TextGame.audio.heartbeat-01.wav"));
+            sp.Stream.Position = 0;
+            sp.PlayLooping();
+        }
+
+        public static void PlayMusic2()
+        {
+            Assembly assembly;
+            SoundPlayer sp;
+            assembly = Assembly.GetExecutingAssembly();
+            sp = new SoundPlayer(assembly.GetManifestResourceStream
+                ("TextGame.audio.heartbeat-02.wav"));
+            sp.Stream.Position = 0;
+            sp.PlayLooping();
         }
 
         public void Start()
         {
-            Services.ScrollText("There is a bomb about to off in the middle of Manhattan", 500);
-            Services.ScrollText("You have beeing training in the bomb squad but have never dealt with a real threat on your own.", 500);
-            Services.ScrollText("Your mentor is out of town; this is your chance to shine.", 500);
+            Services.ScrollText("There is a bomb about to off in the middle of Manhattan", 1000);
+            Services.ScrollText("You have beeing training in the bomb squad but have never dealt with a real threat on your own.", 1000);
+            Services.ScrollText("Your mentor is out of town; this is your chance to shine.", 1000);
             Services.ScrollText("Now as long as you remember all your training, nothing will go wrong..", 1500);
-            Services.ScrollText("You enter the bank where the bomb is located and are escorted over to it.", 500);
-            Services.ScrollText("Everything you've learned in training is spiraling around your brain..");
+            Services.ScrollText("You enter the bank where the bomb is located and are escorted over to it.", 1000);
+            Services.ScrollText("Everything you've learned in training is spiraling around your brain..", 1000);
             Services.ScrollText("All you can remember is: ");
             PrintRules();
             DisableBomb();
@@ -33,9 +74,11 @@ namespace TextGame
 
         public void DisableBomb()
         {
-            if(WireOne())
+            musicThread.Start();
+            if (WireOne())
             {
-                if(WireTwo())
+                musicThread2.Start();
+                if (WireTwo())
                 {
                     if(WireThree())
                     {

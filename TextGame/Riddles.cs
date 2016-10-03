@@ -1,13 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Media;
+using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace TextGame
 {
     class Riddles : Scenario
     {
+        Thread musicThread = new Thread(PlayMusic);
+
         //Riddles
         string _riddle1 = "I have a heart that never beats, I have a home but I never sleep. I can take a mans house and build anothers, "
             + "And I love to play games with my many brothers. I am a king among fools. Who am I?";
@@ -35,6 +40,18 @@ namespace TextGame
         public Riddles(Player player) : base(player)
         {
             _player = player;
+            musicThread.Start();
+        }
+
+        public static void PlayMusic()
+        {
+            Assembly assembly;
+            SoundPlayer sp;
+            assembly = Assembly.GetExecutingAssembly();
+            sp = new SoundPlayer(assembly.GetManifestResourceStream
+                ("TextGame.audio.night.wav"));
+            sp.Stream.Position = 0;
+            sp.PlayLooping();
         }
 
         public void Start()

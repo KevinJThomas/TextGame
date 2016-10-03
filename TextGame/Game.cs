@@ -1,15 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Media;
+using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace TextGame
 {
     class Game
     {
+        Thread musicThread = new Thread(PlayIntro);
+
         //Used for seeing whether the game is won or if the player should simply advance to the next level
-        public static int _totalNumberOfLevels = 5; //We will have to manually change this every time we add a new level
+        public static int _totalNumberOfLevels = 6; //We will have to manually change this every time we add a new level
 
         string[] passwords = new string[] { "skip2", "skip3", "skip4", "skip5" };
 
@@ -24,8 +29,20 @@ namespace TextGame
             CurrentLevel = currentLevel;
         }
 
+        public static void PlayIntro()
+        {
+            Assembly assembly;
+            SoundPlayer sp;
+            assembly = Assembly.GetExecutingAssembly();
+            sp = new SoundPlayer(assembly.GetManifestResourceStream
+                ("TextGame.audio.intro.wav"));
+            sp.Stream.Position = 0;
+            sp.Play();
+        }
+
         public void Intro()
         {
+            musicThread.Start();
             string text1 = "Welcome to 'w/e the game name is'!";
             string text2 = "You are about to start out on a string of wild and bizarre adventures.";
             string text3 = "But first... What is your name?";
@@ -103,6 +120,14 @@ namespace TextGame
             CheckSuccessful();
         }
 
+        public void PlayLevelSix()
+        {
+            Haunted haunted = new Haunted(player);
+            haunted.Start();
+
+            CheckSuccessful();
+        }
+
         //Advances the user to the next level
         public void Advance()
         {
@@ -144,6 +169,9 @@ namespace TextGame
                     break;
                 case 5:
                     PlayLevelFive();
+                    break;
+                case 6:
+                    PlayLevelSix();
                     break;
                 default:
                     Console.WriteLine("ERROR: Game.StartLevel(): Game.CurrentLevel OutOfBounds = {0}", CurrentLevel);

@@ -48,6 +48,7 @@
     <Compile Include="Bomb.cs" />
     <Compile Include="BurningBuilding.cs" />
     <Compile Include="Game.cs" />
+    <Compile Include="Haunted.cs" />
     <Compile Include="Item.cs" />
     <Compile Include="Maze.cs" />
     <Compile Include="Player.cs" />
@@ -59,6 +60,25 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="audio\night.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="audio\intro.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="audio\heartbeat-01.wav" />
+    <EmbeddedResource Include="audio\heartbeat-02.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="audio\siren.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="audio\crowd.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="audio\creepyMusic.wav" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
