@@ -141,26 +141,28 @@ namespace TextGame
                         if(Target == "door")
                         {
                             Services.ScrollText("You use the rug to shield your hand from the heat as you open the door.");
+                            Services.ScrollText("You step through the door into the next room.");
                             RoomTwo();
                         }
                         else if (Target == "lamp")
                         {
                             Services.ScrollText("You shouldn't do that. You're trying to escape, not start more fires.");
+                            RoomOne();
                         }
                         else
                         {
                             Services.ScrollText("It's not very effective.", 500);
+                            RoomOne();
                         }
 
                     }
-
                     else
                     {
                         Services.ScrollText("It's not very effective.", 500);
+                        RoomOne();
                     }
                     Item = null;
                     Target = null;
-                    RoomOne();
                 }
                 else
                 {
@@ -246,7 +248,7 @@ namespace TextGame
             Location = "Room Two";
             EnterArea(room2, "A room.", roomtwotargets);
 
-            Services.ScrollText("You step through the door into the next room.");
+            
             Services.ScrollText("This room contains a ");
         }
     }
