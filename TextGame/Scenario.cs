@@ -80,6 +80,20 @@ namespace TextGame
             Console.WriteLine();
         }
 
+        public void EnterObject(string[] options, string desc, string[] targets)
+        {
+            Description = desc;
+            Targets = targets;
+            Services.ScrollText("What would you like to do?\n");
+
+            foreach (string option in options)
+            {
+                Services.ScrollText((Array.IndexOf(options, option) + 1) + ") " + option);
+            }
+            Console.WriteLine();
+        }
+
+
         public void ExamineCommand(string command)
         {
             if (command.ToLower() == "bag")
@@ -113,6 +127,12 @@ namespace TextGame
                         {
                             Item = _player.Bag.GetContents()[index];
                             Target = "Map";
+                        }
+                        else if (_player.Bag.GetContents()[index].Name == "Paper")
+                        {
+                            Console.WriteLine("\n");
+                            Services.ScrollText("1738993", 1000);
+                            Target = "Paper";
                         }
                         else
                         {

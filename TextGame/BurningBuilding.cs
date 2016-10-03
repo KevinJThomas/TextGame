@@ -10,10 +10,15 @@ namespace TextGame
     {
         Item theChairLeg = new Item("Chair Leg");
         Item rug = new Item("rug");
+        Item deskPaper = new Item("Paper");
         string[] roomonetargets = new string[] { "door", "desk", "lamp", "chair" };
         string[] room1 = new string[] { "Open door", "Examine desk", "Examine chair", "Examine lamp", "Examine rug" };
+        string[] roomtwotargets = new string[] { "" };
+        string[] room2 = new string[] { "" };
 
         bool rugPickedUp = false;
+        bool chairLegpickup = false;
+        bool papertaken = false;
 
         public BurningBuilding(Player player) : base(player)
         {
@@ -25,9 +30,9 @@ namespace TextGame
             
             string introText1 = "You awaken lying on the floor of an unfamiliar room. Smoke billows all around\nyou and alarms can be heard blaring nearby.";
             string introText2 = "You stand up...";
-            string introText3 = "You quickly take in your surroundings. The only entrance to the room is a single metal door. Within the room there is a desk, a folding chair, a lamp, and a rug on the floor.";
+            string introText3 = "You quickly take in your surroundings. The only entrance to the room is a single metal door. Within the room there is a desk, a chair, a lamp, and a rug on the floor.";
 
-            //Anytime where you're repeating code a method usually will save you time/space
+            
             Services.ScrollText(introText1, 2000);
             Console.WriteLine("\n");
             Services.ScrollText(introText2, 2000);
@@ -35,21 +40,21 @@ namespace TextGame
             Services.ScrollText(introText3, 2000);
             RoomOne();
 
-            //If we're going to be making multiple scenarios each one should be its own subclass of scenario.cs otherwise scenario.cs will get HUGE cause it will contain
-            //the majority of the code for the entire game..if you don't know about parent/child classes I think kudvenkat has a vid on it
+
         }
 
         public void RoomOne()
         {
             Location = "Room One";
-            EnterArea(room1, "moo", roomonetargets);
+            EnterArea(room1, "A small room with some furniture in it.", roomonetargets);
 
             string text1 = "You grab the door handle, but it is too hot. You burn yourself.";
-            string text2 = "\nUpon closer examination you see that the desk has a drawer. There is a paper on the top of the desk.";
-            string text5 = "The chair is a simple folding chair made of wood. One of the legs is damaged.";
+            string text2 = "\nUpon closer examination you see that the desk has a drawer.";
+            string text5 = "It's a simple chair made of wood. One of the legs is damaged.";
             string text6 = "Try to break off the leg?\n Yes or No.";
             string text7 = "You stomp on the leg of the chair and break it off.";
             string text8 = "Chair Leg has been added to your bag.";
+            string text10 = "There is a paper on the top of the desk.";
             int decisionOne;
             string roomOne = Console.ReadLine();
 
@@ -64,17 +69,36 @@ namespace TextGame
                         break;
                     case 2:
                         Services.ScrollText(text2, 2000);
+                        if (papertaken == false)
+                        {
+                            Services.ScrollText(text10, 2000);
+                        }
+                        else
+                        {
+                            DeskChoices();
+                        }
+                        
                         DeskChoices();
                         break;                                         
                     case 3:
-                        Services.ScrollText(text5, 2000);
-                        Services.ScrollText(text6, 2000);
-                        string chairLeg = Console.ReadLine().ToUpper();
-                        if (chairLeg == "YES" || chairLeg == "Y")
+                        if (chairLegpickup == false)
                         {
-                            Services.ScrollText(text7, 2000);
-                            Services.ScrollText(text8, 2000);
-                            _player.Add(theChairLeg);
+
+                            Services.ScrollText(text5, 2000);
+                            Services.ScrollText(text6);
+                            string chairLeg = Console.ReadLine().ToUpper();
+                            if (chairLeg == "YES" || chairLeg == "Y")
+                            {
+                                Services.ScrollText(text7, 2000);
+                                Services.ScrollText(text8, 2000);
+                                _player.Add(theChairLeg);
+                                chairLegpickup = true;
+                                
+                            }
+                        }
+                        else
+                        {
+                            Services.ScrollText("It's a simple wooden chair. One of the legs has been broken off.");
                         }
 
                         RoomOne();
@@ -86,7 +110,7 @@ namespace TextGame
                     case 5:
                         if (rugPickedUp == false)
                         {
-                            Services.ScrollText("It's a rug. Would you like to pick it up? Yes or No", 2000);
+                            Services.ScrollText("It's a rug. Would you like to pick it up? Yes or No");
                             string floorRug = Console.ReadLine().ToUpper();
                             if (floorRug == "YES" || floorRug == "Y")
                             {
@@ -119,13 +143,20 @@ namespace TextGame
                     {
                         if(Target == "door")
                         {
-                            Services.ScrollText("HELLO WORLD");
+                            Services.ScrollText("You use the rug to shield your hand from the heat as you open the door.");
+                            RoomTwo();
+                        }
+                        else if (Target == "lamp")
+                        {
+                            Services.ScrollText("You shouldn't do that. You're trying to escape, not start more fires.");
                         }
                         else
                         {
                             Services.ScrollText("It's not very effective.", 500);
                         }
+
                     }
+
                     else
                     {
                         Services.ScrollText("It's not very effective.", 500);
@@ -146,11 +177,17 @@ namespace TextGame
             string text3 = "There is a number of the paper. 1738993";
             string text4 = "The drawer is empty.";
             string text9 = "\nYou step away from the desk";
+            string[] desk1 = new string[] { "Examine paper", "Open drawer", "Nothing"};
+            string[] desktargets = new string[] { "" };
+
+            if (papertaken == true)
+            {
+                desk1 = new string[] { "Open drawer", "Nothing" };
+            }
+            
             Console.WriteLine("\n");
-            Console.WriteLine("What would you like to do?\n");
-            Console.WriteLine("1 - Examine paper");
-            Console.WriteLine("2 - Open drawer");
-            Console.WriteLine("3 - Nothing");
+            EnterObject(desk1, "A desk with a single drawer.", desktargets);
+
             string deskChoice = Console.ReadLine();
             int deskDecision;
             if (Int32.TryParse(deskChoice, out deskDecision))
@@ -158,22 +195,64 @@ namespace TextGame
                 switch (deskDecision)
                 {
                     case 1:
-                        Services.ScrollText(text3, 2000);
+                        if (papertaken == false)
+                        {
+                            Services.ScrollText(text3, 2000);
+                            Services.ScrollText("Take the paper? Yes or no.");
+                            string takePaper = Console.ReadLine().ToUpper();
+                            if (takePaper == "YES" || takePaper == "Y")
+                            {
+                                _player.Add(deskPaper);
+                                Services.ScrollText("Paper has been added to your bag.");
+                                papertaken = true;
+                            }
+                        }
+                        else
+                        {
+                            Services.ScrollText(text4, 2000);
+                            DeskChoices();
+                        }
+
+                             
                         DeskChoices();
                         break;
                     case 2:
-                        Services.ScrollText(text4, 2000);
-                        DeskChoices();
+                        if (papertaken == false)
+                        {
+                            Services.ScrollText(text4, 2000);
+                            DeskChoices();
+                        }
+                        else
+                        {
+                            Services.ScrollText(text9, 2000);
+                            RoomOne();
+                        }
                         break;
                     case 3:
-                        Services.ScrollText(text9, 2000);
-                        RoomOne();
+                        if (papertaken == false)
+                        {
+                            Services.ScrollText(text9, 2000);
+                            RoomOne();
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid input. Please try again.");
+                        }
                         break;
                     default:
                         DeskChoices();
                         break;
                 }
             }
+        }
+
+        public void RoomTwo()
+        {
+            Location = "Room Two";
+            EnterArea(room2, "A room.", roomtwotargets);
+
+            Services.ScrollText("You step through the door into the next room.");
+            Services.ScrollText("This room contains a ");
         }
     }
 }
