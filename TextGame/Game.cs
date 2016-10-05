@@ -16,7 +16,7 @@ namespace TextGame
         //Used for seeing whether the game is won or if the player should simply advance to the next level
         public static int _totalNumberOfLevels = 6; //We will have to manually change this every time we add a new level
 
-        string[] passwords = new string[] { "skip2", "skip3", "skip4", "skip5" };
+        string[] passwords = new string[] { "skip2", "skip3", "skip4", "skip5", "skip6" };
 
         public int CurrentLevel { get; set; } //Keeps track of what level the game is on
 
@@ -42,7 +42,7 @@ namespace TextGame
 
         public void Intro()
         {
-            musicThread.Start();
+            //musicThread.Start();
             string text1 = "Welcome to 'w/e the game name is'!";
             string text2 = "You are about to start out on a string of wild and bizarre adventures.";
             string text3 = "But first... What is your name?";

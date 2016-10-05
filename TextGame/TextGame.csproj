@@ -78,7 +78,13 @@
     <EmbeddedResource Include="audio\crowd.wav" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="audio\creepyMusic.wav" />
+    <EmbeddedResource Include="audio\eerieMusic.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="audio\drums.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="audio\elevatorMusic.wav" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

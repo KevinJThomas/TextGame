@@ -1,13 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Media;
+using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace TextGame
 {
     class Assassination : Scenario
     {
+        Thread musicThread = new Thread(PlayMusic);
+
         bool _talkToGuard = false;
         int _timer = 50;
 
@@ -48,6 +53,18 @@ namespace TextGame
             _player = player;
             List<Item> items = new List<Item>() { gun, knife, twine };
             _player.Bag.Add(items);
+            musicThread.Start();
+        }
+
+        public static void PlayMusic()
+        {
+            Assembly assembly;
+            SoundPlayer sp;
+            assembly = Assembly.GetExecutingAssembly();
+            sp = new SoundPlayer(assembly.GetManifestResourceStream
+                ("TextGame.audio.drums.wav"));
+            sp.Stream.Position = 0;
+            sp.PlayLooping();
         }
 
         public void Start()

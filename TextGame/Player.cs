@@ -18,7 +18,7 @@ namespace TextGame
         public Player(string name)
         {
             Name = name;
-            Health = 10;
+            Health = 100;
 
             LevelCompleted = false;
 

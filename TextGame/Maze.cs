@@ -1,13 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Media;
+using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace TextGame
 {
     class Maze : Scenario
     {
+        Thread musicThread = new Thread(PlayMusic);
+
         //Arrays of available commands for each area/person
         string[] roomOne = new string[] { "Examine Desk", "Examine Table", "Use West Door", "Use East Door" };
         string[] deskOne = new string[] { "Examine Notebook", "Examine Paper", "Leave the Desk" };
@@ -75,6 +80,18 @@ namespace TextGame
         {
             _player = player;
             _player.Bag.Add(map);
+            musicThread.Start();
+        }
+
+        public static void PlayMusic()
+        {
+            Assembly assembly;
+            SoundPlayer sp;
+            assembly = Assembly.GetExecutingAssembly();
+            sp = new SoundPlayer(assembly.GetManifestResourceStream
+                ("TextGame.audio.elevatorMusic.wav"));
+            sp.Stream.Position = 0;
+            sp.PlayLooping();
         }
 
         public void Start()

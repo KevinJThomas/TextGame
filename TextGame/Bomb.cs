@@ -74,7 +74,6 @@ namespace TextGame
 
         public void DisableBomb()
         {
-            musicThread.Start();
             if (WireOne())
             {
                 musicThread2.Start();
@@ -91,6 +90,7 @@ namespace TextGame
         public bool WireOne()
         {
             Services.ScrollText("Enter the wire you would like to cut, starting with the length (ex: 'tiny purple')");
+            musicThread.Start();
             string answer = Console.ReadLine();
             if(CheckAnswer(answer, "medium green"))
             {
