@@ -123,7 +123,7 @@ namespace TextGame
         public void PlayLevelSix()
         {
             Haunted haunted = new Haunted(player);
-            haunted.Start();
+            haunted.Bedroom();
 
             CheckSuccessful();
         }
