@@ -10,8 +10,12 @@ namespace TextGame
     {
         static void Main(string[] args)
         {
-            Game myGame = new Game(6);
-            myGame.Intro();
+            //Game myGame = new Game(7);
+            //myGame.Intro();
+
+            Player player = new Player("Kevin");
+            War war = new War(player);
+            war.PlayTurn();
         }
     }
 }

@@ -12,9 +12,9 @@ namespace TextGame
     class Game
     {
         //Used for seeing whether the game is won or if the player should simply advance to the next level
-        public static int _totalNumberOfLevels = 6; //We will have to manually change this every time we add a new level
+        public static int _totalNumberOfLevels = 7; //We will have to manually change this every time we add a new level
 
-        string[] passwords = new string[] { "skip2", "skip3", "skip4", "skip5", "skip6" };
+        string[] passwords = new string[] { "skip2", "skip3", "skip4", "skip5", "skip6", "skip7" };
 
         public int CurrentLevel { get; set; } //Keeps track of what level the game is on
 
@@ -102,7 +102,15 @@ namespace TextGame
         public void PlayLevelSix()
         {
             Haunted haunted = new Haunted(player);
-            haunted.Bedroom();
+            haunted.Start();
+
+            CheckSuccessful();
+        }
+
+        public void PlayLevelSeven()
+        {
+            War war = new War(player);
+            war.Start();
 
             CheckSuccessful();
         }
@@ -149,6 +157,9 @@ namespace TextGame
                     break;
                 case 6:
                     PlayLevelSix();
+                    break;
+                case 7:
+                    PlayLevelSeven();
                     break;
                 default:
                     Console.WriteLine("ERROR: Game.StartLevel(): Game.CurrentLevel OutOfBounds = {0}", CurrentLevel);

@@ -58,6 +58,8 @@
     <Compile Include="Riddles.cs" />
     <Compile Include="Scenario.cs" />
     <Compile Include="Services.cs" />
+    <Compile Include="Unit.cs" />
+    <Compile Include="War.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -66,14 +68,8 @@
     <EmbeddedResource Include="audio\night.wav" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="audio\intro.wav" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="audio\heartbeat-01.wav" />
     <EmbeddedResource Include="audio\heartbeat-02.wav" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="audio\siren.wav" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="audio\crowd.wav" />
