@@ -13,6 +13,7 @@ namespace TextGame
         public int Type { get; set; } //1: Infantry 2: Archer 3: Cavalier -- Use enum?
 
         bool _hasShield = false;
+        bool _hasArmor = false;
 
         public Unit (int type)
         {
@@ -103,6 +104,26 @@ namespace TextGame
             else
             {
                 Services.ScrollText("ERROR: Attempting to add javelin to non cavalier is prohibited.");
+            }
+        }
+
+        public void AddLeatherArmor()
+        {
+            if (Type == 2)
+            {
+                if (_hasArmor)
+                { 
+                    Health += 3;
+                    _hasArmor = true;
+                }
+                else
+                {
+                    Services.ScrollText("That unit already has armor!");
+                }
+            }
+            else
+            {
+                Services.ScrollText("ERROR: Attempting to add armor to non archer is prohibited.");
             }
         }
     }

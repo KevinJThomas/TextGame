@@ -9,11 +9,33 @@ using System.Threading.Tasks;
 
 namespace TextGame
 {
+    //1) Instead of using switch statements in ShopArcher(), ShopInfantry(), etc.. maybe just do something like Purchase(int type, string name) where type refers
+    //to the type of unit to not get things like 'shield' confused with different types of units that can all receive a shield
+    //2) Find new music
+    //TBD:
+    //1) Receive currency at beginning or end of turn?
+    //2) Queue up all moves and execute at end of turn or perform them immediately 1 by 1 as they're made?
+    //3) Add more units/upgrades/items?
+    //4) Give currency based on how many spaces occupied, how many spaces controlled, how many units? Probably a combination?
+    //5) Give AI currency advantage since it will be stupid?
+    //6) Give AI different unit types or use same as player?
+    //7) Win condition when one player no longer controls any units, or should there be a target 'king' unit to kill like chess?
+    //8) Good idea to add 'terrain' where there is advantage on high ground or some units gain stats in certain terrain?
+    //9) Enemy turn instantly execute to make faster gameplay or should it be slower so the player can keep up with what's happening?
     class War : Scenario
     {
         Thread musicThread = new Thread(PlayMusic);
 
-        string[] shopTypes = new string[] { "Infantry", "Archer", "Cavalier" };
+        string[] shopTypes = new string[] { "Infantry", "Archer", "Cavalier", "Other" };
+        string[] shopInfantry = new string[] { "New Infantry", "Weapon Upgrade", "Shield" };
+        string[] shopArcher = new string[] { "New Archer", "Weapon Upgrade", "Armor Upgrade" };
+        string[] shopCavalier = new string[] { "New Cavalier", "Weapon Upgrade", "Shield" };
+        string[] shopOther = new string[] { "Arrow Shield" };
+
+        int[] priceInfantry = new int[] { 250, 200, 250 };
+        int[] priceArcher = new int[] { 350, 450, 250 };
+        int[] priceCavalier = new int[] { 700, 1000, 350 };
+        int[] priceOther = new int[] { 1000 };
 
         //ally units
         List<Unit> allyUnits1 = new List<Unit>();
@@ -95,22 +117,22 @@ namespace TextGame
         public void PrintMap()
         {
             Console.WriteLine("E = Enemy, A = Ally\n");
-            Console.WriteLine("____________________________________________________");
-            Console.WriteLine("| E: " + enemyUnits1.Count + "         1 | E: " + enemyUnits2.Count + "         2 | E: " + enemyUnits3.Count + "          3 |");
+            Console.WriteLine(" ___________________________________________________");
+            Console.WriteLine("| E: " + enemyUnits1.Count.ToString("00") + "        1 | E: " + enemyUnits2.Count.ToString("00") + "        2 | E: " + enemyUnits3.Count.ToString("00") + "         3 |");
             Console.WriteLine("|                |                |                 |");
-            Console.WriteLine("| A: " + allyUnits1.Count + "           | A: " + allyUnits2.Count + "           | A: " + allyUnits3.Count + "            |");
+            Console.WriteLine("| A: " + allyUnits1.Count.ToString("00") + "          | A: " + allyUnits2.Count.ToString("00") + "          | A: " + allyUnits3.Count.ToString("00") + "           |");
             Console.WriteLine("|________________|________________|_________________|");
-            Console.WriteLine("| E: " + enemyUnits4.Count + "         4 | E: " + enemyUnits5.Count + "         5 | E: " + enemyUnits6.Count + "          6 |");
+            Console.WriteLine("| E: " + enemyUnits4.Count.ToString("00") + "        4 | E: " + enemyUnits5.Count.ToString("00") + "        5 | E: " + enemyUnits6.Count.ToString("00") + "         6 |");
             Console.WriteLine("|                |                |                 |");
-            Console.WriteLine("| A: " + allyUnits4.Count + "           | A: " + allyUnits5.Count + "           | A: " + allyUnits6.Count + "            |");
+            Console.WriteLine("| A: " + allyUnits4.Count.ToString("00") + "          | A: " + allyUnits5.Count.ToString("00") + "          | A: " + allyUnits6.Count.ToString("00") + "           |");
             Console.WriteLine("|________________|________________|_________________|");
-            Console.WriteLine("| E: " + enemyUnits7.Count + "         7 | E: " + enemyUnits8.Count + "         8 | E: " + enemyUnits9.Count + "          9 |");
+            Console.WriteLine("| E: " + enemyUnits7.Count.ToString("00") + "        7 | E: " + enemyUnits8.Count.ToString("00") + "        8 | E: " + enemyUnits9.Count.ToString("00") + "         9 |");
             Console.WriteLine("|                |                |                 |");
-            Console.WriteLine("| A: " + allyUnits7.Count + "           | A: " + allyUnits8.Count + "           | A: " + allyUnits9.Count + "            |");
+            Console.WriteLine("| A: " + allyUnits7.Count.ToString("00") + "          | A: " + allyUnits8.Count.ToString("00") + "          | A: " + allyUnits9.Count.ToString("00") + "           |");
             Console.WriteLine("|________________|________________|_________________|");
-            Console.WriteLine("| E: " + enemyUnits10.Count + "        10 | E: " + enemyUnits11.Count + "        11 | E: " + enemyUnits12.Count + "         12 |");
+            Console.WriteLine("| E: " + enemyUnits10.Count.ToString("00") + "       10 | E: " + enemyUnits11.Count.ToString("00") + "       11 | E: " + enemyUnits12.Count.ToString("00") + "        12 |");
             Console.WriteLine("|                |                |                 |");
-            Console.WriteLine("| A: " + allyUnits10.Count + "           | A: " + allyUnits11.Count + "           | A: " + allyUnits12.Count + "            |");
+            Console.WriteLine("| A: " + allyUnits10.Count.ToString("00") + "          | A: " + allyUnits11.Count.ToString("00") + "          | A: " + allyUnits12.Count.ToString("00") + "           |");
             Console.WriteLine("|________________|________________|_________________|\n");
         }
 
@@ -146,7 +168,7 @@ namespace TextGame
                 switch (cmd)
                 {
                     case "count":
-                        Services.ScrollText("Ally units: " + currentUnits[0].Count + "\nEnemy units: " + currentUnits[1].Count, 500);
+                        Services.ScrollText("Ally units: " + CountAllyUnits() + "\nEnemy units: " + CountEnemyUnits() + "\n");
                         Listen();
                         break;
                     case "shop":
@@ -178,7 +200,7 @@ namespace TextGame
                 switch (cmd)
                 {
                     case "count":
-                        Services.ScrollText("Ally units: " + CountAllyUnits() + "\nEnemy units: " + CountEnemyUnits(), 500);
+                        Services.ScrollText("Ally units: " + currentUnits[0].Count + "\nEnemy units: " + currentUnits[1].Count + "\n");
                         Listen();
                         break;
                     case "map":
@@ -187,6 +209,10 @@ namespace TextGame
                         break;
                     case "end turn":
                         EnemyTurn();
+                        break;
+                    case "zoom":
+                        ZoomOut();
+                        Listen();
                         break;
                     default:
                         Services.ScrollText("Invalid input. Try again.", 500);
@@ -223,6 +249,9 @@ namespace TextGame
                         case "Cavalier":
                             ShopCavalier();
                             break;
+                        case "Other":
+                            ShopOther();
+                            break;
                         default:
                             Services.ScrollText("Invalid input. Try again.");
                             Shop();
@@ -243,17 +272,192 @@ namespace TextGame
 
         public void ShopInfantry()
         {
-            //TODO
+            Console.WriteLine("Your Currency: $" + _playerCurrency + "\n");
+            foreach (string item in shopInfantry)
+            {
+                Console.WriteLine((Array.IndexOf(shopInfantry, item) + 1) + ") " + item);
+            }
+            Console.WriteLine();
+
+            int decision;
+            string cmd = Console.ReadLine();
+
+            if (Int32.TryParse(cmd, out decision))
+            {
+                if (decision >= 1 && decision <= shopInfantry.Length)
+                {
+                    switch (shopInfantry[decision - 1])
+                    {
+                        case "New Infantry":
+                            //TODO
+                            break;
+                        case "Weapon Upgrade":
+                            //TODO
+                            break;
+                        case "Shield":
+                            //TODO
+                            break;
+                        default:
+                            Services.ScrollText("Invalid input. Try again.");
+                            ShopInfantry();
+                            break;
+                    }
+                }
+            }
+            else if (cmd == "exit")
+            {
+                Listen();
+            }
+            else if (cmd == "back")
+            {
+                Shop();
+            }
+            else
+            {
+                Services.ScrollText("Invalid input. Try again.");
+                ShopInfantry();
+            }
         }
 
         public void ShopArcher()
         {
-            //TODO
+            Console.WriteLine("Your Currency: $" + _playerCurrency + "\n");
+            foreach (string item in shopArcher)
+            {
+                Console.WriteLine((Array.IndexOf(shopArcher, item) + 1) + ") " + item);
+            }
+            Console.WriteLine();
+
+            int decision;
+            string cmd = Console.ReadLine();
+
+            if (Int32.TryParse(cmd, out decision))
+            {
+                if (decision >= 1 && decision <= shopArcher.Length)
+                {
+                    switch (shopArcher[decision - 1])
+                    {
+                        case "New Archer":
+                            //TODO
+                            break;
+                        case "Weapon Upgrade":
+                            //TODO
+                            break;
+                        case "Armor Upgrade":
+                            //TODO
+                            break;
+                        default:
+                            Services.ScrollText("Invalid input. Try again.");
+                            ShopArcher();
+                            break;
+                    }
+                }
+            }
+            else if (cmd == "exit")
+            {
+                Listen();
+            }
+            else if (cmd == "back")
+            {
+                Shop();
+            }
+            else
+            {
+                Services.ScrollText("Invalid input. Try again.");
+                ShopArcher();
+            }
         }
 
         public void ShopCavalier()
         {
-            //TODO
+            Console.WriteLine("Your Currency: $" + _playerCurrency + "\n");
+            foreach (string item in shopCavalier)
+            {
+                Console.WriteLine((Array.IndexOf(shopCavalier, item) + 1) + ") " + item);
+            }
+            Console.WriteLine();
+
+            int decision;
+            string cmd = Console.ReadLine();
+
+            if (Int32.TryParse(cmd, out decision))
+            {
+                if (decision >= 1 && decision <= shopCavalier.Length)
+                {
+                    switch (shopCavalier[decision - 1])
+                    {
+                        case "New Cavalier":
+                            //TODO
+                            break;
+                        case "Weapon Upgrade":
+                            //TODO
+                            break;
+                        case "Shield":
+                            //TODO
+                            break;
+                        default:
+                            Services.ScrollText("Invalid input. Try again.");
+                            ShopCavalier();
+                            break;
+                    }
+                }
+            }
+            else if (cmd == "exit")
+            {
+                Listen();
+            }
+            else if (cmd == "back")
+            {
+                Shop();
+            }
+            else
+            {
+                Services.ScrollText("Invalid input. Try again.");
+                ShopCavalier();
+            }
+        }
+
+        public void ShopOther()
+        {
+            Console.WriteLine("Your Currency: $" + _playerCurrency + "\n");
+            foreach (string item in shopOther)
+            {
+                Console.WriteLine((Array.IndexOf(shopOther, item) + 1) + ") " + item);
+            }
+            Console.WriteLine();
+
+            int decision;
+            string cmd = Console.ReadLine();
+
+            if (Int32.TryParse(cmd, out decision))
+            {
+                if (decision >= 1 && decision <= shopOther.Length)
+                {
+                    switch (shopOther[decision - 1])
+                    {
+                        case "Arrow Shield":
+                            //TODO
+                            break;
+                        default:
+                            Services.ScrollText("Invalid input. Try again.");
+                            ShopOther();
+                            break;
+                    }
+                }
+            }
+            else if (cmd == "exit")
+            {
+                Listen();
+            }
+            else if (cmd == "back")
+            {
+                Shop();
+            }
+            else
+            {
+                Services.ScrollText("Invalid input. Try again.");
+                ShopOther();
+            }
         }
 
         public void HelpZoomedOut()
@@ -283,7 +487,6 @@ namespace TextGame
 
         public void ZoomOut()
         {
-            //TODO
             currentUnits.Clear();
             _zoomedLocation = 0;
             _zoomed = false;
