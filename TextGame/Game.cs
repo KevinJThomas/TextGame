@@ -41,16 +41,10 @@ namespace TextGame
         }
 
         public void Intro()
-        {
-            //musicThread.Start();
-            string text1 = "Welcome to 'w/e the game name is'!";
-            string text2 = "You are about to start out on a string of wild and bizarre adventures.";
-            string text3 = "But first... What is your name?";
-            string text5 = "I won't keep you here any longer... Your first adventure starts now!";
-            
-            Services.ScrollText(text1, 1500);
-            Services.ScrollText(text2, 1500);
-            Services.ScrollText(text3);
+        {            
+            Services.ScrollText("Welcome to the Impossible Game!", 1500);
+            Services.ScrollText("You are about to start out on a string of wild and bizarre adventures.", 1500);
+            Services.ScrollText("But first... What is your name?");
 
             Console.Write("> ");
             string name = Console.ReadLine();
@@ -67,15 +61,13 @@ namespace TextGame
             }
 
             player.Name = name;
-
-            string text4 = ("Great! Nice to meet you " + player.Name + ".");
-
-            Services.ScrollText(text4, 1500);
-            Services.ScrollText(text5, 3500);
+            
+            Services.ScrollText("Great! Nice to meet you " + player.Name + ".", 1500);
+            Services.ScrollText("I won't keep you here any longer... Your first adventure starts now!", 3500);
 
             Console.Clear();
 
-            System.Threading.Thread.Sleep(1000);
+            Thread.Sleep(1000);
 
             StartLevel();
         }
