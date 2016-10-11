@@ -135,11 +135,8 @@ namespace TextGame
 
         public void GameOver()
         {
-            string text1 = "Game Over";
-            string text2 = "You made it through " + (CurrentLevel - 1) + " levels.";
-
-            Services.ScrollText(text1, 1000);
-            Services.ScrollText(text2, 1000);
+            Services.ScrollText("Game Over", 1000);
+            Services.ScrollText("You made it through " + (CurrentLevel - 1) + " levels.", 1000);
 
             Services.PlayAgain();
         }
