@@ -59,5 +59,10 @@ namespace TextGame
         {
             return items;
         }
+
+        public void Empty()
+        {
+            items = new List<Item>();
+        }
     }
 }

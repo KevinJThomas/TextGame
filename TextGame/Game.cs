@@ -125,6 +125,7 @@ namespace TextGame
         {
             player.LevelCompleted = false;
             CurrentLevel++;
+            player.Bag.Empty();
             Console.WriteLine();
             Services.ScrollText("Congratulations! You successfully completed the level.", 750);
             Services.ScrollText("Advancing to level " + CurrentLevel + ". . .", 3500);
