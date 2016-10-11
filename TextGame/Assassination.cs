@@ -68,24 +68,15 @@ namespace TextGame
         }
 
         public void Start()
-        {          
-            string text1 = "You are a Russian KGB operative.";
-            string text2 = "There has been a small uprising against the government in Moscow that has a chance of gaining some traction.";
-            string text3 = "The uprising is being lead by a very vocal individual: Bodrov Ilyich";
-            string text4 = "He must be silenced before too much damage is done. This your mission.";
-            string text5 = "He is scheduled to be speaking in the Red Square in 5 minutes.";
-            string text6 = "You are arriving to the square now; there isn't much time to eliminate the target.";
-            string text7 = "In your bag you are carrying a handgun, knife, and 3 feet of twine.";
-            string text8 = "Find and kill Bodrov Ilyich. Your life depends on it.";
-
-            Services.ScrollText(text1, 2000);
-            Services.ScrollText(text2, 2000);
-            Services.ScrollText(text3, 2000);
-            Services.ScrollText(text4, 2000);
-            Services.ScrollText(text5, 2000);
-            Services.ScrollText(text6, 2000);
-            Services.ScrollText(text7, 2000);
-            Services.ScrollText(text8, 3500);
+        {
+            Services.ScrollText("You are a Russian KGB operative.", 1200);
+            Services.ScrollText("There has been a small uprising against the government in Moscow that has a chance of gaining some traction.", 1200);
+            Services.ScrollText("The uprising is being lead by a very vocal individual: Bodrov Ilyich", 1200);
+            Services.ScrollText("He must be silenced before too much damage is done. This your mission.", 1200);
+            Services.ScrollText("He is scheduled to be speaking in the Red Square in 5 minutes.", 1200);
+            Services.ScrollText("You are arriving to the square now; there isn't much time to eliminate the target.", 1200);
+            Services.ScrollText("In your bag you are carrying a handgun, knife, and 3 feet of twine.", 1200);
+            Services.ScrollText("Find and kill Bodrov Ilyich. Your life depends on it.", 3500);
 
             RedSquareEnterance();
         }
