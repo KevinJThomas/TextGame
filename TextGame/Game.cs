@@ -11,8 +11,6 @@ namespace TextGame
 {
     class Game
     {
-        Thread musicThread = new Thread(PlayIntro);
-
         //Used for seeing whether the game is won or if the player should simply advance to the next level
         public static int _totalNumberOfLevels = 6; //We will have to manually change this every time we add a new level
 
@@ -27,17 +25,6 @@ namespace TextGame
         public Game(int currentLevel = 1)
         {
             CurrentLevel = currentLevel;
-        }
-
-        public static void PlayIntro()
-        {
-            Assembly assembly;
-            SoundPlayer sp;
-            assembly = Assembly.GetExecutingAssembly();
-            sp = new SoundPlayer(assembly.GetManifestResourceStream
-                ("TextGame.audio.intro.wav"));
-            sp.Stream.Position = 0;
-            sp.Play();
         }
 
         public void Intro()
