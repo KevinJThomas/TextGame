@@ -10,10 +10,8 @@ namespace TextGame
     {
         static void Main(string[] args)
         {
-            //These 2 lines should be all the code that is in the main method
-            //A player object will be made in the game, a bag object will be made in the player, and item objects can be inserted and removed from the bag whenever
-            Game myGame = new Game(6);
-            myGame.PlayLevelSix();
+            Game myGame = new Game(2);
+            myGame.Intro();
         }
     }
 }

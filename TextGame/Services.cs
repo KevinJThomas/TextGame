@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace TextGame
@@ -16,21 +17,15 @@ namespace TextGame
                 Console.Write(character);
                 System.Threading.Thread.Sleep(rand.Next(2, 5));
             }
-            System.Threading.Thread.Sleep(delay);
-            Console.WriteLine("");
+            Thread.Sleep(delay);
+            Console.WriteLine();
         }
 
         public static void PlayAgain()
         {
-            string text1 = "Would you like to play again? (y/n)";
-            string text2 = "Thanks for playing!\nPress any key to exit. . .";
-            string text3 = "Invalid input. Please try again.\n";
+            ScrollText("Would you like to play again? (y/n)");
 
-            string answer;
-
-            ScrollText(text1);
-
-            answer = Console.ReadLine();
+            string answer = Console.ReadLine();
 
             if (answer == "yes" || answer == "y")
             {
@@ -39,13 +34,13 @@ namespace TextGame
             }
             else if (answer == "no" || answer == "n")
             {
-                ScrollText(text2);
+                ScrollText("Thanks for playing!\nPress any key to exit. . .");
                 Console.ReadKey();
                 Environment.Exit(0);
             }
             else
             {
-                ScrollText(text3);
+                ScrollText("Invalid input. Please try again.\n");
                 PlayAgain();
             }
         }
