@@ -15,7 +15,7 @@ namespace TextGame
 
             Player player = new Player("Kevin");
             War war = new War(player);
-            war.PlayTurn();
+            war.StartTurn();
         }
     }
 }
