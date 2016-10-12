@@ -11,6 +11,8 @@ namespace TextGame
         public int Attack { get; set; }
         public int Health { get; set; }
         public int Type { get; set; } //1: Infantry 2: Archer 3: Cavalier 4: Arrow Shield -- Use enum?
+        public string TypeToString { get; set; }
+        public bool Sleeping { get; set; }
 
         bool _hasShield = false;
         bool _hasArmor = false;
@@ -23,24 +25,29 @@ namespace TextGame
                 case 1:
                     Attack = 2;
                     Health = 10;
+                    TypeToString = "Infantry";
                     break;
                 case 2:
                     Attack = 4;
                     Health = 6;
+                    TypeToString = "Archer";
                     break;
                 case 3:
                     Attack = 3;
                     Health = 20;
+                    TypeToString = "Cavalier";
                     break;
                 case 4:
                     Attack = 0;
                     Health = 100;
+                    TypeToString = "Arrow Shield";
                     break;
                 default:
                     Attack = 1;
                     Health = 1;
                     break;
             }
+            Sleeping = true;
         }
 
         public bool HasShield()
