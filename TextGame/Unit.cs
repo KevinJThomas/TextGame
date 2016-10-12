@@ -10,7 +10,7 @@ namespace TextGame
     {
         public int Attack { get; set; }
         public int Health { get; set; }
-        public int Type { get; set; } //1: Infantry 2: Archer 3: Cavalier -- Use enum?
+        public int Type { get; set; } //1: Infantry 2: Archer 3: Cavalier 4: Arrow Shield -- Use enum?
 
         bool _hasShield = false;
         bool _hasArmor = false;
@@ -32,10 +32,38 @@ namespace TextGame
                     Attack = 3;
                     Health = 20;
                     break;
+                case 4:
+                    Attack = 0;
+                    Health = 100;
+                    break;
                 default:
                     Attack = 1;
                     Health = 1;
                     break;
+            }
+        }
+
+        public bool HasShield()
+        {
+            if (_hasShield)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public bool HasArmor()
+        {
+            if (_hasArmor)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
