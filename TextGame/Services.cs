@@ -15,7 +15,19 @@ namespace TextGame
             foreach (char character in text)
             {
                 Console.Write(character);
-                System.Threading.Thread.Sleep(rand.Next(2, 5));
+                Thread.Sleep(rand.Next(2, 5));
+            }
+            Thread.Sleep(delay);
+            Console.WriteLine();
+        }
+
+        public static void FastScrollText(string text, int delay = 0)
+        {
+            Random rand = new Random();
+            foreach (char character in text)
+            {
+                Console.Write(character);
+                Thread.Sleep(rand.Next(2));
             }
             Thread.Sleep(delay);
             Console.WriteLine();
