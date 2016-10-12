@@ -18,8 +18,12 @@ namespace TextGame
     //5) Give AI currency advantage since it will be stupid?
     //6) Give AI different unit types or use same as player?
     //7) Win condition when one player no longer controls any units, or should there be a target 'king' unit to kill like chess?
-    //8) Good idea to add 'terrain' where there is advantage on high ground or some units gain stats in certain terrain?
-    //9) Enemy turn instantly execute to make faster gameplay or should it be slower so the player can keep up with what's happening?
+    //8) Enemy turn instantly execute to make faster gameplay or should it be slower so the player can keep up with what's happening?
+    //TODO:
+    //1) CalculatePay()
+    //2) Attacking and moving units (1 action per turn using Sleeping prop on units) - add 'all units' command where you can do the same command with all units in the
+    //   location at once
+    //3) EnemyTurn() - make enemies always attack if available else randomly move.. could make a predefined strat for them to always use
     class War : Scenario
     {
         Thread musicThread = new Thread(PlayMusic);
@@ -76,6 +80,8 @@ namespace TextGame
         double _playerCurrency;
         double _enemyCurrency;
 
+        bool _firstTurn = true;
+
         public War(Player player) : base(player)
         {
             _player = player;
@@ -86,7 +92,7 @@ namespace TextGame
             allEnemyUnits = new List<List<Unit>>() { enemyUnits1, enemyUnits2, enemyUnits3, enemyUnits4, enemyUnits5, enemyUnits6,
                 enemyUnits7, enemyUnits8, enemyUnits9, enemyUnits10, enemyUnits11, enemyUnits12};
 
-            _playerCurrency = 100000;
+            _playerCurrency = 100000; //change back to 1000 after testing
             _enemyCurrency = 1000;
         }
 
@@ -106,20 +112,34 @@ namespace TextGame
             Services.ScrollText("You're the general of an army that is about to fight a long and bloody battle to decide to fate of your people.", 1500);
             Services.ScrollText("This war has lasted years, and it's about to be over one way or another.", 1500);
             Services.ScrollText("You've gathered your entire military for this one last stand.", 1500);
-            Services.ScrollText("Ground units, vehicles, air units: you've called in all the stops.", 1500);
+            Services.ScrollText("Infantry, ranged, and mounted units: you've called in all the stops.", 1500);
             Services.ScrollText("Do you have what it takes to win this war?", 1500);
-            PlayTurn();
+            StartTurn();
         }
 
-        public void PlayTurn()
+        public void StartTurn()
         {
-            PrintMap();
-            Listen();
+            if (_firstTurn)
+            {
+                _firstTurn = false;
+                PrintMap();
+                Listen();
+            }
+            else
+            {
+                Services.ScrollText("It's your turn!", 500);
+                int pay = CalculatePay();
+                _playerCurrency += pay;
+                Services.ScrollText("You are given $" + pay, 1200);
+                PrintMap();
+                Listen();
+            }
+            
         }
 
         public void EnemyTurn()
         {
-
+            //TODO
         }
 
         public void PrintMap()
@@ -146,8 +166,49 @@ namespace TextGame
 
         public void PrintLocation()
         {
-            //TODO
-            //prints specfic units in w/e location is zoomed in on
+            Console.WriteLine("AREA " + _zoomedLocation);
+            Console.WriteLine("_______________________________________________\n");
+            Services.ScrollText("ENEMIES:");
+            if (currentUnits[1].Count > 0)
+            {
+                foreach (Unit unit in currentUnits[1])
+                {
+                    if (unit != currentUnits[1][currentUnits[1].Count - 1])
+                    {
+                        Console.Write(unit.TypeToString + " (" + unit.Attack + "/" + unit.Health + ") - ");
+                    }
+                    else
+                    {
+                        Console.Write(unit.TypeToString + " (" + unit.Attack + "/" + unit.Health + ")\n\n");
+                    }
+                }
+            }
+            else
+            {
+                Services.ScrollText("There are no enemy units here\n");
+            }
+            
+
+            Services.ScrollText("ALLIES:");
+            if (currentUnits[0].Count > 0)
+            {
+                foreach (Unit unit in currentUnits[0])
+                {
+                    if (unit != currentUnits[0][currentUnits[0].Count - 1])
+                    {
+                        Console.Write(unit.TypeToString + " (" + unit.Attack + "/" + unit.Health + ") - ");
+                    }
+                    else
+                    {
+                        Console.Write(unit.TypeToString + " (" + unit.Attack + "/" + unit.Health + ")\n\n");
+                    }
+                }
+            }
+            else
+            {
+                Services.ScrollText("There are no ally units here\n");
+            }
+            Console.WriteLine("_______________________________________________\n");
         }
 
         public void Listen()
@@ -172,30 +233,32 @@ namespace TextGame
                         }
                     }
                 }
-
-                switch (cmd)
+                else
                 {
-                    case "count":
-                        Services.ScrollText("Ally units: " + CountAllyUnits() + "\nEnemy units: " + CountEnemyUnits() + "\n");
-                        Listen();
-                        break;
-                    case "shop":
-                        Services.ScrollText("Welcome to the shop!", 1000);
-                        Services.ScrollText("You can type 'back' at any time to navigate 1 section back from where you currently are.", 1000);
-                        Services.ScrollText("If you would ever like to completely exit the shop, type 'exit'.");
-                        Shop();
-                        break;
-                    case "map":
-                        PrintMap();
-                        Listen();
-                        break;
-                    case "end turn":
-                        EnemyTurn();
-                        break;
-                    default:
-                        Services.ScrollText("Invalid input. Try again.", 500);
-                        Listen();
-                        break;
+                    switch (cmd)
+                    {
+                        case "count":
+                            Services.ScrollText("Ally units: " + CountAllyUnits() + "\nEnemy units: " + CountEnemyUnits() + "\n");
+                            Listen();
+                            break;
+                        case "shop":
+                            Services.ScrollText("Welcome to the shop!", 1000);
+                            Services.ScrollText("You can type 'back' at any time to navigate 1 section back from where you currently are.", 1000);
+                            Services.ScrollText("If you would ever like to completely exit the shop, type 'exit'.");
+                            Shop();
+                            break;
+                        case "map":
+                            PrintMap();
+                            Listen();
+                            break;
+                        case "end turn":
+                            EnemyTurn();
+                            break;
+                        default:
+                            Services.ScrollText("Invalid input. Try again.", 500);
+                            Listen();
+                            break;
+                    }
                 }
             }
             else
@@ -958,19 +1021,74 @@ namespace TextGame
 
         public void HelpZoomedIn()
         {
-            //TODO
-            //(number 1 - unit count): select that unit
-            //all: select all units in this area
-            //zoom: zoom back out to the map view
+            Services.FastScrollText("COMMANDS:");
+            Services.FastScrollText("map: prints out the overview of the location you're zoomed in on");
+            Services.FastScrollText("count: gives a total for units in the location you're zoomed in on for both players");
+            Services.FastScrollText("units: access individual units to move or attack with them");
+            Services.FastScrollText("zoom: zooms out to the full map view");
+            Services.FastScrollText("end turn: ends your turn\n");
         }
 
         public void Zoom(int num)
         {
-            //TODO
-            //set currentUnits with appropriate lists
-            //should initally print out the location
+            switch (num)
+            {
+                case 1:
+                    currentUnits.Add(allyUnits1);
+                    currentUnits.Add(enemyUnits1);
+                    break;
+                case 2:
+                    currentUnits.Add(allyUnits2);
+                    currentUnits.Add(enemyUnits2);
+                    break;
+                case 3:
+                    currentUnits.Add(allyUnits3);
+                    currentUnits.Add(enemyUnits3);
+                    break;
+                case 4:
+                    currentUnits.Add(allyUnits4);
+                    currentUnits.Add(enemyUnits4);
+                    break;
+                case 5:
+                    currentUnits.Add(allyUnits5);
+                    currentUnits.Add(enemyUnits5);
+                    break;
+                case 6:
+                    currentUnits.Add(allyUnits6);
+                    currentUnits.Add(enemyUnits6);
+                    break;
+                case 7:
+                    currentUnits.Add(allyUnits7);
+                    currentUnits.Add(enemyUnits7);
+                    break;
+                case 8:
+                    currentUnits.Add(allyUnits8);
+                    currentUnits.Add(enemyUnits8);
+                    break;
+                case 9:
+                    currentUnits.Add(allyUnits9);
+                    currentUnits.Add(enemyUnits9);
+                    break;
+                case 10:
+                    currentUnits.Add(allyUnits10);
+                    currentUnits.Add(enemyUnits10);
+                    break;
+                case 11:
+                    currentUnits.Add(allyUnits11);
+                    currentUnits.Add(enemyUnits11);
+                    break;
+                case 12:
+                    currentUnits.Add(allyUnits12);
+                    currentUnits.Add(enemyUnits12);
+                    break;
+                default:
+                    Services.ScrollText("ERROR: Zoom(int) case not defined for (" + num + ")");
+                    break;
+            }
             _zoomedLocation = num;
             _zoomed = true;
+            PrintLocation();
+            Listen();
         }
 
         public void ZoomOut()
@@ -978,6 +1096,11 @@ namespace TextGame
             currentUnits.Clear();
             _zoomedLocation = 0;
             _zoomed = false;
+        }
+
+        public int CalculatePay()
+        {
+            return 0; //TODO
         }
 
         public int CountAllyUnits()
