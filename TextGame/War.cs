@@ -9,9 +9,7 @@ using System.Threading.Tasks;
 
 namespace TextGame
 {
-    //1) Instead of using switch statements in ShopArcher(), ShopInfantry(), etc.. maybe just do something like Purchase(int type, string name) where type refers
-    //to the type of unit to not get things like 'shield' confused with different types of units that can all receive a shield
-    //2) Find new music
+    //1) Find new music
     //TBD:
     //1) Receive currency at beginning or end of turn?
     //2) Queue up all moves and execute at end of turn or perform them immediately 1 by 1 as they're made?
@@ -50,6 +48,7 @@ namespace TextGame
         List<Unit> allyUnits10 = new List<Unit>();
         List<Unit> allyUnits11 = new List<Unit>();
         List<Unit> allyUnits12 = new List<Unit>();
+        List<List<Unit>> allAllyUnits;
 
         //enemy units
         List<Unit> enemyUnits1 = new List<Unit>();
@@ -64,6 +63,10 @@ namespace TextGame
         List<Unit> enemyUnits10 = new List<Unit>();
         List<Unit> enemyUnits11 = new List<Unit>();
         List<Unit> enemyUnits12 = new List<Unit>();
+        List<List<Unit>> allEnemyUnits;
+
+        Unit selectedUnit;
+        bool _unitSelected = false;
 
         List<List<Unit>> currentUnits = new List<List<Unit>>();
         int _zoomedLocation;
@@ -78,7 +81,12 @@ namespace TextGame
             _player = player;
             musicThread.Start();
 
-            _playerCurrency = 1000;
+            allAllyUnits = new List<List<Unit>>() { allyUnits1, allyUnits2, allyUnits3, allyUnits4, allyUnits5, allyUnits6, allyUnits7,
+                allyUnits8, allyUnits9, allyUnits10, allyUnits11, allyUnits12};
+            allEnemyUnits = new List<List<Unit>>() { enemyUnits1, enemyUnits2, enemyUnits3, enemyUnits4, enemyUnits5, enemyUnits6,
+                enemyUnits7, enemyUnits8, enemyUnits9, enemyUnits10, enemyUnits11, enemyUnits12};
+
+            _playerCurrency = 100000;
             _enemyCurrency = 1000;
         }
 
@@ -118,21 +126,21 @@ namespace TextGame
         {
             Console.WriteLine("E = Enemy, A = Ally\n");
             Console.WriteLine(" ___________________________________________________");
-            Console.WriteLine("| E: " + enemyUnits1.Count.ToString("00") + "        1 | E: " + enemyUnits2.Count.ToString("00") + "        2 | E: " + enemyUnits3.Count.ToString("00") + "         3 |");
+            Console.WriteLine("| E: " + enemyUnits10.Count.ToString("00") + "       10 | E: " + enemyUnits11.Count.ToString("00") + "       11 | E: " + enemyUnits12.Count.ToString("00") + "        12 |");
             Console.WriteLine("|                |                |                 |");
-            Console.WriteLine("| A: " + allyUnits1.Count.ToString("00") + "          | A: " + allyUnits2.Count.ToString("00") + "          | A: " + allyUnits3.Count.ToString("00") + "           |");
-            Console.WriteLine("|________________|________________|_________________|");
-            Console.WriteLine("| E: " + enemyUnits4.Count.ToString("00") + "        4 | E: " + enemyUnits5.Count.ToString("00") + "        5 | E: " + enemyUnits6.Count.ToString("00") + "         6 |");
-            Console.WriteLine("|                |                |                 |");
-            Console.WriteLine("| A: " + allyUnits4.Count.ToString("00") + "          | A: " + allyUnits5.Count.ToString("00") + "          | A: " + allyUnits6.Count.ToString("00") + "           |");
+            Console.WriteLine("| A: " + allyUnits10.Count.ToString("00") + "          | A: " + allyUnits11.Count.ToString("00") + "          | A: " + allyUnits12.Count.ToString("00") + "           |");
             Console.WriteLine("|________________|________________|_________________|");
             Console.WriteLine("| E: " + enemyUnits7.Count.ToString("00") + "        7 | E: " + enemyUnits8.Count.ToString("00") + "        8 | E: " + enemyUnits9.Count.ToString("00") + "         9 |");
             Console.WriteLine("|                |                |                 |");
             Console.WriteLine("| A: " + allyUnits7.Count.ToString("00") + "          | A: " + allyUnits8.Count.ToString("00") + "          | A: " + allyUnits9.Count.ToString("00") + "           |");
             Console.WriteLine("|________________|________________|_________________|");
-            Console.WriteLine("| E: " + enemyUnits10.Count.ToString("00") + "       10 | E: " + enemyUnits11.Count.ToString("00") + "       11 | E: " + enemyUnits12.Count.ToString("00") + "        12 |");
+            Console.WriteLine("| E: " + enemyUnits4.Count.ToString("00") + "        4 | E: " + enemyUnits5.Count.ToString("00") + "        5 | E: " + enemyUnits6.Count.ToString("00") + "         6 |");
             Console.WriteLine("|                |                |                 |");
-            Console.WriteLine("| A: " + allyUnits10.Count.ToString("00") + "          | A: " + allyUnits11.Count.ToString("00") + "          | A: " + allyUnits12.Count.ToString("00") + "           |");
+            Console.WriteLine("| A: " + allyUnits4.Count.ToString("00") + "          | A: " + allyUnits5.Count.ToString("00") + "          | A: " + allyUnits6.Count.ToString("00") + "           |");
+            Console.WriteLine("|________________|________________|_________________|");
+            Console.WriteLine("| E: " + enemyUnits1.Count.ToString("00") + "        1 | E: " + enemyUnits2.Count.ToString("00") + "        2 | E: " + enemyUnits3.Count.ToString("00") + "         3 |");
+            Console.WriteLine("|                |                |                 |");
+            Console.WriteLine("| A: " + allyUnits1.Count.ToString("00") + "          | A: " + allyUnits2.Count.ToString("00") + "          | A: " + allyUnits3.Count.ToString("00") + "           |");
             Console.WriteLine("|________________|________________|_________________|\n");
         }
 
@@ -151,7 +159,7 @@ namespace TextGame
                 Console.Write("> ");
                 string cmd = Console.ReadLine().ToLower();
 
-                if (cmd.Substring(0, 4) == "zoom" && cmd.Length >= 6)
+                if (cmd.Length >= 4 && cmd.Substring(0, 4) == "zoom" && cmd.Length >= 6)
                 {
                     cmd = cmd.Substring(5);
                     int num;
@@ -214,6 +222,10 @@ namespace TextGame
                         ZoomOut();
                         Listen();
                         break;
+                    case "units":
+                        //TODO
+                        //Lists all units with the option of either selecting one for further options or typing back/exit to go back to listening
+                        break;
                     default:
                         Services.ScrollText("Invalid input. Try again.", 500);
                         Listen();
@@ -224,14 +236,15 @@ namespace TextGame
 
         public void Shop()
         {
-            Console.WriteLine("Your Currency: $" + _playerCurrency + "\n");
+            Services.ScrollText("Your Currency: $" + _playerCurrency + "\n");
             foreach (string type in shopTypes)
             {
-                Console.WriteLine((Array.IndexOf(shopTypes, type) + 1) + ") " + type);
+                Services.ScrollText((Array.IndexOf(shopTypes, type) + 1) + ") " + type);
             }
             Console.WriteLine();
 
             int decision;
+            Console.Write("> ");
             string cmd = Console.ReadLine();
 
             if (Int32.TryParse(cmd, out decision))
@@ -261,6 +274,7 @@ namespace TextGame
             }
             else if (cmd == "back" || cmd == "exit")
             {
+                Services.ScrollText("Exiting shop. . .\n");
                 Listen();
             }
             else
@@ -272,40 +286,27 @@ namespace TextGame
 
         public void ShopInfantry()
         {
-            Console.WriteLine("Your Currency: $" + _playerCurrency + "\n");
+            Services.ScrollText("Your Currency: $" + _playerCurrency + "\n");
             foreach (string item in shopInfantry)
             {
-                Console.WriteLine((Array.IndexOf(shopInfantry, item) + 1) + ") " + item);
+                Services.ScrollText((Array.IndexOf(shopInfantry, item) + 1) + ") " + item + " (" + priceInfantry[Array.IndexOf(shopInfantry, item)] + ")");
             }
             Console.WriteLine();
 
             int decision;
+            Console.Write("> ");
             string cmd = Console.ReadLine();
 
             if (Int32.TryParse(cmd, out decision))
             {
                 if (decision >= 1 && decision <= shopInfantry.Length)
                 {
-                    switch (shopInfantry[decision - 1])
-                    {
-                        case "New Infantry":
-                            //TODO
-                            break;
-                        case "Weapon Upgrade":
-                            //TODO
-                            break;
-                        case "Shield":
-                            //TODO
-                            break;
-                        default:
-                            Services.ScrollText("Invalid input. Try again.");
-                            ShopInfantry();
-                            break;
-                    }
+                    Purchase(1, shopInfantry[decision - 1]);
                 }
             }
             else if (cmd == "exit")
             {
+                Services.ScrollText("Exiting shop. . .\n");
                 Listen();
             }
             else if (cmd == "back")
@@ -321,40 +322,27 @@ namespace TextGame
 
         public void ShopArcher()
         {
-            Console.WriteLine("Your Currency: $" + _playerCurrency + "\n");
+            Services.ScrollText("Your Currency: $" + _playerCurrency + "\n");
             foreach (string item in shopArcher)
             {
-                Console.WriteLine((Array.IndexOf(shopArcher, item) + 1) + ") " + item);
+                Services.ScrollText((Array.IndexOf(shopArcher, item) + 1) + ") " + item + " (" + priceArcher[Array.IndexOf(shopArcher, item)] + ")");
             }
             Console.WriteLine();
 
             int decision;
+            Console.Write("> ");
             string cmd = Console.ReadLine();
 
             if (Int32.TryParse(cmd, out decision))
             {
                 if (decision >= 1 && decision <= shopArcher.Length)
                 {
-                    switch (shopArcher[decision - 1])
-                    {
-                        case "New Archer":
-                            //TODO
-                            break;
-                        case "Weapon Upgrade":
-                            //TODO
-                            break;
-                        case "Armor Upgrade":
-                            //TODO
-                            break;
-                        default:
-                            Services.ScrollText("Invalid input. Try again.");
-                            ShopArcher();
-                            break;
-                    }
+                    Purchase(2, shopArcher[decision - 1]);
                 }
             }
             else if (cmd == "exit")
             {
+                Services.ScrollText("Exiting shop. . .\n");
                 Listen();
             }
             else if (cmd == "back")
@@ -370,40 +358,27 @@ namespace TextGame
 
         public void ShopCavalier()
         {
-            Console.WriteLine("Your Currency: $" + _playerCurrency + "\n");
+            Services.ScrollText("Your Currency: $" + _playerCurrency + "\n");
             foreach (string item in shopCavalier)
             {
-                Console.WriteLine((Array.IndexOf(shopCavalier, item) + 1) + ") " + item);
+                Services.ScrollText((Array.IndexOf(shopCavalier, item) + 1) + ") " + item + " (" + priceCavalier[Array.IndexOf(shopCavalier, item)] + ")");
             }
             Console.WriteLine();
 
             int decision;
+            Console.Write("> ");
             string cmd = Console.ReadLine();
 
             if (Int32.TryParse(cmd, out decision))
             {
                 if (decision >= 1 && decision <= shopCavalier.Length)
                 {
-                    switch (shopCavalier[decision - 1])
-                    {
-                        case "New Cavalier":
-                            //TODO
-                            break;
-                        case "Weapon Upgrade":
-                            //TODO
-                            break;
-                        case "Shield":
-                            //TODO
-                            break;
-                        default:
-                            Services.ScrollText("Invalid input. Try again.");
-                            ShopCavalier();
-                            break;
-                    }
+                    Purchase(3, shopCavalier[decision - 1]);
                 }
             }
             else if (cmd == "exit")
             {
+                Services.ScrollText("Exiting shop. . .\n");
                 Listen();
             }
             else if (cmd == "back")
@@ -419,34 +394,27 @@ namespace TextGame
 
         public void ShopOther()
         {
-            Console.WriteLine("Your Currency: $" + _playerCurrency + "\n");
+            Services.ScrollText("Your Currency: $" + _playerCurrency + "\n");
             foreach (string item in shopOther)
             {
-                Console.WriteLine((Array.IndexOf(shopOther, item) + 1) + ") " + item);
+                Services.ScrollText((Array.IndexOf(shopOther, item) + 1) + ") " + item + " (" + priceOther[Array.IndexOf(shopOther, item)] + ")");
             }
             Console.WriteLine();
 
             int decision;
+            Console.Write("> ");
             string cmd = Console.ReadLine();
 
             if (Int32.TryParse(cmd, out decision))
             {
                 if (decision >= 1 && decision <= shopOther.Length)
                 {
-                    switch (shopOther[decision - 1])
-                    {
-                        case "Arrow Shield":
-                            //TODO
-                            break;
-                        default:
-                            Services.ScrollText("Invalid input. Try again.");
-                            ShopOther();
-                            break;
-                    }
+                    Purchase(4, shopOther[decision - 1]);
                 }
             }
             else if (cmd == "exit")
             {
+                Services.ScrollText("Exiting shop. . .\n");
                 Listen();
             }
             else if (cmd == "back")
@@ -460,13 +428,532 @@ namespace TextGame
             }
         }
 
+        public void Purchase(int type, string item)
+        {
+            switch (type)
+            {
+                case 1: //Infantry
+                    switch (item)
+                    {
+                        case "New Infantry":
+                            if (_playerCurrency >= priceInfantry[Array.IndexOf(shopInfantry, item)])
+                            {
+                                _playerCurrency -= priceInfantry[Array.IndexOf(shopInfantry, item)];
+                                Services.ScrollText("You purchased a new infantry unit.", 300);
+                                PlaceUnit(1);
+                            }
+                            else
+                            {
+                                Services.ScrollText("You don't have enough money for that!");
+                                ShopInfantry();
+                            }
+                            break;
+                        case "Weapon Upgrade":
+                            if (_playerCurrency >= priceInfantry[Array.IndexOf(shopInfantry, item)])
+                            {
+                                ListInfantry();
+                                if (_unitSelected)
+                                {
+                                    switch (selectedUnit.Attack)
+                                    {
+                                        case 2:
+                                            _playerCurrency -= priceInfantry[Array.IndexOf(shopInfantry, item)];
+                                            Services.ScrollText("You upgrade your unit with a sword!");
+                                            selectedUnit.AddSword();
+                                            Shop();
+                                            break;
+                                        case 4:
+                                            _playerCurrency -= priceInfantry[Array.IndexOf(shopInfantry, item)];
+                                            Services.ScrollText("You upgrade your unit with an axe!");
+                                            selectedUnit.AddAxe();
+                                            Shop();
+                                            break;
+                                        case 6:
+                                            Services.ScrollText("You can't upgrade that unit's weapon anymore!");
+                                            Shop();
+                                            break;
+                                        default:
+                                            Services.ScrollText("ERROR: Purchase(int, string) case 1, case Weapon Upgrade..selectedUnit.Attack outOfIndex (" +
+                                                selectedUnit.Attack + ")");
+                                            Shop();
+                                            break;
+                                    }
+                                    _unitSelected = false;
+                                }
+                                else
+                                {
+                                    ShopInfantry();
+                                }
+                            }
+                            else
+                            {
+                                Services.ScrollText("You don't have enough money for that!");
+                                ShopInfantry();
+                            }
+                            break;
+                        case "Shield":
+                            if (_playerCurrency >= priceInfantry[Array.IndexOf(shopInfantry, item)])
+                            {
+                                ListInfantry();
+                                if (_unitSelected)
+                                {
+                                    if (!selectedUnit.HasShield())
+                                    {
+                                        _playerCurrency -= priceInfantry[Array.IndexOf(shopInfantry, item)];
+                                        Services.ScrollText("You upgrade your unit with a shield!");
+                                        selectedUnit.AddShield();
+                                        Shop();
+                                    }
+                                    else
+                                    {
+                                        Services.ScrollText("That unit already has a shield!");
+                                        Shop();
+                                    }
+                                    _unitSelected = false;
+                                }
+                                else
+                                {
+                                    ShopInfantry();
+                                }
+                            }
+                            else
+                            {
+                                Services.ScrollText("You don't have enough money for that!");
+                                ShopInfantry();
+                            }
+                            break;
+                        default:
+                            Services.ScrollText("ERROR: Purchase(int, string) case 1..no matched case for " + item);
+                            Shop();
+                            break;
+                    }
+                    break;
+                case 2: //Archer
+                    switch (item)
+                    {
+                        case "New Archer":
+                            if (_playerCurrency >= priceArcher[Array.IndexOf(shopArcher, item)])
+                            {
+                                _playerCurrency -= priceArcher[Array.IndexOf(shopArcher, item)];
+                                Services.ScrollText("You purchased a new archer unit.", 300);
+                                PlaceUnit(2);
+                            }
+                            else
+                            {
+                                Services.ScrollText("You don't have enough money for that!");
+                                ShopArcher();
+                            }
+                            break;
+                        case "Weapon Upgrade":
+                            if (_playerCurrency >= priceArcher[Array.IndexOf(shopArcher, item)])
+                            {
+                                ListArcher();
+                                if (_unitSelected)
+                                {
+                                    switch (selectedUnit.Attack)
+                                    {
+                                        case 4:
+                                            _playerCurrency -= priceArcher[Array.IndexOf(shopArcher, item)];
+                                            Services.ScrollText("You upgrade your unit with a crossbow!");
+                                            selectedUnit.AddCrossbow();
+                                            Shop();
+                                            break;
+                                        case 7:
+                                            Services.ScrollText("You can't upgrade that unit's weapon anymore!");
+                                            Shop();
+                                            break;
+                                        default:
+                                            Services.ScrollText("ERROR: Purchase(int, string) case 1, case Weapon Upgrade..selectedUnit.Attack outOfIndex (" +
+                                                selectedUnit.Attack + ")");
+                                            Shop();
+                                            break;
+                                    }
+                                    _unitSelected = false;
+                                }
+                                else
+                                {
+                                    ShopArcher();
+                                }
+                            }
+                            else
+                            {
+                                Services.ScrollText("You don't have enough money for that!");
+                                ShopArcher();
+                            }
+                            break;
+                        case "Armor Upgrade":
+                            if (_playerCurrency >= priceArcher[Array.IndexOf(shopArcher, item)])
+                            {
+                                ListArcher();
+                                if (_unitSelected)
+                                {
+                                    if (!selectedUnit.HasArmor())
+                                    {
+                                        _playerCurrency -= priceArcher[Array.IndexOf(shopArcher, item)];
+                                        Services.ScrollText("You upgrade your unit with armor!");
+                                        selectedUnit.AddLeatherArmor();
+                                        Shop();
+                                    }
+                                    else
+                                    {
+                                        Services.ScrollText("That unit already has armor!");
+                                        Shop();
+                                    }
+                                    _unitSelected = false;
+                                }
+                                else
+                                {
+                                    ShopArcher();
+                                }
+                            }
+                            else
+                            {
+                                Services.ScrollText("You don't have enough money for that!");
+                                ShopArcher();
+                            }
+                            break;
+                        default:
+                            Services.ScrollText("ERROR: Purchase(int, string) case 2..no matched case for " + item);
+                            Shop();
+                            break;
+                    }
+                            break;
+                case 3: //Cavalier
+                    switch (item)
+                    {
+                        case "New Cavalier":
+                            if (_playerCurrency >= priceCavalier[Array.IndexOf(shopCavalier, item)])
+                            {
+                                _playerCurrency -= priceCavalier[Array.IndexOf(shopCavalier, item)];
+                                Services.ScrollText("You purchased a new cavalier unit.", 300);
+                                PlaceUnit(3);
+                            }
+                            else
+                            {
+                                Services.ScrollText("You don't have enough money for that!");
+                                ShopCavalier();
+                            }
+                            break;
+                        case "Weapon Upgrade":
+                            if (_playerCurrency >= priceCavalier[Array.IndexOf(shopCavalier, item)])
+                            {
+                                ListCavalier();
+                                if (_unitSelected)
+                                {
+                                    switch (selectedUnit.Attack)
+                                    {
+                                        case 3:
+                                            _playerCurrency -= priceCavalier[Array.IndexOf(shopCavalier, item)];
+                                            Services.ScrollText("You upgrade your unit with a javelin!");
+                                            selectedUnit.AddJavelin();
+                                            Shop();
+                                            break;
+                                        case 6:
+                                            Services.ScrollText("You can't upgrade that unit's weapon anymore!");
+                                            Shop();
+                                            break;
+                                        default:
+                                            Services.ScrollText("ERROR: Purchase(int, string) case 1, case Weapon Upgrade..selectedUnit.Attack outOfIndex (" +
+                                                selectedUnit.Attack + ")");
+                                            Shop();
+                                            break;
+                                    }
+                                    _unitSelected = false;
+                                }
+                                else
+                                {
+                                    ShopCavalier();
+                                }
+                            }
+                            else
+                            {
+                                Services.ScrollText("You don't have enough money for that!");
+                                ShopCavalier();
+                            }
+                            break;
+                        case "Shield":
+                            if (_playerCurrency >= priceCavalier[Array.IndexOf(shopCavalier, item)])
+                            {
+                                ListCavalier();
+                                if (_unitSelected)
+                                {
+                                    if (!selectedUnit.HasShield())
+                                    {
+                                        _playerCurrency -= priceCavalier[Array.IndexOf(shopCavalier, item)];
+                                        Services.ScrollText("You upgrade your unit with a shield!");
+                                        selectedUnit.AddShield();
+                                        Shop();
+                                    }
+                                    else
+                                    {
+                                        Services.ScrollText("That unit already has a shield!");
+                                        Shop();
+                                    }
+                                    _unitSelected = false;
+                                }
+                                else
+                                {
+                                    ShopCavalier();
+                                }
+                            }
+                            else
+                            {
+                                Services.ScrollText("You don't have enough money for that!");
+                                ShopCavalier();
+                            }
+                            break;
+                        default:
+                            Services.ScrollText("ERROR: Purchase(int, string) case 3..no matched case for " + item);
+                            Shop();
+                            break;
+                    }
+                    break;
+                case 4: //Other
+                    switch (item)
+                    {
+                        case "Arrow Shield":
+                            if (_playerCurrency >= priceOther[Array.IndexOf(shopOther, item)])
+                            {
+                                _playerCurrency -= priceOther[Array.IndexOf(shopOther, item)];
+                                Services.ScrollText("You purchased a new arrow shield.", 300);
+                                PlaceUnit(4);
+                            }
+                            else
+                            {
+                                Services.ScrollText("You don't have enough money for that!");
+                                ShopOther();
+                            }
+                            break;
+                        default:
+                            Services.ScrollText("ERROR: Purchase(int, string) case 4..no matched case for " + item);
+                            Shop();
+                            break;
+                    }
+                    break;
+                default:
+                    Services.ScrollText("Error: Purchase(int, string) outOfIndex for base case statement (" + type + ")");
+                    break;
+            }
+        }
+
+        public void PlaceUnit(int type)
+        {
+            if (type >= 1 && type <= 3)
+            {
+                Services.ScrollText("Where would you like to place your new unit?");
+            }
+            else
+            {
+                Services.ScrollText("Where would you like to place your new item?");
+            }
+            
+            Services.ScrollText("1) 1");
+            Services.ScrollText("2) 2");
+            Services.ScrollText("3) 3");
+
+            int decision;
+            Console.Write("> ");
+            string answer = Console.ReadLine();
+
+            if(Int32.TryParse(answer, out decision))
+            {
+                switch (decision)
+                {
+                    case 1:
+                        allyUnits1.Add(new Unit(type));
+                        Shop();
+                        break;
+                    case 2:
+                        allyUnits2.Add(new Unit(type));
+                        Shop();
+                        break;
+                    case 3:
+                        allyUnits3.Add(new Unit(type));
+                        Shop();
+                        break;
+                    default:
+                        Services.ScrollText("Invalid input. Try again.");
+                        PlaceUnit(type);
+                        break;
+                }
+            }
+            else
+            {
+                Services.ScrollText("Invalid input. Try again.");
+                PlaceUnit(type);
+            }
+        }
+
+        public void ListInfantry()
+        {
+            List<Unit> tempUnitList = new List<Unit>();
+            List<int> tempIntList = new List<int>();
+            foreach (List<Unit> list in allAllyUnits)
+            {
+                foreach (Unit unit in list)
+                {
+                    if (unit.Type == 1)
+                    {
+                        tempUnitList.Add(unit);
+                        tempIntList.Add(allAllyUnits.IndexOf(list) + 1);
+                    }
+                }
+            }
+            Console.WriteLine();
+
+            if (tempUnitList.Count > 0)
+            {
+                Services.ScrollText("Select the unit you would like to upgrade:\n");
+
+                foreach (Unit unit in tempUnitList)
+                {
+                    Services.ScrollText((tempUnitList.IndexOf(unit) + 1) + 
+                        ") Infantry A:" + unit.Attack + " H:" + unit.Health + " Location: " + tempIntList[tempUnitList.IndexOf(unit)]);
+                }
+
+                int decision;
+                Console.Write("> ");
+                string answer = Console.ReadLine();
+
+                if (Int32.TryParse(answer, out decision))
+                {
+                    if (decision <= tempUnitList.Count)
+                    {
+                        selectedUnit = tempUnitList[decision - 1];
+                        _unitSelected = true;
+                    }
+                    else
+                    {
+                        Services.ScrollText("Invalid input. Try again.");
+                    }
+                }
+                else
+                {
+                    Services.ScrollText("Invalid input. Try again.");
+                }
+            }
+            else
+            {
+                Services.ScrollText("You don't have any infantry to upgrade!", 500);
+            }
+        }
+
+        public void ListArcher()
+        {
+            List<Unit> tempUnitList = new List<Unit>();
+            List<int> tempIntList = new List<int>();
+            foreach (List<Unit> list in allAllyUnits)
+            {
+                foreach (Unit unit in list)
+                {
+                    if (unit.Type == 2)
+                    {
+                        tempUnitList.Add(unit);
+                        tempIntList.Add(allAllyUnits.IndexOf(list) + 1);
+                    }
+                }
+            }
+            Console.WriteLine();
+
+            if (tempUnitList.Count > 0)
+            {
+                Services.ScrollText("Select the unit you would like to upgrade:\n");
+
+                foreach (Unit unit in tempUnitList)
+                {
+                    Services.ScrollText((tempUnitList.IndexOf(unit) + 1) +
+                        ") Archer A:" + unit.Attack + " H:" + unit.Health + " Location: " + tempIntList[tempUnitList.IndexOf(unit)]);
+                }
+
+                int decision;
+                Console.Write("> ");
+                string answer = Console.ReadLine();
+
+                if (Int32.TryParse(answer, out decision))
+                {
+                    if (decision <= tempUnitList.Count)
+                    {
+                        selectedUnit = tempUnitList[decision - 1];
+                        _unitSelected = true;
+                    }
+                    else
+                    {
+                        Services.ScrollText("Invalid input. Try again.");
+                    }
+                }
+                else
+                {
+                    Services.ScrollText("Invalid input. Try again.");
+                }
+            }
+            else
+            {
+                Services.ScrollText("You don't have any infantry to upgrade!", 500);
+            }
+        }
+
+        public void ListCavalier()
+        {
+            List<Unit> tempUnitList = new List<Unit>();
+            List<int> tempIntList = new List<int>();
+            foreach (List<Unit> list in allAllyUnits)
+            {
+                foreach (Unit unit in list)
+                {
+                    if (unit.Type == 3)
+                    {
+                        tempUnitList.Add(unit);
+                        tempIntList.Add(allAllyUnits.IndexOf(list) + 1);
+                    }
+                }
+            }
+            Console.WriteLine();
+
+            if (tempUnitList.Count > 0)
+            {
+                Services.ScrollText("Select the unit you would like to upgrade:\n");
+
+                foreach (Unit unit in tempUnitList)
+                {
+                    Services.ScrollText((tempUnitList.IndexOf(unit) + 1) +
+                        ") Cavalier A:" + unit.Attack + " H:" + unit.Health + " Location: " + tempIntList[tempUnitList.IndexOf(unit)]);
+                }
+
+                int decision;
+                Console.Write("> ");
+                string answer = Console.ReadLine();
+
+                if (Int32.TryParse(answer, out decision))
+                {
+                    if (decision <= tempUnitList.Count)
+                    {
+                        selectedUnit = tempUnitList[decision - 1];
+                        _unitSelected = true;
+                    }
+                    else
+                    {
+                        Services.ScrollText("Invalid input. Try again.");
+                    }
+                }
+                else
+                {
+                    Services.ScrollText("Invalid input. Try again.");
+                }
+            }
+            else
+            {
+                Services.ScrollText("You don't have any cavaliers to upgrade!", 500);
+            }
+        }
+
         public void HelpZoomedOut()
         {
-            //TODO
-            //zoom (number 1-12): take a closer look at a specfic area - this is the view where units are controlled
-            //count: gives a total for all units for both players
-            //shop: opens a shop to spend resources
-            //end turn: ends your turns
+            Services.FastScrollText("COMMANDS:");
+            Services.FastScrollText("map: prints out the overview of the battlefield");
+            Services.FastScrollText("count: gives a total for all units for both players");
+            Services.FastScrollText("shop: opens the shop where you can spend your resources");
+            Services.FastScrollText("zoom *1-12*: take a closer look at a specific location - this is the view where units are controlled");
+            Services.FastScrollText("end turn: ends your turn\n");
         }
 
         public void HelpZoomedIn()
@@ -481,6 +968,7 @@ namespace TextGame
         {
             //TODO
             //set currentUnits with appropriate lists
+            //should initally print out the location
             _zoomedLocation = num;
             _zoomed = true;
         }
