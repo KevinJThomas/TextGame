@@ -14,11 +14,10 @@ namespace TextGame
     //1) Receive currency at beginning or end of turn?
     //2) Queue up all moves and execute at end of turn or perform them immediately 1 by 1 as they're made?
     //3) Add more units/upgrades/items?
-    //4) Give currency based on how many spaces occupied, how many spaces controlled, how many units? Probably a combination?
-    //5) Give AI currency advantage since it will be stupid?
-    //6) Give AI different unit types or use same as player?
-    //7) Win condition when one player no longer controls any units, or should there be a target 'king' unit to kill like chess?
-    //8) Enemy turn instantly execute to make faster gameplay or should it be slower so the player can keep up with what's happening?
+    //4) Give AI currency advantage since it will be stupid?
+    //5) Give AI different unit types or use same as player?
+    //6) Win condition when one player no longer controls any units, or should there be a target 'king' unit to kill like chess?
+    //7) Enemy turn instantly execute to make faster gameplay or should it be slower so the player can keep up with what's happening?
     //TODO:
     //1) CalculatePay()
     //2) Attacking and moving units (1 action per turn using Sleeping prop on units) - add 'all units' command where you can do the same command with all units in the
@@ -1100,7 +1099,61 @@ namespace TextGame
 
         public int CalculatePay()
         {
-            return 0; //TODO
+            int unitCompensation = CountAllyUnits() * 10;
+            int locationCompensation = 0;
+
+            if (allyUnits1.Count > enemyUnits1.Count)
+            {
+                locationCompensation++;
+            }
+            if (allyUnits2.Count > enemyUnits2.Count)
+            {
+                locationCompensation++;
+            }
+            if (allyUnits3.Count > enemyUnits3.Count)
+            {
+                locationCompensation++;
+            }
+            if (allyUnits4.Count > enemyUnits4.Count)
+            {
+                locationCompensation++;
+            }
+            if (allyUnits5.Count > enemyUnits5.Count)
+            {
+                locationCompensation++;
+            }
+            if (allyUnits6.Count > enemyUnits6.Count)
+            {
+                locationCompensation++;
+            }
+            if (allyUnits7.Count > enemyUnits7.Count)
+            {
+                locationCompensation++;
+            }
+            if (allyUnits8.Count > enemyUnits8.Count)
+            {
+                locationCompensation++;
+            }
+            if (allyUnits9.Count > enemyUnits9.Count)
+            {
+                locationCompensation++;
+            }
+            if (allyUnits10.Count > enemyUnits10.Count)
+            {
+                locationCompensation++;
+            }
+            if (allyUnits11.Count > enemyUnits11.Count)
+            {
+                locationCompensation++;
+            }
+            if (allyUnits12.Count > enemyUnits12.Count)
+            {
+                locationCompensation++;
+            }
+
+            locationCompensation = locationCompensation * 50;
+
+            return locationCompensation + unitCompensation + 200;
         }
 
         public int CountAllyUnits()
