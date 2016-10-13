@@ -37,6 +37,21 @@ namespace TextGame
         int[] priceCavalier = new int[] { 700, 1000, 350 };
         int[] priceOther = new int[] { 1000 };
 
+        string[] unitCommands = new string[] { "Move", "Attack" };
+
+        int[] moveableLocations1 = new int[] { 2, 4 };
+        int[] moveableLocations2 = new int[] { 1, 3, 5 };
+        int[] moveableLocations3 = new int[] { 2, 6 };
+        int[] moveableLocations4 = new int[] { 1, 5, 7 };
+        int[] moveableLocations5 = new int[] { 2, 4, 6, 8 };
+        int[] moveableLocations6 = new int[] { 3, 5, 9 };
+        int[] moveableLocations7 = new int[] { 4, 8, 10 };
+        int[] moveableLocations8 = new int[] { 5, 7, 9, 11 };
+        int[] moveableLocations9 = new int[] { 6, 8, 12 };
+        int[] moveableLocations10 = new int[] { 7, 11 };
+        int[] moveableLocations11 = new int[] { 8, 10, 12 };
+        int[] moveableLocations12 = new int[] { 9, 12 };
+
         List<Unit> allyUnits = new List<Unit>();
 
         List<Unit> enemyUnits = new List<Unit>();
@@ -48,8 +63,8 @@ namespace TextGame
 
         bool _zoomed = false;
 
-        double _playerCurrency;
-        double _enemyCurrency;
+        int _playerCurrency;
+        int _enemyCurrency;
 
         bool _firstTurn = true;
 
@@ -93,6 +108,10 @@ namespace TextGame
             }
             else
             {
+                foreach (Unit unit in allyUnits)
+                {
+                    unit.Sleeping = false;
+                }
                 Services.ScrollText("It's your turn!", 500);
                 int pay = CalculatePay();
                 _playerCurrency += pay;
@@ -105,7 +124,8 @@ namespace TextGame
 
         public void EnemyTurn()
         {
-            //TODO
+            Services.ScrollText("Enemy playing turn. . .", 2000);
+            StartTurn();
         }
 
         public void PrintMap()
@@ -145,7 +165,7 @@ namespace TextGame
                     }
                     else
                     {
-                        Console.Write(unit.TypeToString + " (" + unit.Attack + "/" + unit.Health + ")\n\n");
+                        Console.Write(unit.TypeToString + " (" + unit.Attack + "/" + unit.Health + ")\n");
                     }
                 }
             }
@@ -166,7 +186,7 @@ namespace TextGame
                     }
                     else
                     {
-                        Console.Write(unit.TypeToString + " (" + unit.Attack + "/" + unit.Health + ")\n\n");
+                        Console.Write(unit.TypeToString + " (" + unit.Attack + "/" + unit.Health + ")\n");
                     }
                 }
             }
@@ -253,8 +273,7 @@ namespace TextGame
                         Listen();
                         break;
                     case "units":
-                        //TODO
-                        //Lists all units with the option of either selecting one for further options or typing back/exit to go back to listening
+                        UseUnits();
                         break;
                     default:
                         Services.ScrollText("Invalid input. Try again.", 500);
@@ -955,6 +974,202 @@ namespace TextGame
             }
         }
 
+        public void UseUnits()
+        {
+            List<Unit> tempUnitList = new List<Unit>();
+
+            foreach (Unit unit in allyUnits)
+            {
+                if (unit.Location == _zoomedLocation && unit.Sleeping == false)
+                {
+                    tempUnitList.Add(unit);
+                }
+            }
+
+            if (tempUnitList.Count > 0)
+            {
+                Console.WriteLine();
+                Services.FastScrollText("(You can type 'back' at any time to leave the unit control session)");
+                Services.FastScrollText("Available Units:");
+                foreach (Unit unit in tempUnitList)
+                {
+                    Services.FastScrollText((tempUnitList.IndexOf(unit) + 1).ToString() + ") " + unit.TypeToString + " (" + unit.Attack + "/" + unit.Health + ")");
+                }
+
+                int decision;
+                Console.Write("> ");
+                string answer = Console.ReadLine();
+
+                if (Int32.TryParse(answer, out decision))
+                {
+                    if (decision >= 1 && decision <= tempUnitList.Count)
+                    {
+                        _unitSelected = true;
+                        selectedUnit = tempUnitList[decision - 1];
+
+                        Console.WriteLine();
+                        Services.ScrollText("What would you like to do with this unit?");
+
+                        foreach(string option in unitCommands)
+                        {
+                            Services.FastScrollText((Array.IndexOf(unitCommands, option) + 1).ToString() + ") " + option);
+                        }
+
+                        int cmd;
+                        Console.Write("> ");
+                        string input = Console.ReadLine();
+
+                        if (Int32.TryParse(input, out cmd))
+                        {
+                            if (cmd >= 1 && cmd <= unitCommands.Length)
+                            {
+                                switch (unitCommands[cmd - 1])
+                                {
+                                    case "Move":
+                                        UnitMove();
+                                        break;
+                                    case "Attack":
+                                        UnitAttack();
+                                        break;
+                                    default:
+                                        Services.ScrollText("Invalid input. Try again.");
+                                        UseUnits();
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                Services.ScrollText("Invalid input. Try again.");
+                                UseUnits();
+                            }
+                        }
+                        else
+                        {
+                            Services.ScrollText("Invalid input. Try again.");
+                            UseUnits();
+                        }
+                    }
+                    else
+                    {
+                        Services.ScrollText("Invalid input. Try again.");
+                        UseUnits();
+                    }
+                }
+                else if (answer == "back" || answer == "exit")
+                {
+                    PrintLocation();
+                    Listen();
+                }
+                else
+                {
+                    Services.ScrollText("Invalid input. Try again.");
+                    UseUnits();
+                }
+            }
+            else
+            {
+                Services.ScrollText("There are no units available to use this turn in this location!", 500);
+                Listen();
+            }
+        }
+
+        public void UnitMove()
+        {
+            int[] moveableLocations = new int[0];
+
+            switch (selectedUnit.Location)
+            {
+                case 1:
+                    moveableLocations = moveableLocations1;
+                    break;
+                case 2:
+                    moveableLocations = moveableLocations2;
+                    break;
+                case 3:
+                    moveableLocations = moveableLocations3;
+                    break;
+                case 4:
+                    moveableLocations = moveableLocations4;
+                    break;
+                case 5:
+                    moveableLocations = moveableLocations5;
+                    break;
+                case 6:
+                    moveableLocations = moveableLocations6;
+                    break;
+                case 7:
+                    moveableLocations = moveableLocations7;
+                    break;
+                case 8:
+                    moveableLocations = moveableLocations8;
+                    break;
+                case 9:
+                    moveableLocations = moveableLocations9;
+                    break;
+                case 10:
+                    moveableLocations = moveableLocations10;
+                    break;
+                case 11:
+                    moveableLocations = moveableLocations11;
+                    break;
+                case 12:
+                    moveableLocations = moveableLocations12;
+                    break;
+                default:
+                    Services.ScrollText("ERROR: The unit's location is invalid. .returning to main view");
+                    Listen();
+                    break;
+            }
+
+            Services.FastScrollText("You can type 'back' at any time to cancel this move)");
+            Services.FastScrollText("Where would you like to move?");
+
+            PrintMoveOptions(moveableLocations);
+
+            int cmd;
+            Console.Write("> ");
+            string input = Console.ReadLine();
+
+            if (Int32.TryParse(input, out cmd))
+            {
+                if (moveableLocations.Contains(cmd))
+                {
+                    selectedUnit.Location = cmd;
+                    selectedUnit.Sleeping = true;
+                    _unitSelected = false;
+                    UseUnits();
+                }
+                else
+                {
+                    Services.ScrollText("Invalid input. Try again.");
+                    UnitMove();
+                }
+            }
+            else if (input == "back" || input == "exit")
+            {
+                _unitSelected = false;
+                UseUnits();
+            }
+            else
+            {
+                Services.ScrollText("Invalid input. Try again.");
+                UnitMove();
+            }
+        }
+
+        public void PrintMoveOptions(int[] options)
+        {
+            foreach (int num in options)
+            {
+                Console.WriteLine(num + ") " + num);
+            }
+        }
+
+        public void UnitAttack()
+        {
+            //TODO
+        }
+
         public void HelpZoomedOut()
         {
             Services.FastScrollText("COMMANDS:");
@@ -987,6 +1202,7 @@ namespace TextGame
         {
             _zoomedLocation = 0;
             _zoomed = false;
+            PrintMap();
         }
 
         public int CalculatePay()
