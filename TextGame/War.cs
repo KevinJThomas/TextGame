@@ -9,18 +9,11 @@ using System.Threading.Tasks;
 
 namespace TextGame
 {
-    //1) Find new music
     //TBD:
-    //1) Receive currency at beginning or end of turn?
-    //2) Queue up all moves and execute at end of turn or perform them immediately 1 by 1 as they're made?
-    //3) Add more units/upgrades/items?
-    //4) Give AI currency advantage since it will be stupid?
-    //5) Give AI different unit types or use same as player?
-    //6) Win condition when one player no longer controls any units, or should there be a target 'king' unit to kill like chess?
-    //7) Enemy turn instantly execute to make faster gameplay or should it be slower so the player can keep up with what's happening?
+    //1) Give AI currency advantage since it will be stupid?
+    //2) Enemy turn instantly execute to make faster gameplay or should it be slower so the player can keep up with what's happening?
     //TODO:
-    //1) Attacking and moving units (1 action per turn using Sleeping prop on units) - add 'all units' command where you can do the same command with all units in the
-    //   location at once
+    //1) Find new music
     //2) EnemyTurn() - make enemies always attack if available else randomly move.. could make a predefined strat for them to always use
     class War : Scenario
     {
@@ -72,6 +65,24 @@ namespace TextGame
         {
             _player = player;
             musicThread.Start();
+
+            //Keep after testing
+            enemyUnits.Add(new Unit(3, 10));
+            enemyUnits.Add(new Unit(2, 12));
+            enemyUnits.Add(new Unit(1, 11));
+            enemyUnits.Add(new Unit(1, 11));
+
+            //Remove after testing
+            allyUnits.Add(new Unit(1, 1));
+            allyUnits.Add(new Unit(2, 1));
+            allyUnits.Add(new Unit(3, 1));
+            allyUnits.Add(new Unit(1, 2));
+            allyUnits.Add(new Unit(2, 2));
+            allyUnits.Add(new Unit(3, 2));
+            allyUnits.Add(new Unit(1, 3));
+            allyUnits.Add(new Unit(2, 3));
+            allyUnits.Add(new Unit(3, 3));
+            enemyUnits.Add(new Unit(3, 1));
 
             _playerCurrency = 100000; //change back to 1000 after testing
             _enemyCurrency = 1000;
@@ -130,7 +141,7 @@ namespace TextGame
 
         public void PrintMap()
         {
-            Console.WriteLine("E = Enemy, A = Ally\n");
+            Console.WriteLine("\nE = Enemy, A = Ally\n");
             Console.WriteLine(" ___________________________________________________");
             Console.WriteLine("| E: " + GetUnitsAtLocation(10, false).Count.ToString("00") + "       10 | E: " + GetUnitsAtLocation(11, false).Count.ToString("00") + "       11 | E: " + GetUnitsAtLocation(12, false).Count.ToString("00") + "        12 |");
             Console.WriteLine("|                |                |                 |");
@@ -152,7 +163,7 @@ namespace TextGame
 
         public void PrintLocation()
         {
-            Console.WriteLine("AREA " + _zoomedLocation);
+            Console.WriteLine("\nAREA " + _zoomedLocation);
             Console.WriteLine("_______________________________________________\n");
             Services.ScrollText("ENEMIES:");
             if (GetUnitsAtLocation(_zoomedLocation, false).Count > 0)
@@ -203,7 +214,7 @@ namespace TextGame
             {
                 HelpZoomedOut();
 
-                Console.Write("> ");
+                Console.Write("\n> ");
                 string cmd = Console.ReadLine().ToLower();
 
                 if (cmd.Length >= 4 && cmd.Substring(0, 4) == "zoom" && cmd.Length >= 6)
@@ -251,7 +262,7 @@ namespace TextGame
             {
                 HelpZoomedIn();
 
-                Console.Write("> ");
+                Console.Write("\n> ");
                 string cmd = Console.ReadLine().ToLower();
 
                 switch (cmd)
@@ -293,7 +304,7 @@ namespace TextGame
             Console.WriteLine();
 
             int decision;
-            Console.Write("> ");
+            Console.Write("\n> ");
             string cmd = Console.ReadLine();
 
             if (Int32.TryParse(cmd, out decision))
@@ -343,7 +354,7 @@ namespace TextGame
             Console.WriteLine();
 
             int decision;
-            Console.Write("> ");
+            Console.Write("\n> ");
             string cmd = Console.ReadLine();
 
             if (Int32.TryParse(cmd, out decision))
@@ -379,7 +390,7 @@ namespace TextGame
             Console.WriteLine();
 
             int decision;
-            Console.Write("> ");
+            Console.Write("\n> ");
             string cmd = Console.ReadLine();
 
             if (Int32.TryParse(cmd, out decision))
@@ -415,7 +426,7 @@ namespace TextGame
             Console.WriteLine();
 
             int decision;
-            Console.Write("> ");
+            Console.Write("\n> ");
             string cmd = Console.ReadLine();
 
             if (Int32.TryParse(cmd, out decision))
@@ -451,7 +462,7 @@ namespace TextGame
             Console.WriteLine();
 
             int decision;
-            Console.Write("> ");
+            Console.Write("\n> ");
             string cmd = Console.ReadLine();
 
             if (Int32.TryParse(cmd, out decision))
@@ -801,7 +812,7 @@ namespace TextGame
             Services.ScrollText("3) 3");
 
             int decision;
-            Console.Write("> ");
+            Console.Write("\n> ");
             string answer = Console.ReadLine();
 
             if(Int32.TryParse(answer, out decision))
@@ -848,7 +859,7 @@ namespace TextGame
                 }
 
                 int decision;
-                Console.Write("> ");
+                Console.Write("\n> ");
                 string answer = Console.ReadLine();
 
                 if (Int32.TryParse(answer, out decision))
@@ -898,7 +909,7 @@ namespace TextGame
                 }
 
                 int decision;
-                Console.Write("> ");
+                Console.Write("\n> ");
                 string answer = Console.ReadLine();
 
                 if (Int32.TryParse(answer, out decision))
@@ -948,7 +959,7 @@ namespace TextGame
                 }
 
                 int decision;
-                Console.Write("> ");
+                Console.Write("\n> ");
                 string answer = Console.ReadLine();
 
                 if (Int32.TryParse(answer, out decision))
@@ -989,16 +1000,17 @@ namespace TextGame
             if (tempUnitList.Count > 0)
             {
                 Console.WriteLine();
-                Services.FastScrollText("(You can type 'back' at any time to leave the unit control session)");
-                Services.FastScrollText("Available Units:");
+                Services.FastScrollText("(You can type 'back' at any time to leave the unit control session)\n");
+                Services.FastScrollText("Available Units: (or type 'all' to control them all at once)");
+
                 foreach (Unit unit in tempUnitList)
                 {
                     Services.FastScrollText((tempUnitList.IndexOf(unit) + 1).ToString() + ") " + unit.TypeToString + " (" + unit.Attack + "/" + unit.Health + ")");
                 }
 
                 int decision;
-                Console.Write("> ");
-                string answer = Console.ReadLine();
+                Console.Write("\n> ");
+                string answer = Console.ReadLine().ToLower();
 
                 if (Int32.TryParse(answer, out decision))
                 {
@@ -1016,8 +1028,8 @@ namespace TextGame
                         }
 
                         int cmd;
-                        Console.Write("> ");
-                        string input = Console.ReadLine();
+                        Console.Write("\n> ");
+                        string input = Console.ReadLine().ToLower();
 
                         if (Int32.TryParse(input, out cmd))
                         {
@@ -1033,6 +1045,7 @@ namespace TextGame
                                         break;
                                     default:
                                         Services.ScrollText("Invalid input. Try again.");
+                                        _unitSelected = false;
                                         UseUnits();
                                         break;
                                 }
@@ -1040,7 +1053,59 @@ namespace TextGame
                             else
                             {
                                 Services.ScrollText("Invalid input. Try again.");
+                                _unitSelected = false;
                                 UseUnits();
+                            }
+                        }
+                        else
+                        {
+                            Services.ScrollText("Invalid input. Try again.");
+                            _unitSelected = false;
+                            UseUnits();
+                        }
+                    }
+                    else
+                    {
+                        Services.ScrollText("Invalid input. Try again.");
+                        _unitSelected = false;
+                        UseUnits();
+                    }
+                }
+                else if (answer == "back" || answer == "exit")
+                {
+                    PrintLocation();
+                    Listen();
+                }
+                else if (answer == "all")
+                {
+                    Console.WriteLine();
+                    Services.ScrollText("What would you like to do with your units?");
+
+                    foreach (string option in unitCommands)
+                    {
+                        Services.FastScrollText((Array.IndexOf(unitCommands, option) + 1).ToString() + ") " + option);
+                    }
+
+                    int cmd;
+                    Console.Write("\n> ");
+                    string input = Console.ReadLine().ToLower();
+
+                    if (Int32.TryParse(input, out cmd))
+                    {
+                        if (cmd >= 1 && cmd <= unitCommands.Length)
+                        {
+                            switch (unitCommands[cmd - 1])
+                            {
+                                case "Move":
+                                    MoveAll();
+                                    break;
+                                case "Attack":
+                                    AttackAll();
+                                    break;
+                                default:
+                                    Services.ScrollText("Invalid input. Try again.");
+                                    UseUnits();
+                                    break;
                             }
                         }
                         else
@@ -1055,20 +1120,17 @@ namespace TextGame
                         UseUnits();
                     }
                 }
-                else if (answer == "back" || answer == "exit")
-                {
-                    PrintLocation();
-                    Listen();
-                }
                 else
                 {
                     Services.ScrollText("Invalid input. Try again.");
+                    _unitSelected = false;
                     UseUnits();
                 }
             }
             else
             {
                 Services.ScrollText("There are no units available to use this turn in this location!", 500);
+                PrintLocation();
                 Listen();
             }
         }
@@ -1127,7 +1189,7 @@ namespace TextGame
             PrintMoveOptions(moveableLocations);
 
             int cmd;
-            Console.Write("> ");
+            Console.Write("\n> ");
             string input = Console.ReadLine();
 
             if (Int32.TryParse(input, out cmd))
@@ -1137,7 +1199,15 @@ namespace TextGame
                     selectedUnit.Location = cmd;
                     selectedUnit.Sleeping = true;
                     _unitSelected = false;
-                    UseUnits();
+                    if (CheckLocation(true))
+                    {
+                        PrintLocation();
+                        Listen();
+                    }
+                    else
+                    {
+                        UseUnits();
+                    }
                 }
                 else
                 {
@@ -1167,7 +1237,258 @@ namespace TextGame
 
         public void UnitAttack()
         {
-            //TODO
+            List<Unit> tempEnemyUnitList = new List<Unit>();
+
+            foreach (Unit unit in enemyUnits)
+            {
+                if (unit.Location == _zoomedLocation)
+                {
+                    tempEnemyUnitList.Add(unit);
+                }
+            }
+
+            if (tempEnemyUnitList.Count > 0)
+            {
+                Services.FastScrollText("You can type 'back' at any point to return to the previous menu)");
+                Services.ScrollText("You are attacking with: " + selectedUnit.TypeToString + " (" + selectedUnit.Attack + "/" + selectedUnit.Health + ")");
+                Services.FastScrollText("Select which unit you'd like to attack:");
+
+                foreach (Unit unit in tempEnemyUnitList)
+                {
+                    Services.FastScrollText((tempEnemyUnitList.IndexOf(unit) + 1).ToString() + ") " + unit.TypeToString + " (" + unit.Attack + "/" + unit.Health + ")");
+                }
+
+                int cmd;
+                Console.Write("\n> ");
+                string input = Console.ReadLine();
+
+                if (Int32.TryParse(input, out cmd))
+                {
+                    if (cmd >= 1 && cmd <= tempEnemyUnitList.Count)
+                    {
+                        Services.ScrollText(selectedUnit.TypeToString + " attacks " + tempEnemyUnitList[cmd - 1].TypeToString + "!");
+                        Attack(selectedUnit, tempEnemyUnitList[cmd - 1]);
+                        _unitSelected = false;
+                        if (CheckLocation(true))
+                        {
+                            PrintLocation();
+                            Listen();
+                        }
+                        else
+                        {
+                            UseUnits();
+                        }
+                    }
+                }
+                else if (input == "back")
+                {
+                    _unitSelected = false;
+                    UseUnits();
+                }
+                else if (input == "exit")
+                {
+                    _unitSelected = false;
+                    Listen();
+                }
+                else
+                {
+                    Services.ScrollText("Invalid input. Try again.");
+                    UnitAttack();
+                }
+            }
+            else
+            {
+                Services.ScrollText("There are no enemies to attack in this location!");
+                _unitSelected = false;
+                UseUnits();
+            }
+        }
+
+        public void MoveAll()
+        {
+            int[] moveableLocations = new int[0];
+
+            switch (_zoomedLocation)
+            {
+                case 1:
+                    moveableLocations = moveableLocations1;
+                    break;
+                case 2:
+                    moveableLocations = moveableLocations2;
+                    break;
+                case 3:
+                    moveableLocations = moveableLocations3;
+                    break;
+                case 4:
+                    moveableLocations = moveableLocations4;
+                    break;
+                case 5:
+                    moveableLocations = moveableLocations5;
+                    break;
+                case 6:
+                    moveableLocations = moveableLocations6;
+                    break;
+                case 7:
+                    moveableLocations = moveableLocations7;
+                    break;
+                case 8:
+                    moveableLocations = moveableLocations8;
+                    break;
+                case 9:
+                    moveableLocations = moveableLocations9;
+                    break;
+                case 10:
+                    moveableLocations = moveableLocations10;
+                    break;
+                case 11:
+                    moveableLocations = moveableLocations11;
+                    break;
+                case 12:
+                    moveableLocations = moveableLocations12;
+                    break;
+                default:
+                    Services.ScrollText("ERROR: The units' location is invalid. .returning to main view");
+                    Listen();
+                    break;
+            }
+
+            Services.FastScrollText("You can type 'back' at any time to cancel this move)");
+            Services.FastScrollText("Where would you like to move?");
+
+            PrintMoveOptions(moveableLocations);
+
+            int cmd;
+            Console.Write("\n> ");
+            string input = Console.ReadLine();
+
+            if (Int32.TryParse(input, out cmd))
+            {
+                if (moveableLocations.Contains(cmd))
+                {
+                    foreach (Unit unit in allyUnits)
+                    {
+                        if (unit.Location == _zoomedLocation)
+                        {
+                            unit.Location = cmd;
+                            unit.Sleeping = true;
+                        }
+                    }
+                    if (CheckLocation(true))
+                    {
+                        PrintLocation();
+                        Listen();
+                    }
+                    else
+                    {
+                        UseUnits();
+                    }
+                }
+                else
+                {
+                    Services.ScrollText("Invalid input. Try again.");
+                    MoveAll();
+                }
+            }
+            else if (input == "back" || input == "exit")
+            {
+                UseUnits();
+            }
+            else
+            {
+                Services.ScrollText("Invalid input. Try again.");
+                MoveAll();
+            }
+        }
+
+        public void AttackAll()
+        {
+            List<Unit> tempEnemyUnitList = new List<Unit>();
+
+            foreach (Unit unit in enemyUnits)
+            {
+                if (unit.Location == _zoomedLocation)
+                {
+                    tempEnemyUnitList.Add(unit);
+                }
+            }
+
+            if (tempEnemyUnitList.Count > 0)
+            {
+                Services.FastScrollText("You can type 'back' at any point to return to the previous menu)");
+                Services.ScrollText("You are attacking with all units");
+                Services.FastScrollText("Select which unit you'd like to attack:");
+
+                foreach (Unit unit in tempEnemyUnitList)
+                {
+                    Services.FastScrollText((tempEnemyUnitList.IndexOf(unit) + 1).ToString() + ") " + unit.TypeToString + " (" + unit.Attack + "/" + unit.Health + ")");
+                }
+
+                int cmd;
+                Console.Write("\n> ");
+                string input = Console.ReadLine();
+
+                if (Int32.TryParse(input, out cmd))
+                {
+                    if (cmd >= 1 && cmd <= tempEnemyUnitList.Count)
+                    {
+                        Services.ScrollText("All units attack " + tempEnemyUnitList[cmd - 1].TypeToString + "!");
+
+                        foreach (Unit unit in allyUnits)
+                        {
+                            if (unit.Location == _zoomedLocation)
+                            {
+                                Attack(unit, tempEnemyUnitList[cmd - 1]);
+                            }
+                        }
+                        if (CheckLocation(true))
+                        {
+                            PrintLocation();
+                            Listen();
+                        }
+                        else
+                        {
+                            UseUnits();
+                        }
+                    }
+                }
+                else if (input == "back")
+                {
+                    UseUnits();
+                }
+                else if (input == "exit")
+                {
+                    Listen();
+                }
+                else
+                {
+                    Services.ScrollText("Invalid input. Try again.");
+                    AttackAll();
+                }
+            }
+            else
+            {
+                Services.ScrollText("There are no enemies to attack in this location!");
+                UseUnits();
+            }
+        }
+
+        public bool CheckLocation(bool ally)
+        {
+            bool clear = true;
+            if (ally)
+            {
+                foreach (Unit unit in allyUnits)
+                {
+                    if (unit.Location == _zoomedLocation)
+                    {
+                        if (unit.Sleeping == false)
+                        {
+                            clear = false;
+                        }
+                    }
+                }
+            }
+            return clear;
         }
 
         public void HelpZoomedOut()
@@ -1203,6 +1524,35 @@ namespace TextGame
             _zoomedLocation = 0;
             _zoomed = false;
             PrintMap();
+        }
+
+        public void Attack(Unit attacker, Unit defender)
+        {
+            attacker.Health -= defender.Attack;
+            defender.Health -= attacker.Attack;
+            attacker.Sleeping = true;
+
+            CheckDeath(attacker, defender);
+        }
+
+        //Not currently used
+        public void CheckDeath(Unit unit)
+        {
+
+        }
+
+        public void CheckDeath(Unit ally, Unit enemy)
+        {
+            if (ally.Health < 1)
+            {
+                Services.ScrollText(ally.TypeToString + " dies!");
+                allyUnits.Remove(ally);
+            }
+            if (enemy.Health < 1)
+            {
+                Services.ScrollText(enemy.TypeToString + " dies!");
+                allyUnits.Remove(enemy);
+            }
         }
 
         public int CalculatePay()
