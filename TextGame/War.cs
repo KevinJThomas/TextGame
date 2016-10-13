@@ -19,10 +19,9 @@ namespace TextGame
     //6) Win condition when one player no longer controls any units, or should there be a target 'king' unit to kill like chess?
     //7) Enemy turn instantly execute to make faster gameplay or should it be slower so the player can keep up with what's happening?
     //TODO:
-    //1) CalculatePay()
-    //2) Attacking and moving units (1 action per turn using Sleeping prop on units) - add 'all units' command where you can do the same command with all units in the
+    //1) Attacking and moving units (1 action per turn using Sleeping prop on units) - add 'all units' command where you can do the same command with all units in the
     //   location at once
-    //3) EnemyTurn() - make enemies always attack if available else randomly move.. could make a predefined strat for them to always use
+    //2) EnemyTurn() - make enemies always attack if available else randomly move.. could make a predefined strat for them to always use
     class War : Scenario
     {
         Thread musicThread = new Thread(PlayMusic);
@@ -38,40 +37,13 @@ namespace TextGame
         int[] priceCavalier = new int[] { 700, 1000, 350 };
         int[] priceOther = new int[] { 1000 };
 
-        //ally units
-        List<Unit> allyUnits1 = new List<Unit>();
-        List<Unit> allyUnits2 = new List<Unit>();
-        List<Unit> allyUnits3 = new List<Unit>();
-        List<Unit> allyUnits4 = new List<Unit>();
-        List<Unit> allyUnits5 = new List<Unit>();
-        List<Unit> allyUnits6 = new List<Unit>();
-        List<Unit> allyUnits7 = new List<Unit>();
-        List<Unit> allyUnits8 = new List<Unit>();
-        List<Unit> allyUnits9 = new List<Unit>();
-        List<Unit> allyUnits10 = new List<Unit>();
-        List<Unit> allyUnits11 = new List<Unit>();
-        List<Unit> allyUnits12 = new List<Unit>();
-        List<List<Unit>> allAllyUnits;
+        List<Unit> allyUnits = new List<Unit>();
 
-        //enemy units
-        List<Unit> enemyUnits1 = new List<Unit>();
-        List<Unit> enemyUnits2 = new List<Unit>();
-        List<Unit> enemyUnits3 = new List<Unit>();
-        List<Unit> enemyUnits4 = new List<Unit>();
-        List<Unit> enemyUnits5 = new List<Unit>();
-        List<Unit> enemyUnits6 = new List<Unit>();
-        List<Unit> enemyUnits7 = new List<Unit>();
-        List<Unit> enemyUnits8 = new List<Unit>();
-        List<Unit> enemyUnits9 = new List<Unit>();
-        List<Unit> enemyUnits10 = new List<Unit>();
-        List<Unit> enemyUnits11 = new List<Unit>();
-        List<Unit> enemyUnits12 = new List<Unit>();
-        List<List<Unit>> allEnemyUnits;
+        List<Unit> enemyUnits = new List<Unit>();
 
         Unit selectedUnit;
         bool _unitSelected = false;
-
-        List<List<Unit>> currentUnits = new List<List<Unit>>();
+        
         int _zoomedLocation;
 
         bool _zoomed = false;
@@ -85,11 +57,6 @@ namespace TextGame
         {
             _player = player;
             musicThread.Start();
-
-            allAllyUnits = new List<List<Unit>>() { allyUnits1, allyUnits2, allyUnits3, allyUnits4, allyUnits5, allyUnits6, allyUnits7,
-                allyUnits8, allyUnits9, allyUnits10, allyUnits11, allyUnits12};
-            allEnemyUnits = new List<List<Unit>>() { enemyUnits1, enemyUnits2, enemyUnits3, enemyUnits4, enemyUnits5, enemyUnits6,
-                enemyUnits7, enemyUnits8, enemyUnits9, enemyUnits10, enemyUnits11, enemyUnits12};
 
             _playerCurrency = 100000; //change back to 1000 after testing
             _enemyCurrency = 1000;
@@ -145,21 +112,21 @@ namespace TextGame
         {
             Console.WriteLine("E = Enemy, A = Ally\n");
             Console.WriteLine(" ___________________________________________________");
-            Console.WriteLine("| E: " + enemyUnits10.Count.ToString("00") + "       10 | E: " + enemyUnits11.Count.ToString("00") + "       11 | E: " + enemyUnits12.Count.ToString("00") + "        12 |");
+            Console.WriteLine("| E: " + GetUnitsAtLocation(10, false).Count.ToString("00") + "       10 | E: " + GetUnitsAtLocation(11, false).Count.ToString("00") + "       11 | E: " + GetUnitsAtLocation(12, false).Count.ToString("00") + "        12 |");
             Console.WriteLine("|                |                |                 |");
-            Console.WriteLine("| A: " + allyUnits10.Count.ToString("00") + "          | A: " + allyUnits11.Count.ToString("00") + "          | A: " + allyUnits12.Count.ToString("00") + "           |");
+            Console.WriteLine("| A: " + GetUnitsAtLocation(10, true).Count.ToString("00") + "          | A: " + GetUnitsAtLocation(11, true).Count.ToString("00") + "          | A: " + GetUnitsAtLocation(12, true).Count.ToString("00") + "           |");
             Console.WriteLine("|________________|________________|_________________|");
-            Console.WriteLine("| E: " + enemyUnits7.Count.ToString("00") + "        7 | E: " + enemyUnits8.Count.ToString("00") + "        8 | E: " + enemyUnits9.Count.ToString("00") + "         9 |");
+            Console.WriteLine("| E: " + GetUnitsAtLocation(7, false).Count.ToString("00") + "        7 | E: " + GetUnitsAtLocation(8, false).Count.ToString("00") + "        8 | E: " + GetUnitsAtLocation(9, false).Count.ToString("00") + "         9 |");
             Console.WriteLine("|                |                |                 |");
-            Console.WriteLine("| A: " + allyUnits7.Count.ToString("00") + "          | A: " + allyUnits8.Count.ToString("00") + "          | A: " + allyUnits9.Count.ToString("00") + "           |");
+            Console.WriteLine("| A: " + GetUnitsAtLocation(7, true).Count.ToString("00") + "          | A: " + GetUnitsAtLocation(8, true).Count.ToString("00") + "          | A: " + GetUnitsAtLocation(9, true).Count.ToString("00") + "           |");
             Console.WriteLine("|________________|________________|_________________|");
-            Console.WriteLine("| E: " + enemyUnits4.Count.ToString("00") + "        4 | E: " + enemyUnits5.Count.ToString("00") + "        5 | E: " + enemyUnits6.Count.ToString("00") + "         6 |");
+            Console.WriteLine("| E: " + GetUnitsAtLocation(4, false).Count.ToString("00") + "        4 | E: " + GetUnitsAtLocation(5, false).Count.ToString("00") + "        5 | E: " + GetUnitsAtLocation(6, false).Count.ToString("00") + "         6 |");
             Console.WriteLine("|                |                |                 |");
-            Console.WriteLine("| A: " + allyUnits4.Count.ToString("00") + "          | A: " + allyUnits5.Count.ToString("00") + "          | A: " + allyUnits6.Count.ToString("00") + "           |");
+            Console.WriteLine("| A: " + GetUnitsAtLocation(4, true).Count.ToString("00") + "          | A: " + GetUnitsAtLocation(5, true).Count.ToString("00") + "          | A: " + GetUnitsAtLocation(6, true).Count.ToString("00") + "           |");
             Console.WriteLine("|________________|________________|_________________|");
-            Console.WriteLine("| E: " + enemyUnits1.Count.ToString("00") + "        1 | E: " + enemyUnits2.Count.ToString("00") + "        2 | E: " + enemyUnits3.Count.ToString("00") + "         3 |");
+            Console.WriteLine("| E: " + GetUnitsAtLocation(1, false).Count.ToString("00") + "        1 | E: " + GetUnitsAtLocation(2, false).Count.ToString("00") + "        2 | E: " + GetUnitsAtLocation(3, false).Count.ToString("00") + "         3 |");
             Console.WriteLine("|                |                |                 |");
-            Console.WriteLine("| A: " + allyUnits1.Count.ToString("00") + "          | A: " + allyUnits2.Count.ToString("00") + "          | A: " + allyUnits3.Count.ToString("00") + "           |");
+            Console.WriteLine("| A: " + GetUnitsAtLocation(1, true).Count.ToString("00") + "          | A: " + GetUnitsAtLocation(2, true).Count.ToString("00") + "          | A: " + GetUnitsAtLocation(3, true).Count.ToString("00") + "           |");
             Console.WriteLine("|________________|________________|_________________|\n");
         }
 
@@ -168,11 +135,11 @@ namespace TextGame
             Console.WriteLine("AREA " + _zoomedLocation);
             Console.WriteLine("_______________________________________________\n");
             Services.ScrollText("ENEMIES:");
-            if (currentUnits[1].Count > 0)
+            if (GetUnitsAtLocation(_zoomedLocation, false).Count > 0)
             {
-                foreach (Unit unit in currentUnits[1])
+                foreach (Unit unit in GetUnitsAtLocation(_zoomedLocation, false))
                 {
-                    if (unit != currentUnits[1][currentUnits[1].Count - 1])
+                    if (unit != GetUnitsAtLocation(_zoomedLocation, false)[GetUnitsAtLocation(_zoomedLocation, false).Count - 1])
                     {
                         Console.Write(unit.TypeToString + " (" + unit.Attack + "/" + unit.Health + ") - ");
                     }
@@ -189,11 +156,11 @@ namespace TextGame
             
 
             Services.ScrollText("ALLIES:");
-            if (currentUnits[0].Count > 0)
+            if (GetUnitsAtLocation(_zoomedLocation, true).Count > 0)
             {
-                foreach (Unit unit in currentUnits[0])
+                foreach (Unit unit in GetUnitsAtLocation(_zoomedLocation, true))
                 {
-                    if (unit != currentUnits[0][currentUnits[0].Count - 1])
+                    if (unit != GetUnitsAtLocation(_zoomedLocation, true)[GetUnitsAtLocation(_zoomedLocation, true).Count - 1])
                     {
                         Console.Write(unit.TypeToString + " (" + unit.Attack + "/" + unit.Health + ") - ");
                     }
@@ -270,7 +237,8 @@ namespace TextGame
                 switch (cmd)
                 {
                     case "count":
-                        Services.ScrollText("Ally units: " + currentUnits[0].Count + "\nEnemy units: " + currentUnits[1].Count + "\n");
+                        Services.ScrollText("Ally units: " + GetUnitsAtLocation(_zoomedLocation, true).Count + 
+                            "\nEnemy units: " + GetUnitsAtLocation(_zoomedLocation, false).Count + "\n");
                         Listen();
                         break;
                     case "map":
@@ -819,24 +787,15 @@ namespace TextGame
 
             if(Int32.TryParse(answer, out decision))
             {
-                switch (decision)
+                if (decision >= 1 && decision <= 3)
                 {
-                    case 1:
-                        allyUnits1.Add(new Unit(type));
-                        Shop();
-                        break;
-                    case 2:
-                        allyUnits2.Add(new Unit(type));
-                        Shop();
-                        break;
-                    case 3:
-                        allyUnits3.Add(new Unit(type));
-                        Shop();
-                        break;
-                    default:
-                        Services.ScrollText("Invalid input. Try again.");
-                        PlaceUnit(type);
-                        break;
+                    allyUnits.Add(new Unit(type, decision));
+                    Shop();
+                }
+                else
+                {
+                    Services.ScrollText("Invalid input. Try again.");
+                    PlaceUnit(type);
                 }
             }
             else
@@ -849,16 +808,12 @@ namespace TextGame
         public void ListInfantry()
         {
             List<Unit> tempUnitList = new List<Unit>();
-            List<int> tempIntList = new List<int>();
-            foreach (List<Unit> list in allAllyUnits)
+            
+            foreach (Unit unit in allyUnits)
             {
-                foreach (Unit unit in list)
+                if (unit.Type == 1)
                 {
-                    if (unit.Type == 1)
-                    {
-                        tempUnitList.Add(unit);
-                        tempIntList.Add(allAllyUnits.IndexOf(list) + 1);
-                    }
+                    tempUnitList.Add(unit);
                 }
             }
             Console.WriteLine();
@@ -870,7 +825,7 @@ namespace TextGame
                 foreach (Unit unit in tempUnitList)
                 {
                     Services.ScrollText((tempUnitList.IndexOf(unit) + 1) + 
-                        ") Infantry A:" + unit.Attack + " H:" + unit.Health + " Location: " + tempIntList[tempUnitList.IndexOf(unit)]);
+                        ") Infantry A:" + unit.Attack + " H:" + unit.Health + " Location: " + unit.Location);
                 }
 
                 int decision;
@@ -903,16 +858,12 @@ namespace TextGame
         public void ListArcher()
         {
             List<Unit> tempUnitList = new List<Unit>();
-            List<int> tempIntList = new List<int>();
-            foreach (List<Unit> list in allAllyUnits)
+
+            foreach (Unit unit in allyUnits)
             {
-                foreach (Unit unit in list)
+                if (unit.Type == 2)
                 {
-                    if (unit.Type == 2)
-                    {
-                        tempUnitList.Add(unit);
-                        tempIntList.Add(allAllyUnits.IndexOf(list) + 1);
-                    }
+                    tempUnitList.Add(unit);
                 }
             }
             Console.WriteLine();
@@ -924,7 +875,7 @@ namespace TextGame
                 foreach (Unit unit in tempUnitList)
                 {
                     Services.ScrollText((tempUnitList.IndexOf(unit) + 1) +
-                        ") Archer A:" + unit.Attack + " H:" + unit.Health + " Location: " + tempIntList[tempUnitList.IndexOf(unit)]);
+                        ") Archer A:" + unit.Attack + " H:" + unit.Health + " Location: " + unit.Location);
                 }
 
                 int decision;
@@ -957,16 +908,12 @@ namespace TextGame
         public void ListCavalier()
         {
             List<Unit> tempUnitList = new List<Unit>();
-            List<int> tempIntList = new List<int>();
-            foreach (List<Unit> list in allAllyUnits)
+
+            foreach (Unit unit in allyUnits)
             {
-                foreach (Unit unit in list)
+                if (unit.Type == 3)
                 {
-                    if (unit.Type == 3)
-                    {
-                        tempUnitList.Add(unit);
-                        tempIntList.Add(allAllyUnits.IndexOf(list) + 1);
-                    }
+                    tempUnitList.Add(unit);
                 }
             }
             Console.WriteLine();
@@ -978,7 +925,7 @@ namespace TextGame
                 foreach (Unit unit in tempUnitList)
                 {
                     Services.ScrollText((tempUnitList.IndexOf(unit) + 1) +
-                        ") Cavalier A:" + unit.Attack + " H:" + unit.Health + " Location: " + tempIntList[tempUnitList.IndexOf(unit)]);
+                        ") Cavalier A:" + unit.Attack + " H:" + unit.Health + " Location: " + unit.Location);
                 }
 
                 int decision;
@@ -1030,60 +977,6 @@ namespace TextGame
 
         public void Zoom(int num)
         {
-            switch (num)
-            {
-                case 1:
-                    currentUnits.Add(allyUnits1);
-                    currentUnits.Add(enemyUnits1);
-                    break;
-                case 2:
-                    currentUnits.Add(allyUnits2);
-                    currentUnits.Add(enemyUnits2);
-                    break;
-                case 3:
-                    currentUnits.Add(allyUnits3);
-                    currentUnits.Add(enemyUnits3);
-                    break;
-                case 4:
-                    currentUnits.Add(allyUnits4);
-                    currentUnits.Add(enemyUnits4);
-                    break;
-                case 5:
-                    currentUnits.Add(allyUnits5);
-                    currentUnits.Add(enemyUnits5);
-                    break;
-                case 6:
-                    currentUnits.Add(allyUnits6);
-                    currentUnits.Add(enemyUnits6);
-                    break;
-                case 7:
-                    currentUnits.Add(allyUnits7);
-                    currentUnits.Add(enemyUnits7);
-                    break;
-                case 8:
-                    currentUnits.Add(allyUnits8);
-                    currentUnits.Add(enemyUnits8);
-                    break;
-                case 9:
-                    currentUnits.Add(allyUnits9);
-                    currentUnits.Add(enemyUnits9);
-                    break;
-                case 10:
-                    currentUnits.Add(allyUnits10);
-                    currentUnits.Add(enemyUnits10);
-                    break;
-                case 11:
-                    currentUnits.Add(allyUnits11);
-                    currentUnits.Add(enemyUnits11);
-                    break;
-                case 12:
-                    currentUnits.Add(allyUnits12);
-                    currentUnits.Add(enemyUnits12);
-                    break;
-                default:
-                    Services.ScrollText("ERROR: Zoom(int) case not defined for (" + num + ")");
-                    break;
-            }
             _zoomedLocation = num;
             _zoomed = true;
             PrintLocation();
@@ -1092,7 +985,6 @@ namespace TextGame
 
         public void ZoomOut()
         {
-            currentUnits.Clear();
             _zoomedLocation = 0;
             _zoomed = false;
         }
@@ -1102,53 +994,28 @@ namespace TextGame
             int unitCompensation = CountAllyUnits() * 10;
             int locationCompensation = 0;
 
-            if (allyUnits1.Count > enemyUnits1.Count)
+            for (int i = 1; i <= 12; i++)
             {
-                locationCompensation++;
-            }
-            if (allyUnits2.Count > enemyUnits2.Count)
-            {
-                locationCompensation++;
-            }
-            if (allyUnits3.Count > enemyUnits3.Count)
-            {
-                locationCompensation++;
-            }
-            if (allyUnits4.Count > enemyUnits4.Count)
-            {
-                locationCompensation++;
-            }
-            if (allyUnits5.Count > enemyUnits5.Count)
-            {
-                locationCompensation++;
-            }
-            if (allyUnits6.Count > enemyUnits6.Count)
-            {
-                locationCompensation++;
-            }
-            if (allyUnits7.Count > enemyUnits7.Count)
-            {
-                locationCompensation++;
-            }
-            if (allyUnits8.Count > enemyUnits8.Count)
-            {
-                locationCompensation++;
-            }
-            if (allyUnits9.Count > enemyUnits9.Count)
-            {
-                locationCompensation++;
-            }
-            if (allyUnits10.Count > enemyUnits10.Count)
-            {
-                locationCompensation++;
-            }
-            if (allyUnits11.Count > enemyUnits11.Count)
-            {
-                locationCompensation++;
-            }
-            if (allyUnits12.Count > enemyUnits12.Count)
-            {
-                locationCompensation++;
+                int ally = 0;
+                int enemy = 0;
+                foreach (Unit unit in allyUnits)
+                {
+                    if (unit.Location == i)
+                    {
+                        ally++;
+                    }
+                }
+                foreach (Unit unit in enemyUnits)
+                {
+                    if (unit.Location == i)
+                    {
+                        enemy++;
+                    }
+                }
+                if (ally > enemy)
+                {
+                    locationCompensation++;
+                }
             }
 
             locationCompensation = locationCompensation * 50;
@@ -1156,16 +1023,43 @@ namespace TextGame
             return locationCompensation + unitCompensation + 200;
         }
 
+        public List<Unit> GetUnitsAtLocation(int location, bool allies)
+        {
+            List<Unit> tempUnitList = new List<Unit>();
+
+            if (allies)
+            {
+                foreach (Unit unit in allyUnits)
+                {
+                    if (unit.Location == location)
+                    {
+                        tempUnitList.Add(unit);
+                    }
+                }
+            }
+            else
+            {
+                foreach (Unit unit in enemyUnits)
+                {
+                    if (unit.Location == location)
+                    {
+                        tempUnitList.Add(unit);
+                    }
+                }
+            }
+            
+
+            return tempUnitList;
+        }
+
         public int CountAllyUnits()
         {
-            return allyUnits1.Count + allyUnits2.Count + allyUnits3.Count + allyUnits4.Count + allyUnits5.Count + allyUnits6.Count + allyUnits7.Count + allyUnits8.Count
-                 + allyUnits9.Count + allyUnits10.Count + allyUnits11.Count + allyUnits12.Count;
+            return allyUnits.Count;
         }
 
         public int CountEnemyUnits()
         {
-            return enemyUnits1.Count + enemyUnits2.Count + enemyUnits3.Count + enemyUnits4.Count + enemyUnits5.Count + enemyUnits6.Count + enemyUnits7.Count
-                + enemyUnits8.Count + enemyUnits9.Count + enemyUnits10.Count + enemyUnits11.Count + enemyUnits12.Count;
+            return enemyUnits.Count;
         }
     }
 }

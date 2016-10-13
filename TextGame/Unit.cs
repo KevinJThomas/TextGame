@@ -13,13 +13,16 @@ namespace TextGame
         public int Type { get; set; } //1: Infantry 2: Archer 3: Cavalier 4: Arrow Shield -- Use enum?
         public string TypeToString { get; set; }
         public bool Sleeping { get; set; }
+        public int Location { get; set; }
 
         bool _hasShield = false;
         bool _hasArmor = false;
 
-        public Unit (int type)
+        public Unit (int type, int location)
         {
             Type = type;
+            Location = location;
+
             switch (Type)
             {
                 case 1:
