@@ -389,6 +389,11 @@ namespace TextGame
                             break;
                     }
                 }
+                else
+                {
+                    Services.ScrollText("Invalid input. Try again.");
+                    Shop();
+                }
             }
             else if (cmd == "back" || cmd == "exit")
             {
@@ -422,6 +427,12 @@ namespace TextGame
                 {
                     Purchase(1, shopInfantry[decision - 1]);
                 }
+                else
+                {
+                    Services.ScrollText("Invalid input. Try again.");
+                    ShopInfantry();
+                }
+
             }
             else if (cmd == "exit")
             {
@@ -459,6 +470,11 @@ namespace TextGame
                 {
                     Purchase(2, shopArcher[decision - 1]);
                 }
+                else
+                {
+                    Services.ScrollText("Invalid input. Try again.");
+                    ShopArcher();
+                }
             }
             else if (cmd == "exit")
             {
@@ -495,6 +511,11 @@ namespace TextGame
                 if (decision >= 1 && decision <= shopCavalier.Length)
                 {
                     Purchase(3, shopCavalier[decision - 1]);
+                }
+                else
+                {
+                    Services.ScrollText("Invalid input. Try again.");
+                    ShopCavalier();
                 }
             }
             else if (cmd == "exit")

@@ -43,7 +43,7 @@ namespace TextGame
                 case 4:
                     Attack = 0;
                     Health = 50;
-                    TypeToString = "Arrow Shield";
+                    TypeToString = "Giant Shield";
                     break;
                 default:
                     Attack = 1;
