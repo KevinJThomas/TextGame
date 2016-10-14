@@ -9,13 +9,6 @@ using System.Threading.Tasks;
 
 namespace TextGame
 {
-    //TBD:
-    //1) Give AI currency advantage since it will be stupid?
-    //2) Enemy turn instantly execute to make faster gameplay or should it be slower so the player can keep up with what's happening?
-    //TODO:
-    //1) Find new music
-    //2) add 'zoom out' and zoom (1-12) as options when zoomed in
-    //3) add a check at the beginning of listen to inform the player if they have no more moves left for the turn?
     class War : Scenario
     {
         Thread musicThread = new Thread(PlayMusic);
@@ -67,8 +60,8 @@ namespace TextGame
         {
             _player = player;
             musicThread.Start();
-
-            //Keep after testing
+            
+            //Starting units for enemy
             enemyUnits.Add(new Unit(3, 10));
             enemyUnits.Add(new Unit(2, 12));
             enemyUnits.Add(new Unit(1, 11));
@@ -239,6 +232,7 @@ namespace TextGame
                 {
                     HelpZoomedOut();
 
+                    CheckAvailableMoves();
                     Console.Write("\n> ");
                     string cmd = Console.ReadLine().ToLower();
 
@@ -297,34 +291,62 @@ namespace TextGame
                 {
                     HelpZoomedIn();
 
+                    CheckAvailableMoves();
                     Console.Write("\n> ");
                     string cmd = Console.ReadLine().ToLower();
 
-                    switch (cmd)
+                    if (cmd.Length >= 4 && cmd.Substring(0, 4) == "zoom" && cmd.Length >= 6)
                     {
-                        case "count":
-                            Services.ScrollText("Ally units: " + GetUnitsAtLocation(_zoomedLocation, true).Count +
-                                "\nEnemy units: " + GetUnitsAtLocation(_zoomedLocation, false).Count + "\n");
-                            Listen();
-                            break;
-                        case "map":
-                            PrintLocation();
-                            Listen();
-                            break;
-                        case "end turn":
-                            EnemyTurn();
-                            break;
-                        case "zoom":
+                        cmd = cmd.Substring(5);
+                        int num;
+
+                        if (Int32.TryParse(cmd, out num))
+                        {
+                            if (num >= 1 && num <= 12)
+                            {
+                                Zoom(num);
+                            }
+                            else
+                            {
+                                Services.ScrollText("Invalid input. Try Again.");
+                                Listen();
+                            }
+                        }
+                        else if (cmd == "out")
+                        {
                             ZoomOut();
                             Listen();
-                            break;
-                        case "units":
-                            UseUnits();
-                            break;
-                        default:
-                            Services.ScrollText("Invalid input. Try again.", 500);
+                        }
+                        else
+                        {
+                            Services.ScrollText("Invalid input. Try Again.");
                             Listen();
-                            break;
+                        }
+                    }
+                    else
+                    {
+                        switch (cmd)
+                        {
+                            case "count":
+                                Services.ScrollText("Ally units: " + GetUnitsAtLocation(_zoomedLocation, true).Count +
+                                    "\nEnemy units: " + GetUnitsAtLocation(_zoomedLocation, false).Count + "\n");
+                                Listen();
+                                break;
+                            case "map":
+                                PrintLocation();
+                                Listen();
+                                break;
+                            case "end turn":
+                                EnemyTurn();
+                                break;
+                            case "units":
+                                UseUnits();
+                                break;
+                            default:
+                                Services.ScrollText("Invalid input. Try again.", 500);
+                                Listen();
+                                break;
+                        }
                     }
                 }
             }
@@ -370,7 +392,8 @@ namespace TextGame
             }
             else if (cmd == "back" || cmd == "exit")
             {
-                Services.ScrollText("Exiting shop. . .\n");
+                Services.ScrollText("Exiting shop. . .\n", 500);
+                PrintMap();
                 Listen();
             }
             else
@@ -402,7 +425,8 @@ namespace TextGame
             }
             else if (cmd == "exit")
             {
-                Services.ScrollText("Exiting shop. . .\n");
+                Services.ScrollText("Exiting shop. . .\n", 500);
+                PrintMap();
                 Listen();
             }
             else if (cmd == "back")
@@ -438,7 +462,8 @@ namespace TextGame
             }
             else if (cmd == "exit")
             {
-                Services.ScrollText("Exiting shop. . .\n");
+                Services.ScrollText("Exiting shop. . .\n", 500);
+                PrintMap();
                 Listen();
             }
             else if (cmd == "back")
@@ -474,7 +499,8 @@ namespace TextGame
             }
             else if (cmd == "exit")
             {
-                Services.ScrollText("Exiting shop. . .\n");
+                Services.ScrollText("Exiting shop. . .\n", 500);
+                PrintMap();
                 Listen();
             }
             else if (cmd == "back")
@@ -510,7 +536,8 @@ namespace TextGame
             }
             else if (cmd == "exit")
             {
-                Services.ScrollText("Exiting shop. . .\n");
+                Services.ScrollText("Exiting shop. . .\n", 500);
+                PrintMap();
                 Listen();
             }
             else if (cmd == "back")
@@ -1922,6 +1949,30 @@ namespace TextGame
                     }
                     Services.ScrollText("It's placed in square 12", 600);
                     break;
+            }
+        }
+
+        public void CheckAvailableMoves()
+        {
+            List<Unit> tempUnitList = new List<Unit>();
+            bool turnOver = true;
+
+            foreach (Unit unit in allyUnits)
+            {
+                if (unit.Sleeping == false)
+                {
+                    turnOver = false;
+                }
+            }
+
+            if (_playerCurrency >= 250)
+            {
+                turnOver = false;
+            }
+
+            if (turnOver)
+            {
+                Services.ScrollText("It looks like you have no more available moves this turn. You should end your turn!", 200);
             }
         }
 
