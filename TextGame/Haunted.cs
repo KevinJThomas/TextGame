@@ -711,6 +711,7 @@ namespace TextGame
                                 Services.ScrollText("It's safe to touch because of the holy water, and you're able to walk straight out.", 500);
                                 Services.ScrollText("You escaped with your life!", 4000);
                                 _player.LevelCompleted = true;
+                                _gameRunning = false;
                             }
                             
                             break;
@@ -1508,6 +1509,7 @@ namespace TextGame
                                 Services.ScrollText("You squeeze through the hole and starting crawling..", 1000);
                                 Services.ScrollText("A few moments later you begin to see light, you're out!", 1500);
                                 _player.LevelCompleted = true;
+                                _gameRunning = false;
                             }
                             else
                             {
@@ -1647,6 +1649,7 @@ namespace TextGame
                             Services.ScrollText("He is instantly engulfed in flames and quickly withers away into nothing.", 1000);
                             Services.ScrollText("The dark presence you have been feeling is no longer there! You're free!", 4000);
                             _player.LevelCompleted = true;
+                            _gameRunning = false;
                         }
                         else
                         {
