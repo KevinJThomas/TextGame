@@ -42,7 +42,7 @@ namespace TextGame
                     break;
                 case 4:
                     Attack = 0;
-                    Health = 100;
+                    Health = 50;
                     TypeToString = "Arrow Shield";
                     break;
                 default:

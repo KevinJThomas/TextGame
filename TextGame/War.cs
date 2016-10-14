@@ -17,7 +17,7 @@ namespace TextGame
         string[] shopInfantry = new string[] { "New Infantry", "Weapon Upgrade", "Shield" };
         string[] shopArcher = new string[] { "New Archer", "Weapon Upgrade", "Armor Upgrade" };
         string[] shopCavalier = new string[] { "New Cavalier", "Weapon Upgrade", "Shield" };
-        string[] shopOther = new string[] { "Arrow Shield" };
+        string[] shopOther = new string[] { "Giant Shield" };
 
         int[] priceInfantry = new int[] { 250, 200, 250 };
         int[] priceArcher = new int[] { 350, 450, 250 };
@@ -834,11 +834,11 @@ namespace TextGame
                 case 4: //Other
                     switch (item)
                     {
-                        case "Arrow Shield":
+                        case "Giant Shield":
                             if (_playerCurrency >= priceOther[Array.IndexOf(shopOther, item)])
                             {
                                 _playerCurrency -= priceOther[Array.IndexOf(shopOther, item)];
-                                Services.ScrollText("You purchased a new arrow shield.", 300);
+                                Services.ScrollText("You purchased a new giant shield.", 300);
                                 PlaceUnit(4);
                             }
                             else
@@ -1592,7 +1592,8 @@ namespace TextGame
             Services.FastScrollText("map: prints out the overview of the location you're zoomed in on");
             Services.FastScrollText("count: gives a total for units in the location you're zoomed in on for both players");
             Services.FastScrollText("units: access individual units to move or attack with them");
-            Services.FastScrollText("zoom: zooms out to the full map view");
+            Services.FastScrollText("zoom *1-12*: take a closer look at a specific location - this is the view where units are controlled");
+            Services.FastScrollText("zoom out: go back to the overhead view of the whole map");
             Services.FastScrollText("end turn: ends your turn\n");
         }
 
@@ -1917,7 +1918,7 @@ namespace TextGame
                             enemyUnits.Add(new Unit(3, 10));
                             break;
                     }
-                    Services.ScrollText("It's placed in square 10", 600);
+                    Services.ScrollText("It's placed in square 10.", 600);
                     break;
                 case 1:
                     switch (type)
@@ -1932,7 +1933,7 @@ namespace TextGame
                             enemyUnits.Add(new Unit(3, 11));
                             break;
                     }
-                    Services.ScrollText("It's placed in square 11", 600);
+                    Services.ScrollText("It's placed in square 11.", 600);
                     break;
                 case 2:
                     switch (type)
@@ -1947,7 +1948,7 @@ namespace TextGame
                             enemyUnits.Add(new Unit(3, 12));
                             break;
                     }
-                    Services.ScrollText("It's placed in square 12", 600);
+                    Services.ScrollText("It's placed in square 12.", 600);
                     break;
             }
         }
@@ -1972,7 +1973,7 @@ namespace TextGame
 
             if (turnOver)
             {
-                Services.ScrollText("It looks like you have no more available moves this turn. You should end your turn!", 200);
+                Services.FastScrollText("It looks like you have no more available moves this turn. You should end your turn!", 200);
             }
         }
 
