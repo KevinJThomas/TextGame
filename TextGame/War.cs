@@ -1642,18 +1642,35 @@ namespace TextGame
             CheckDeath(attacker, defender);
         }
 
-        public void CheckDeath(Unit ally, Unit enemy)
+        public void CheckDeath(Unit attacker, Unit defender)
         {
-            if (ally.Health < 1)
+            if (attacker.Health < 1)
             {
-                Services.ScrollText("Your " + ally.TypeToString + " dies!");
-                allyUnits.Remove(ally);
+                if (allyUnits.Contains(attacker))
+                {
+                    Services.ScrollText("Your " + attacker.TypeToString + " dies!");
+                    allyUnits.Remove(attacker);
+                }
+                else
+                {
+                    Services.ScrollText("The enemy " + attacker.TypeToString + " dies!");
+                    enemyUnits.Remove(attacker);
+                }
             }
-            if (enemy.Health < 1)
+            if (defender.Health < 1)
             {
-                Services.ScrollText("The enemy " + enemy.TypeToString + " dies!");
-                enemyUnits.Remove(enemy);
+                if (allyUnits.Contains(defender))
+                {
+                    Services.ScrollText("Your " + defender.TypeToString + " dies!");
+                    allyUnits.Remove(defender);
+                }
+                else
+                {
+                    Services.ScrollText("The enemy " + defender.TypeToString + " dies!");
+                    enemyUnits.Remove(defender);
+                }
             }
+
             if (CheckLose())
             {
                 Services.ScrollText("You lost!");
@@ -1692,7 +1709,7 @@ namespace TextGame
 
         public int CalculatePay()
         {
-            int unitCompensation = CountAllyUnits() * 10;
+            int unitCompensation = CountAllyUnits() * 12;
             int locationCompensation = 0;
 
             for (int i = 1; i <= 12; i++)
@@ -1719,14 +1736,14 @@ namespace TextGame
                 }
             }
 
-            locationCompensation = locationCompensation * 50;
+            locationCompensation = locationCompensation * 60;
 
-            return locationCompensation + unitCompensation + 200;
+            return locationCompensation + unitCompensation + 600;
         }
 
         public int EnemyCalculatePay()
         {
-            int unitCompensation = CountEnemyUnits() * 10;
+            int unitCompensation = CountEnemyUnits() * 12;
             int locationCompensation = 0;
 
             for (int i = 1; i <= 12; i++)
@@ -1753,9 +1770,9 @@ namespace TextGame
                 }
             }
 
-            locationCompensation = locationCompensation * 50;
+            locationCompensation = locationCompensation * 60;
 
-            return locationCompensation + unitCompensation + 500;
+            return locationCompensation + unitCompensation + 900;
         }
 
         public List<Unit> GetUnitsAtLocation(int location, bool allies)
