@@ -62,7 +62,7 @@ namespace TextGame
         public void Start()
         {
             Services.ScrollText("There is a bomb about to off in the middle of Manhattan", 1000);
-            Services.ScrollText("You have beeing training in the bomb squad but have never dealt with a real threat on your own.", 1000);
+            Services.ScrollText("You have been training in the bomb squad but have never dealt with a real threat on your own.", 1000);
             Services.ScrollText("Your mentor is out of town; this is your chance to shine.", 1000);
             Services.ScrollText("Now as long as you remember all your training, nothing will go wrong..", 1500);
             Services.ScrollText("You enter the bank where the bomb is located and are escorted over to it.", 1000);

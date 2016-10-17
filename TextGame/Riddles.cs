@@ -25,6 +25,15 @@ namespace TextGame
         string _riddle7 = "I never was, am always to be, No one ever saw me, nor ever will," +
             " And yet I am the confidence of all To live and breathe on this terrestrial ball. What am I?";
 
+        //Answers
+        string _answer1 = "king of hearts";
+        string _answer2 = "11";
+        string _answer3 = "dictionary";
+        string _answer4 = "braking";
+        string _answer5 = "hole";
+        string _answer6 = "eye";
+        string _answer7 = "tomorrow";
+
         //Rooms
         string[] theCircularRoom = new string[] { "Talk to the man at the door", "Talk to the man with a bright orange scarf", "Talk to the man picking grass",
             "Talk to the man holding a large and vibrantly blue snake", "Talk to the man eating an eggplant", "Talk to the man making a fire",
@@ -41,6 +50,31 @@ namespace TextGame
         {
             _player = player;
             musicThread.Start();
+
+            switch (_player.DifficultyLevel)
+            {
+                case 1:
+                    _riddle1 = "Mary's father has 4 children; 3 are named Nana, Nene, and Nini. What is the 4th child's name?";
+                    _answer1 = "mary";
+                    _riddle3 = "What 5-letter word becomes shorter when you add 2 letters?";
+                    _answer3 = "short";
+                    _riddle4 = "During what month do people sleep the least?";
+                    _answer4 = "february";
+                    _riddle6 = "There is a basket full of hats. 3 of them are white and 2 of them are black. There are 3 men Tom, Tim, and Jim." +
+                        " They each take a hat out of the basket and put it on their heads without seeing the hat they selected or the hats the other men selected." +
+                        " The men arrange themselves so Tom can see Tim and Jim's hats, Tim can see Jim's hat, and Jim can't see anyone's hat.\n\n" +
+                        "What color is his hat?";
+                    _answer6 = "white";
+                    break;
+                case 4:
+                    _riddle2 = "Swallowing one is fine. Swallowing two together is fine. But swallow them seperately and all is doomed. What are they?";
+                    _answer2 = "magnets";
+                    _riddle5 = "What is the next number in the sequence? 1 11 21 1211 111221 312211";
+                    _answer5 = "13112221";
+                    _riddle6 = "You are my brother, but I am not your brother. Who am I?";
+                    _answer6 = "sister";
+                    break;
+            }
         }
 
         public static void PlayMusic()
@@ -97,7 +131,7 @@ namespace TextGame
                         if (trusted == true)
                         {
                             Services.ScrollText("What is the password?");
-                            if (ProvidePass("11"))
+                            if (ProvidePass(_answer2))
                             {
                                 Services.ScrollText(_riddle3);
                                 Password(3);
@@ -117,7 +151,7 @@ namespace TextGame
                         if (trusted == true)
                         {
                             Services.ScrollText("What is the password?");
-                            if (ProvidePass("braking"))
+                            if (ProvidePass(_answer4))
                             {
                                 Services.ScrollText(_riddle5);
                                 Password(5);
@@ -137,7 +171,7 @@ namespace TextGame
                         if (trusted == true)
                         {
                             Services.ScrollText("What is the password?");
-                            if (ProvidePass("hole"))
+                            if (ProvidePass(_answer5))
                             {
                                 Services.ScrollText(_riddle6);
                                 Password(6);
@@ -157,7 +191,7 @@ namespace TextGame
                         if (trusted == true)
                         {
                             Services.ScrollText("What is the password?");
-                            if (ProvidePass("eye"))
+                            if (ProvidePass(_answer6))
                             {
                                 Services.ScrollText(_riddle7);
                                 Password(7);
@@ -189,7 +223,7 @@ namespace TextGame
                         if (trusted == true)
                         {
                             Services.ScrollText("What is the password?");
-                            if (ProvidePass("dictionary"))
+                            if (ProvidePass(_answer3))
                             {
                                 Services.ScrollText(_riddle4);
                                 Password(4);
@@ -252,7 +286,7 @@ namespace TextGame
                     case 2:
                         Services.ScrollText("\"" + doorMan[input - 1] + "\"\n", 1000);
                         Services.ScrollText("What is the password?", 1000);
-                        if (ProvidePass("tomorrow"))
+                        if (ProvidePass(_answer7))
                         {
                             _player.LevelCompleted = true;
                             Services.ScrollText("Very good! You may leave now. Good luck on your future journies.", 1500);
@@ -288,7 +322,7 @@ namespace TextGame
             {
                 case 1:
                     answer = Console.ReadLine();
-                    if (answer.ToLower().Contains("king of hearts"))
+                    if (answer.ToLower().Contains(_answer1))
                     {
                         trusted = true;
                         Services.ScrollText("Very good! I'm impressed.", 750);
@@ -309,22 +343,22 @@ namespace TextGame
                     }
                     break;
                 case 2:
-                    Guessing(num, "11");
+                    Guessing(num, _answer2);
                     break;
                 case 3:
-                    Guessing(num, "dictionary");
+                    Guessing(num, _answer3);
                     break;
                 case 4:
-                    Guessing(num, "braking");
+                    Guessing(num, _answer4);
                     break;
                 case 5:
-                    Guessing(num, "hole");
+                    Guessing(num, _answer5);
                     break;
                 case 6:
-                    Guessing(num, "eye");
+                    Guessing(num, _answer6);
                     break;
                 case 7:
-                    Guessing(num, "tomorrow");
+                    Guessing(num, _answer7);
                     break;
             }
         }
