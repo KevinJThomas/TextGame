@@ -14,7 +14,7 @@ namespace TextGame
         Thread musicThread = new Thread(PlayMusic);
 
         bool _talkToGuard = false;
-        int _timer = 50;
+        int _timer;
 
         //Arrays of available commands for each area/person
         string[] redSquareEnterance = new string[] { "Scan the crowd", "Head over to the stage", "Go into the nearby hotel" };
@@ -34,14 +34,14 @@ namespace TextGame
         string stageFrontDesc = "In front of you is a large stage with a single podium in the center. There are a few sound guys preparing the microphone.";
         string hotelDesc = "Wow! This is a nice hotel! The lobby a high ceiling and is very open with a few silk couches sitting in the middle around a coffee table.";
         string stageBackDesc = "It's pretty grimy back here. This must just be used as a storage space.";
-        string basementDesc = "An emptry room except for a trashy couch and a tv. The lighting is very poor.";
+        string basementDesc = "An empty room except for a trashy couch and a tv. The lighting is very poor.";
 
         //Targets for items for each area
-        string[] redSquareEnteranceTarget = new string[] { };
-        string[] stageFrontTarget = new string[] { };
+        string[] redSquareEnteranceTarget = new string[] { "Crowd" };
+        string[] stageFrontTarget = new string[] { "Crowd", "Stage" };
         string[] hotelTarget = new string[] { "Receptionist" };
         string[] stageBackTarget = new string[] { "Guard", "Tarps", "Crates" };
-        string[] basementTarget = new string[] { "Bodrov Ilyich" };
+        string[] basementTarget = new string[] { "Bodrov Ilyich", "Couch" };
 
         //Items the player will start with
         Item gun = new Item("Gun");
@@ -54,6 +54,22 @@ namespace TextGame
             List<Item> items = new List<Item>() { gun, knife, twine };
             _player.Bag.Add(items);
             musicThread.Start();
+
+            switch (_player.DifficultyLevel)
+            {
+                case 1:
+                    _timer = 75;
+                    break;
+                case 2:
+                    _timer = 50;
+                    break;
+                case 3:
+                    _timer = 25;
+                    break;
+                case 4:
+                    _timer = 10;
+                    break;
+            }
         }
 
         public static void PlayMusic()
@@ -122,11 +138,65 @@ namespace TextGame
                 ExamineCommand(decision);
                 if (Item != null && Target != null)
                 {
-                    Services.ScrollText("It's not very effective.", 500);
-                    Item = null;
-                    Target = null;
-                    Timer();
-                    RedSquareEnterance();
+                    if (Target == "Crowd")
+                    {
+                        if (Item.Name == "Gun")
+                        {
+                            if (_player.DifficultyLevel > 2)
+                            {
+                                Services.ScrollText("You fire your gun into the crowd!", 1200);
+                                Services.ScrollText("You're instantly swarmed by guards, disarmed, and enprisoned.", 1500);
+                            }
+                            else
+                            {
+                                Services.ScrollText("You probably shouldn't shoot innocent people..", 500);
+                                Timer();
+                                Item = null;
+                                Target = null;
+                                RedSquareEnterance();
+                            }
+                        }
+                        else if (Item.Name == "Knife")
+                        {
+                            if (_player.DifficultyLevel > 2)
+                            {
+                                Services.ScrollText("You pull out your knife. . .panic ensues in the crowd.", 1200);
+                                Services.ScrollText("After a few seconds of chaos, you are shot by a nearby guard", 1500);
+                            }
+                            else
+                            {
+                                Services.ScrollText("You probably shouldn't hurt innocent people..", 500);
+                                Timer();
+                                Item = null;
+                                Target = null;
+                                RedSquareEnterance();
+                            }
+                        }
+                        else if (Item.Name == "Twine")
+                        {
+                            Services.ScrollText("You try to show off your twine to a few folks, but no one shows any interest.");
+                            Timer();
+                            Item = null;
+                            Target = null;
+                            RedSquareEnterance();
+                        }
+                        else
+                        {
+                            Services.ScrollText("It's not very effective.", 500);
+                            Timer();
+                            Item = null;
+                            Target = null;
+                            RedSquareEnterance();
+                        }
+                    }
+                    else
+                    {
+                        Services.ScrollText("It's not very effective.", 500);
+                        Timer();
+                        Item = null;
+                        Target = null;
+                        RedSquareEnterance();
+                    }
                 }
                 else
                 {
@@ -192,13 +262,79 @@ namespace TextGame
                 ExamineCommand(decision);
                 if (Item != null && Target != null)
                 {
-                    Services.ScrollText("It's not very effective.", 500);
-                    Item = null;
-                    Target = null;
-                    Timer();
+                    if (Target == "Crowd")
+                    {
+                        if (Item.Name == "Gun")
+                        {
+                            if (_player.DifficultyLevel > 2)
+                            {
+                                Services.ScrollText("You fire your gun into the crowd!", 1200);
+                                Services.ScrollText("You're instantly swarmed by guards, disarmed, and enprisoned.", 1500);
+                            }
+                            else
+                            {
+                                Services.ScrollText("You probably shouldn't shoot innocent people..", 500);
+                                Timer();
+                                Item = null;
+                                Target = null;
+                                Stage();
+                            }
+                        }
+                        else if (Item.Name == "Knife")
+                        {
+                            if (_player.DifficultyLevel > 2)
+                            {
+                                Services.ScrollText("You pull out your knife. . .panic ensues in the crowd.", 1200);
+                                Services.ScrollText("After a few seconds of chaos, you are shot by a nearby guard", 1500);
+                            }
+                            else
+                            {
+                                Services.ScrollText("You probably shouldn't hurt innocent people..", 500);
+                                Timer();
+                                Item = null;
+                                Target = null;
+                                Stage();
+                            }
+                        }
+                        else if (Item.Name == "Twine")
+                        {
+                            Services.ScrollText("You try to show off your twine to a few folks, but no one shows any interest.");
+                            Timer();
+                            Item = null;
+                            Target = null;
+                            Stage();
+                        }
+                        else
+                        {
+                            Services.ScrollText("It's not very effective.", 500);
+                            Timer();
+                            Item = null;
+                            Target = null;
+                            Stage();
+                        }
+                    }
+                    else if (Target == "Stage")
+                    {
+                        Services.ScrollText("It's too far away!", 500);
+                        Item = null;
+                        Target = null;
+                        Timer();
+                        Stage();
+                    }
+                    else
+                    {
+                        Services.ScrollText("It's not very effective.", 500);
+                        Item = null;
+                        Target = null;
+                        Timer();
+                        Stage();
+                    }
+                }
+                else
+                {
+                    Services.ScrollText("Invalid input. Try again.", 500);
                     Stage();
                 }
-                Stage();
             }
         }
 
@@ -252,13 +388,46 @@ namespace TextGame
                 ExamineCommand(decision);
                 if (Item != null && Target != null)
                 {
-                    Services.ScrollText("It's not very effective.", 500);
-                    Item = null;
-                    Target = null;
-                    Timer();
+                    if (_player.DifficultyLevel >= 4)
+                    {
+                        if (Target == "Receptionist")
+                        {
+                            if (Item.Name == "Twine")
+                            {
+                                Services.ScrollText("You show the receptionist your twine..", 800);
+                                Services.ScrollText("GUARDS! GUARDS! HE HAS A WEAPON!", 800);
+                            }
+                            else
+                            {
+                                Services.ScrollText("It's not very effective.", 500);
+                                Item = null;
+                                Target = null;
+                                Timer();
+                                Hotel();
+                            }
+                        }
+                        else
+                        {
+                            Services.ScrollText("It's not very effective.", 500);
+                            Item = null;
+                            Target = null;
+                            Timer();
+                            Hotel();
+                        }
+                    }
+                    else
+                    {
+                        Services.ScrollText("It's not very effective.", 500);
+                        Item = null;
+                        Target = null;
+                        Timer();
+                        Hotel();
+                    }
+                }
+                else
+                {
                     Hotel();
                 }
-                Hotel();
             }
         }
 
@@ -337,6 +506,12 @@ namespace TextGame
                             Timer();
                             Stage();
                         }
+                        else if (Item.Name == "Knife" && _player.DifficultyLevel >= 4)
+                        {
+                            Services.ScrollText("You pull out your knife and stab in into a crate..", 800);
+                            Services.ScrollText("BOOOOOOM. . .", 1000);
+                            Services.ScrollText("The explosion kills you..", 600);
+                        }
                         else
                         {
                             Services.ScrollText("It's not very effective.", 500);
@@ -404,6 +579,14 @@ namespace TextGame
                                 _player.LevelCompleted = true;
                             }
                         }
+                        else if (Target == "Couch" && _player.DifficultyLevel >= 3)
+                        {
+                            Services.ScrollText("You walk up the couch and place your twine on it.", 800);
+                            Services.ScrollText("Bodrov hears you and jolts out of the couch, gun in hand", 1000);
+                            Services.ScrollText("You're left defenseless against your target", 1000);
+                            Services.ScrollText("POW!", 400);
+                            Services.ScrollText("He shoots you and you quickly slip into darkness", 800);
+                        }
                         else
                         {
                             Services.ScrollText("It's not very effective.", 500);
@@ -422,7 +605,7 @@ namespace TextGame
             }
             else
             {
-                Services.ScrollText("Uh oh, there's a guard at the doorway at the bottom of the stairs");
+                Services.ScrollText("Uh oh, there's a guard at the doorway at the bottom of the stairs.");
                 Services.ScrollText("Hey! No one is allowed down here. Go back upstairs!");
                 Timer();
                 Hotel();
@@ -487,7 +670,7 @@ namespace TextGame
             }
             else
             {
-                ExamineCommand(decision);
+                Services.ScrollText("Invalid input. Try again.", 500);
                 Receptionist();
             }
         }
@@ -535,7 +718,7 @@ namespace TextGame
             }
             else
             {
-                ExamineCommand(decision);
+                Services.ScrollText("Invalid input. Try again.", 500);
                 Guard();
             }
         }
@@ -543,25 +726,94 @@ namespace TextGame
         public void Timer()
         {
             _timer--;
-            switch (_timer)
+            switch (_player.DifficultyLevel)
             {
-                case 40:
-                    Services.ScrollText("There are 4 minutes until he makes it to that stage; you must eliminate the target soon!", 500);
+                case 1:
+                    switch (_timer)
+                    {
+                        case 60:
+                            Services.ScrollText("There are 4 minutes until he makes it to that stage; you must eliminate the target soon!", 500);
+                            break;
+                        case 45:
+                            Services.ScrollText("There are 3 minutes until he makes it to that stage; you must eliminate the target soon!", 500);
+                            break;
+                        case 30:
+                            Services.ScrollText("There are 2 minutes until he makes it to that stage; you must eliminate the target soon!", 500);
+                            break;
+                        case 15:
+                            Services.ScrollText("There is 1 minute until he makes it to that stage; you must eliminate the target soon!", 500);
+                            break;
+                        case 0:
+                            Services.ScrollText("You're too late! The speech is starting. Mission failed.", 500);
+                            Services.PlayAgain();
+                            break;
+                    }
                     break;
-                case 30:
-                    Services.ScrollText("There are 3 minutes until he makes it to that stage; you must eliminate the target soon!", 500);
+                case 2:
+                    switch (_timer)
+                    {
+                        case 40:
+                            Services.ScrollText("There are 4 minutes until he makes it to that stage; you must eliminate the target soon!", 500);
+                            break;
+                        case 30:
+                            Services.ScrollText("There are 3 minutes until he makes it to that stage; you must eliminate the target soon!", 500);
+                            break;
+                        case 20:
+                            Services.ScrollText("There are 2 minutes until he makes it to that stage; you must eliminate the target soon!", 500);
+                            break;
+                        case 10:
+                            Services.ScrollText("There is 1 minute until he makes it to that stage; you must eliminate the target soon!", 500);
+                            break;
+                        case 0:
+                            Services.ScrollText("You're too late! The speech is starting. Mission failed.", 500);
+                            Services.PlayAgain();
+                            break;
+                    }
                     break;
-                case 20:
-                    Services.ScrollText("There are 2 minutes until he makes it to that stage; you must eliminate the target soon!", 500);
+                case 3:
+                    switch (_timer)
+                    {
+                        case 20:
+                            Services.ScrollText("There are 4 minutes until he makes it to that stage; you must eliminate the target soon!", 500);
+                            break;
+                        case 15:
+                            Services.ScrollText("There are 3 minutes until he makes it to that stage; you must eliminate the target soon!", 500);
+                            break;
+                        case 10:
+                            Services.ScrollText("There are 2 minutes until he makes it to that stage; you must eliminate the target soon!", 500);
+                            break;
+                        case 5:
+                            Services.ScrollText("There is 1 minute until he makes it to that stage; you must eliminate the target soon!", 500);
+                            break;
+                        case 0:
+                            Services.ScrollText("You're too late! The speech is starting. Mission failed.", 500);
+                            Services.PlayAgain();
+                            break;
+                    }
                     break;
-                case 10:
-                    Services.ScrollText("There is 1 minute until he makes it to that stage; you must eliminate the target soon!", 500);
-                    break;
-                case 0:
-                    Services.ScrollText("You're too late! The speech is starting. Mission failed.", 500);
-                    Services.PlayAgain();
+                case 4:
+                    switch (_timer)
+                    {
+                        case 8:
+                            Services.ScrollText("There are 4 minutes until he makes it to that stage; you must eliminate the target soon!", 500);
+                            break;
+                        case 6:
+                            Services.ScrollText("There are 3 minutes until he makes it to that stage; you must eliminate the target soon!", 500);
+                            break;
+                        case 4:
+                            Services.ScrollText("There are 2 minutes until he makes it to that stage; you must eliminate the target soon!", 500);
+                            break;
+                        case 2:
+                            Services.ScrollText("There is 1 minute until he makes it to that stage; you must eliminate the target soon!", 500);
+                            break;
+                        case 0:
+                            Services.ScrollText("You're too late! The speech is starting. Mission failed.", 500);
+                            Services.PlayAgain();
+                            break;
+                    }
                     break;
             }
+            
         }
     }
 }
