@@ -98,7 +98,6 @@ namespace TextGame
             {
                 _firstTurn = false;
                 PrintMap();
-                Services.FastScrollText("Your resources: $" + _playerCurrency + "\n");
                 Listen();
             }
             else
@@ -175,6 +174,7 @@ namespace TextGame
             Console.WriteLine("|                |                |                 |");
             Console.WriteLine("| A: " + GetUnitsAtLocation(1, true).Count.ToString("00") + "          | A: " + GetUnitsAtLocation(2, true).Count.ToString("00") + "          | A: " + GetUnitsAtLocation(3, true).Count.ToString("00") + "           |");
             Console.WriteLine("|________________|________________|_________________|\n");
+            Services.FastScrollText("Your resources: $" + _playerCurrency + "\n");
         }
 
         public void PrintLocation()
