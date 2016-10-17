@@ -15,6 +15,7 @@ namespace TextGame
         public static int _totalNumberOfLevels = 7; //We will have to manually change this every time we add a new level
 
         string[] passwords = new string[] { "skip2", "skip3", "skip4", "skip5", "skip6", "skip7" };
+        string[] difficulties = new string[] { "Easy", "Normal", "Hard", "Impossible" };
 
         public int CurrentLevel { get; set; } //Keeps track of what level the game is on
 
@@ -50,6 +51,12 @@ namespace TextGame
             player.Name = name;
             
             Services.ScrollText("Great! Nice to meet you " + player.Name + ".", 1500);
+
+            Services.ScrollText("One more thing before you get started:");
+            Services.ScrollText("What difficulty will you be playing on today?");
+
+            ChooseDifficulty();
+
             Services.ScrollText("I won't keep you here any longer... Your first adventure starts now!", 3500);
 
             Console.Clear();
@@ -57,6 +64,50 @@ namespace TextGame
             Thread.Sleep(1000);
 
             StartLevel();
+        }
+
+        public void ChooseDifficulty()
+        {
+            foreach (string difficulty in difficulties)
+            {
+                Services.FastScrollText((Array.IndexOf(difficulties, difficulty) + 1).ToString() + ") " + difficulty);
+            }
+            Console.Write("> ");
+
+            int cmd;
+            string input = Console.ReadLine();
+
+            if (Int32.TryParse(input, out cmd))
+            {
+                switch (difficulties[cmd - 1])
+                {
+                    case "Easy":
+                        player.DifficultyLevel = 1;
+                        Services.ScrollText("Ah! A beginner!", 600);
+                        break;
+                    case "Normal":
+                        player.DifficultyLevel = 2;
+                        Services.ScrollText("Good decision!", 600);
+                        break;
+                    case "Hard":
+                        player.DifficultyLevel = 3;
+                        Services.ScrollText("Wow! You must be up for a challenge!", 600);
+                        break;
+                    case "Impossible":
+                        player.DifficultyLevel = 4;
+                        Services.ScrollText("You're a brave soul. . .maybe you'll get lucky!", 600);
+                        break;
+                    default:
+                        Services.ScrollText("Invalid input. Try again.", 500);
+                        ChooseDifficulty();
+                        break;
+                }
+            }
+            else
+            {
+                Services.ScrollText("Invalid input. Try again.", 500);
+                ChooseDifficulty();
+            }
         }
 
         public void PlayLevelOne()

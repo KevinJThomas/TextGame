@@ -14,6 +14,7 @@ namespace TextGame
         public int Defense { get; set; } //not sure if we want these or if we'll do combat some other way?
         public Bag Bag { get; set; }
         public bool LevelCompleted { get; set; }
+        public int DifficultyLevel { get; set; }
 
         public Player(string name)
         {
