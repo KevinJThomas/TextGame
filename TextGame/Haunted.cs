@@ -1263,7 +1263,7 @@ namespace TextGame
                             tankState[2] = "0";
                             break;
                         case 2:
-                            Services.ScrollText("You dump  the '5' tank into the '1' tank..", 1000);
+                            Services.ScrollText("You dump the '5' tank into the '1' tank..", 1000);
                             if (tank5 == 1)
                             {
                                 Services.ScrollText("You hear a sound from the hole in the wall!", 1000);
@@ -1315,7 +1315,7 @@ namespace TextGame
                             tankState[3] = "0";
                             break;
                         case 2:
-                            Services.ScrollText("You dump  the '7' tank into the '1' tank..", 1000);
+                            Services.ScrollText("You dump the '7' tank into the '1' tank..", 1000);
                             if (tank7 == 1)
                             {
                                 Services.ScrollText("You hear a sound from the hole in the wall!", 1000);
