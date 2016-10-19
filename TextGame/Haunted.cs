@@ -98,7 +98,26 @@ namespace TextGame
         public Haunted(Player player) : base(player)
         {
             _player = player;
-            _player.Health = 100;
+            
+            switch (_player.DifficultyLevel)
+            {
+                case 1:
+                    _player.Health = 150;
+                    break;
+                case 2:
+                    _player.Health = 100;
+                    break;
+                case 3:
+                    _player.Health = 50;
+                    break;
+                case 4:
+                    _player.Health = 15;
+                    break;
+                default:
+                    _player.Health = 100;
+                    break;
+            }
+
             _player.Add(torch);
             musicThread.Start();
             colorThread.Start();
@@ -1175,6 +1194,11 @@ namespace TextGame
                                 Console.WriteLine("Invalid input. Please try again.");
                                 WaterTanks();
                             }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid input. Please try again.");
+                            WaterTanks();
                         }
                     }
                 }
