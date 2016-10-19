@@ -1816,7 +1816,7 @@ namespace TextGame
             {
                 yesNo = "No";
             }
-            Console.Write("H:{0} Lgt:{1}> ", _player.Health, yesNo);
+            Console.Write("HP:{0} Light:{1}> ", _player.Health, yesNo);
             string cmd = Console.ReadLine();
             return cmd;
         }
