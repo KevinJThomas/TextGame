@@ -21,6 +21,7 @@ namespace TextGame
         public bool Aura { get; set; }
         public bool Taunt { get; set; }
         public bool Stealth { get; set; }
+        public bool Spell { get; set; }
 
         public Card(string name)
         {
@@ -33,36 +34,7 @@ namespace TextGame
             Aura = false;
             Taunt = false;
             Stealth = false;
-
-            switch (Name)
-            {
-                case "Chicken":
-                    Cost = 1;
-                    Attack = 1;
-                    Health = 1;
-                    break;
-                case "Stampeding Kodo":
-                    Text = "Battlecry: Destroy a random enemy minion with 2 or less attack";
-                    Cost = 5;
-                    Attack = 3;
-                    Health = 5;
-                    Battlecry = true;
-                    break;
-                case "Strangulthorn Tiger":
-                    Text = "Stealth";
-                    Cost = 5;
-                    Attack = 5;
-                    Health = 5;
-                    Stealth = true;
-                    break;
-                case "Dire Wolf Alpha":
-                    Text = "Adjacent minions have +1 attack";
-                    Cost = 2;
-                    Attack = 2;
-                    Health = 2;
-                    Adjacent = true;
-                    break;
-            }
+            Spell = false;
         }
     }
 }
