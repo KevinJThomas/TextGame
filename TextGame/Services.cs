@@ -21,7 +21,7 @@ namespace TextGame
             Console.WriteLine();
         }
 
-        public static void FastScrollText(string text, int delay = 0)
+        public static void FastScrollText(string text, int delay = 0, bool OneLine = false)
         {
             Random rand = new Random();
             foreach (char character in text)
@@ -30,7 +30,9 @@ namespace TextGame
                 Thread.Sleep(rand.Next(2));
             }
             Thread.Sleep(delay);
-            Console.WriteLine();
+
+            if (!OneLine)
+                Console.WriteLine();
         }
 
         public static void PlayAgain()
