@@ -15,26 +15,19 @@ namespace TextGame
         public int Attack { get; set; }
         public int Health { get; set; }
 
-        public bool Battlecry { get; set; }
-        public bool DeathRattle { get; set; }
-        public bool Adjacent { get; set; }
-        public bool Aura { get; set; }
-        public bool Taunt { get; set; }
-        public bool Stealth { get; set; }
-        public bool Spell { get; set; }
+        public bool Battlecry { get; set; } = false;
+        public bool DeathRattle { get; set; } = false;
+        public bool Adjacent { get; set; } = false;
+        public bool Aura { get; set; } = false;
+        public bool Taunt { get; set; } = false;
+        public bool Stealth { get; set; } = false;
+        public bool Spell { get; set; } = false;
+
+        public bool Sleeping { get; set; } = true;
 
         public Card(string name)
         {
             Name = name;
-
-            Text = "";
-            Battlecry = false;
-            DeathRattle = false;
-            Adjacent = false;
-            Aura = false;
-            Taunt = false;
-            Stealth = false;
-            Spell = false;
         }
     }
 }
