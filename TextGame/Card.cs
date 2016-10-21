@@ -22,6 +22,9 @@ namespace TextGame
         public bool Taunt { get; set; } = false;
         public bool Stealth { get; set; } = false;
         public bool Spell { get; set; } = false;
+        public bool Charge { get; set; } = false;
+        public bool Windfury { get; set; } = false;
+        public bool Poisoned { get; set; } = false;
 
         public bool Sleeping { get; set; } = true;
 
