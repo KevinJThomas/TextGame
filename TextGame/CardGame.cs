@@ -9,6 +9,11 @@ using System.Threading.Tasks;
 
 namespace TextGame
 {
+    //TODO
+    //1) Add basic AI to play a turn
+    //2) Test webspinner deathrattle to make sure it's working properly
+    //3) Add all beasts into Cards.cs
+    //4) Test heroes dying
     class CardGame : Scenario
     {
         Thread musicThread = new Thread(PlayMusic);
@@ -24,6 +29,8 @@ namespace TextGame
         List<Card> _playerBoard = new List<Card>();
         List<Card> _enemyBoard = new List<Card>();
 
+        public int PlayerHeroHealth { get; set; } = 30;
+        public int EnemyHeroHealth { get; set; } = 30;
         public int PlayerMana { get; set; } = 0;
         public int PlayerCurrentMana { get; set; }
         public int EnemyMana { get; set; } = 0;
@@ -32,6 +39,7 @@ namespace TextGame
 
         bool _mulliganStage = true;
         bool _playerTurn;
+        bool _gameOver = false;
 
         public CardGame(Player player) : base(player)
         {
@@ -96,6 +104,9 @@ namespace TextGame
 
             PlayerCurrentMana = PlayerMana; //refill empty mana crystals for the turn
 
+            foreach (Card card in _playerBoard)
+                card.Sleeping = false;
+
             DrawCard();
             PrintBoard();
             Listen();
@@ -105,41 +116,38 @@ namespace TextGame
         {
             //TODO: Basic AI to play a full turn
             _playerTurn = false;
+            foreach (Card card in _enemyBoard)
+                card.Sleeping = false;
+            DrawCard(false);
             Services.ScrollText("ENEMY PLAYING TURN...", 500); //testing only
             StartTurn();
         }
 
         public void Listen()
         {
-            PrintOptions();
-            Console.Write("> ");
-
-            int cmd;
-            string input = Console.ReadLine();
-
-            if (Int32.TryParse(input, out cmd))
+            if (!_gameOver)
             {
-                if (cmd <= _playerCards.Count)
-                {
-                    PlayCard(_playerCards[cmd - 1]);
-                    Listen();
-                }
-                else
-                {
-                    Services.ScrollText("Invalid input. Try again.", 500);
-                    Listen();
-                }
-            }
-            else
-            {
+                PrintOptions();
+                Console.Write("> ");
+                
+                string input = Console.ReadLine();
+                
                 switch (input.ToLower())
                 {
                     case "attack":
-                        //TODO: attacking interface
+                        if (PlayerHasAvailableMinions())
+                        {
+                            Attacking();
+                        }
+                        else
+                        {
+                            Services.ScrollText("You don't have any minions available to attack with!", 500);
+                            PrintBoard();
+                            Listen();
+                        }
                         break;
                     case "hand":
                         PlayHand();
-                        Listen();
                         break;
                     case "board":
                         PrintBoard();
@@ -164,12 +172,13 @@ namespace TextGame
         {
             if (_playerBoard.Count != 0 || _enemyBoard.Count != 0)
             {
-                Services.FastScrollText("OPPONENT");
+                Console.WriteLine();
+                Services.FastScrollText(" - OPPONENT - (" + EnemyHeroHealth + ")");
                 if (_enemyBoard.Count > 0)
                 {
                     foreach (Card card in _enemyBoard)
                     {
-                        Services.FastScrollText(card.Name + "(" + card.Attack + "/" + card.Health + ") ", 0, true);
+                        Services.FastScrollText(card.Name + "(" + card.Attack + "/" + card.Health + ")  ", 0, true);
                     }
                 }
                 else
@@ -184,7 +193,7 @@ namespace TextGame
                 {
                     foreach (Card card in _playerBoard)
                     {
-                        Services.FastScrollText(card.Name + "(" + card.Attack + "/" + card.Health + ") ", 0, true);
+                        Services.FastScrollText(card.Name + "(" + card.Attack + "/" + card.Health + ")  ", 0, true);
                     }
                 }
                 else
@@ -193,25 +202,13 @@ namespace TextGame
                 }
 
                 Console.WriteLine();
-                Services.FastScrollText("YOU\n");
+                Services.FastScrollText(" -   YOU   - (" + PlayerHeroHealth + ")\n");
             }
             else
             {
                 Services.ScrollText("The board is empty\n");
             }
         }
-
-        //public void PrintHand()
-        //{
-        //    foreach (Card card in _playerCards)
-        //    {
-        //        if (!card.Spell)
-        //            Services.FastScrollText("[ *" + card.Cost + "* " + card.Name + " (" + card.Attack + "/" + card.Health + ") ] ", 0, true);
-        //        else
-        //            Services.FastScrollText("[ *" + card.Cost + "* " + card.Name + " ]", 0, true);
-        //    }
-        //    Console.WriteLine();
-        //}
 
         public void PrintCount()
         {
@@ -220,6 +217,7 @@ namespace TextGame
 
         public void PrintHand()
         {
+            Services.FastScrollText("\n(You can type 'back' at any point to return to the main menu of commands)");
             if (_playerCards.Count > 0)
             {
                 Services.FastScrollText("\nYour hand:             Mana: (" + PlayerCurrentMana + "/" + PlayerMana + ")");
@@ -235,6 +233,25 @@ namespace TextGame
             }
         }
 
+        public List<Card> PrintAvailableMinions()
+        {
+            Services.FastScrollText("\n(You can type 'back' at any point to return to the main menu of commands)");
+            List<Card> tempList = new List<Card>();
+            
+            foreach (Card card in _playerBoard)
+            {
+                if (!card.Sleeping)
+                    tempList.Add(card);
+            }
+
+            foreach (Card card in tempList)
+            {
+                Services.FastScrollText((tempList.IndexOf(card) + 1).ToString() + ") " + card.Name + " (" + card.Attack + "/" + card.Health + ")");
+            }
+
+            return tempList;
+        }
+
         public void PrintOptions()
         {
             Services.FastScrollText("You have " + _playerCards.Count + " cards. Mana: (" + PlayerCurrentMana + "/" + PlayerMana + ")\n");
@@ -247,17 +264,30 @@ namespace TextGame
 
         public void PlayHand()
         {
-            PrintHand();
-            Console.Write("> ");
-            int cmd;
-            string input = Console.ReadLine();
-
-            if (Int32.TryParse(input, out cmd))
+            if (!_gameOver)
             {
-                if (cmd <= _playerCards.Count)
+                PrintHand();
+                Console.Write("> ");
+                int cmd;
+                string input = Console.ReadLine();
+
+                if (Int32.TryParse(input, out cmd))
                 {
-                    PlayCard(_playerCards[cmd - 1]);
-                    PlayHand();
+                    if (cmd <= _playerCards.Count)
+                    {
+                        PlayCard(_playerCards[cmd - 1]);
+                        PlayHand();
+                    }
+                    else
+                    {
+                        Services.ScrollText("Invalid input. Try again.", 500);
+                        PlayHand();
+                    }
+                }
+                else if (input.ToLower() == "back" || input.ToLower() == "exit")
+                {
+                    PrintBoard();
+                    Listen();
                 }
                 else
                 {
@@ -265,10 +295,187 @@ namespace TextGame
                     PlayHand();
                 }
             }
-            else if (input.ToLower() == "back" || input.ToLower() == "exit")
+        }
+
+        public void Attacking()
+        {
+            if (!_gameOver)
             {
+                if (PlayerHasAvailableMinions())
+                {
+                    List<Card> availableMinions = PrintAvailableMinions();
+                    Console.Write("> ");
+                    int cmd;
+                    string input = Console.ReadLine();
+
+                    if (Int32.TryParse(input, out cmd))
+                    {
+                        if (cmd <= availableMinions.Count)
+                        {
+                            ChooseTarget(availableMinions[cmd - 1]);
+                        }
+                        else
+                        {
+                            Services.ScrollText("Invalid input. Try again.", 500);
+                            Attacking();
+                        }
+                    }
+                    else if (input.ToLower() == "back" || input.ToLower() == "exit")
+                    {
+                        PrintBoard();
+                        Listen();
+                    }
+                    else
+                    {
+                        Services.ScrollText("Invalid input. Try again.", 500);
+                        Attacking();
+                    }
+                }
+                else
+                {
+                    Services.ScrollText("You don't have any minions available to attack with!", 500);
+                    PrintBoard();
+                    Listen();
+                }
+            }
+        }
+
+        public void ChooseTarget(Card card)
+        {
+            Services.ScrollText("\nSelect a target to attack with your " + card.Name + " (" + card.Attack + "/" + card.Health + ")");
+            
+            foreach (Card target in _enemyBoard)
+            {
+                Services.FastScrollText((_enemyBoard.IndexOf(target) + 1).ToString() + ") " + target.Name + " (" + target.Attack + "/" + target.Health + ")");
+            }
+            Services.FastScrollText((_enemyBoard.Count + 1).ToString() + ") Enemy Hero");
+            Console.Write("> ");
+
+            int cmd;
+            string input = Console.ReadLine();
+
+            if (Int32.TryParse(input, out cmd))
+            {
+                if (cmd <= _enemyBoard.Count + 1)
+                {
+                    if (cmd != _enemyBoard.Count + 1)
+                    {
+                        Swing(card, _enemyBoard[cmd - 1]);
+                    }
+                    else
+                    {
+                        Swing(card, null);
+                    }
+                }
+                else
+                {
+                    Services.ScrollText("Invalid input. Try again.", 500);
+                    ChooseTarget(card);
+                }
+            }
+            else if (input.ToLower() == "back")
+            {
+                PrintBoard();
+                Attacking();
+            }
+            else if (input.ToLower() == "exit")
+            {
+                PrintBoard();
                 Listen();
             }
+            else
+            {
+                Services.ScrollText("Invalid input. Try again.", 500);
+                ChooseTarget(card);
+            }
+        }
+
+        public void Swing(Card attacker, Card defender)
+        {
+            if (defender == null)
+                DamageHero(attacker.Attack);
+            else
+            {
+                defender.Health -= attacker.Attack;
+                attacker.Health -= defender.Attack;
+                DeathCheck(new List<Card> { attacker, defender });
+            }
+
+            attacker.Sleeping = true;
+            Attacking();
+        }
+
+        public void DamageHero(int damage, bool enemyHero = true)
+        {
+            if (enemyHero)
+            {
+                EnemyHeroHealth -= damage;
+                if (EnemyHeroHealth <= 0)
+                    _player.LevelCompleted = true;
+            }
+            else
+            {
+                PlayerHeroHealth -= damage;
+                if (PlayerHeroHealth <= 0)
+                    _gameOver = true;
+            }
+        }
+
+        public void DeathCheck(List<Card> cards)
+        {
+            foreach (Card card in cards)
+            {
+                if (card.Health <= 0)
+                {
+                    Services.ScrollText(card.Name + "dies!");
+                    Die(card);
+                }
+            }
+        }
+
+        public void Die(Card card)
+        {
+            if (card.DeathRattle)
+            {
+                switch (card.Name)
+                {
+                    case "Webspinner":
+                        Random rand = new Random();
+                        Card[] tempArr = (Card[]) _allCards.Clone();
+
+                        Card randomBeast = tempArr[rand.Next(tempArr.Length)];
+
+                        if (_playerBoard.Contains(card))
+                        {
+                            _playerCards.Add(randomBeast);
+                            Services.ScrollText("Webspinner gives you a " + randomBeast.Name);
+                        }
+                        else if (_enemyBoard.Contains(card))
+                        {
+                            _enemyCards.Add(randomBeast);
+                        }
+                        break;
+                }
+            }
+
+            if (_playerBoard.Contains(card))
+                _playerBoard.Remove(card);
+            else if (_enemyBoard.Contains(card))
+                _enemyBoard.Remove(card);
+        }
+
+        public bool PlayerHasAvailableMinions()
+        {
+            if (_playerBoard.Count > 0)
+            {
+                foreach (Card card in _playerBoard)
+                {
+                    if (!card.Sleeping)
+                        return true;
+                }
+                return false;
+            }
+            return false;
         }
 
         public bool GoingFirst()
