@@ -12,9 +12,9 @@ namespace TextGame
     class Game
     {
         //Used for seeing whether the game is won or if the player should simply advance to the next level
-        public static int _totalNumberOfLevels = 7; //We will have to manually change this every time we add a new level
+        public static int _totalNumberOfLevels = 8; //We will have to manually change this every time we add a new level
 
-        string[] passwords = new string[] { "skip2", "skip3", "skip4", "skip5", "skip6", "skip7" };
+        string[] passwords = new string[] { "skip2", "skip3", "skip4", "skip5", "skip6", "skip7", "skip8" };
         string[] difficulties = new string[] { "Easy", "Normal", "Hard", "Impossible" };
 
         public int CurrentLevel { get; set; } //Keeps track of what level the game is on
@@ -166,6 +166,14 @@ namespace TextGame
             CheckSuccessful();
         }
 
+        public void PlayLevelEight()
+        {
+            CardGame cardGame = new CardGame(player);
+            cardGame.Start();
+
+            CheckSuccessful();
+        }
+
         //Advances the user to the next level
         public void Advance()
         {
@@ -211,6 +219,9 @@ namespace TextGame
                     break;
                 case 7:
                     PlayLevelSeven();
+                    break;
+                case 8:
+                    PlayLevelEight();
                     break;
                 default:
                     Console.WriteLine("ERROR: Game.StartLevel(): Game.CurrentLevel OutOfBounds = {0}", CurrentLevel);
