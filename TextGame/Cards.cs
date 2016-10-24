@@ -135,9 +135,9 @@ namespace TextGame
                 new Card("Scavenging Hyena")
                 {
                     Text = "Whenever a friendly beast dies, gain +2/+1",
-                    Cost = 1,
-                    Health = 1,
-                    Attack = 1
+                    Cost = 2,
+                    Health = 2,
+                    Attack = 2
                 },
                 new Card("Addled Grizzly")
                 {
