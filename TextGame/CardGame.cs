@@ -12,8 +12,7 @@ namespace TextGame
     //TODO
     //1) Add basic AI to play a turn
     //2) Test webspinner deathrattle to make sure it's working properly
-    //3) Add all beasts into Cards.cs
-    //4) Test heroes dying
+    //3) Test heroes dying
     class CardGame : Scenario
     {
         Thread musicThread = new Thread(PlayMusic);
@@ -39,6 +38,7 @@ namespace TextGame
 
         bool _mulliganStage = true;
         bool _playerTurn;
+        bool _tunderCoin;
         bool _gameOver = false;
 
         public CardGame(Player player) : base(player)
@@ -63,7 +63,20 @@ namespace TextGame
 
         public void Start()
         {
-            //TODO: Write intro text before the game starts
+            //Services.ScrollText("You are sitting across the table from a tough-looking dwarf.", 1200);
+            //Services.ScrollText(". . .", 500);
+            //Services.ScrollText("Oh hello there! My name is Tunder the Great.", 800);
+            //Services.ScrollText("I hope you're ready to lose! I've never lost a card game in my life.", 800);
+            //Services.ScrollText("\nIn case you don't know, here are the rules of the game:", 600);
+            //Services.FastScrollText("1) You draw one card at the beginning of each turn");
+            //Services.FastScrollText("2) You have a limited amount on mana each turn, which will increase by 1 each turn");
+            //Services.FastScrollText("3) You'll start with 1 mana on turn 1, and once you reach 10 mana it will stop increasing");
+            //Services.FastScrollText("4) Each player has 30 health, and the first player to bring the opponent to 0 health wins");
+            //Services.FastScrollText("5) The attacking player chooses each minion's target", 6000);
+            //Services.ScrollText("\n. . .", 500);
+            //Services.ScrollText("Tunder takes two 30 card decks out of his leather sack and hands one to you.", 1100);
+            //Services.ScrollText("He takes a coin out of his pocket, flips it in the air, and catches it on the back of his hand.", 1100);
+
             if (GoingFirst())
             {
                 _playerTurn = true;
@@ -75,7 +88,9 @@ namespace TextGame
                     Cost = 0,
                     Spell = true
                 });
+                _tunderCoin = true;
                 _mulliganStage = false;
+                Services.ScrollText("Well, it looks like you get to go first this time, laddy.", 1100);
                 StartTurn();
             }
             else
@@ -90,6 +105,7 @@ namespace TextGame
                     Spell = true
                 });
                 _mulliganStage = false;
+                Services.ScrollText("It looks like I'll be going first today, laddy.", 1100);
                 EnemyTurn();
             }
             
@@ -99,7 +115,7 @@ namespace TextGame
         {
             _playerTurn = true;
 
-            if (PlayerMana <= MaxMana)
+            if (PlayerMana < MaxMana)
                 PlayerMana++;
 
             PlayerCurrentMana = PlayerMana; //refill empty mana crystals for the turn
@@ -114,12 +130,21 @@ namespace TextGame
 
         public void EnemyTurn()
         {
-            //TODO: Basic AI to play a full turn
             _playerTurn = false;
+
+            if (EnemyMana < MaxMana)
+                EnemyMana++;
+
+            EnemyCurrentMana = EnemyMana; //refill empty mana crystals for the turn
+
             foreach (Card card in _enemyBoard)
                 card.Sleeping = false;
+
             DrawCard(false);
             Services.ScrollText("ENEMY PLAYING TURN...", 500); //testing only
+            EnemyMakeAttacks();
+            EnemySpendMana();
+            Services.ScrollText("Tunder ends his turn", 600);
             StartTurn();
         }
 
@@ -152,6 +177,10 @@ namespace TextGame
                     case "board":
                         PrintBoard();
                         Listen();
+                        break;
+                    case "read":
+                        //TODO: read cards
+                        Listen(); //remove when done
                         break;
                     case "count":
                         PrintCount();
@@ -223,7 +252,7 @@ namespace TextGame
                 Services.FastScrollText("\nYour hand:             Mana: (" + PlayerCurrentMana + "/" + PlayerMana + ")");
                 foreach (Card card in _playerCards)
                 {
-                    Services.FastScrollText((_playerCards.IndexOf(card) + 1).ToString() + ") " + card.Name + " (" + card.Attack + "/" + card.Health + ")");
+                    Services.FastScrollText((_playerCards.IndexOf(card) + 1).ToString() + ") " + card.Name + " (" + card.Attack + "/" + card.Health + ") *" + card.Cost + "*");
                 }
                 Console.WriteLine();
             }
@@ -258,6 +287,7 @@ namespace TextGame
             Services.FastScrollText("attack: view and select available minions to attack with");
             Services.FastScrollText("hand: view and play cards from your hand");
             Services.FastScrollText("board: print out the board");
+            Services.FastScrollText("read: view and select cards in your hand or on the board to read their text");
             Services.FastScrollText("count: print out a count of each player's hand");
             Services.FastScrollText("end turn: end your turn\n");
         }
@@ -361,10 +391,12 @@ namespace TextGame
                     if (cmd != _enemyBoard.Count + 1)
                     {
                         Swing(card, _enemyBoard[cmd - 1]);
+                        Attacking();
                     }
                     else
                     {
                         Swing(card, null);
+                        Attacking();
                     }
                 }
                 else
@@ -393,16 +425,27 @@ namespace TextGame
         public void Swing(Card attacker, Card defender)
         {
             if (defender == null)
-                DamageHero(attacker.Attack);
+            {
+                if (_playerTurn)
+                {
+                    DamageHero(attacker.Attack);
+                    Services.ScrollText(attacker.Name + " hits Tunder for " + attacker.Attack + " damage", 600);
+                }
+                else
+                {
+                    DamageHero(attacker.Attack, false);
+                    Services.ScrollText(attacker.Name + " hits you for " + attacker.Attack + " damage", 600);
+                } 
+            }
             else
             {
                 defender.Health -= attacker.Attack;
                 attacker.Health -= defender.Attack;
+                Services.ScrollText(attacker.Name + " attacks " + defender.Name, 600);
                 DeathCheck(new List<Card> { attacker, defender });
             }
 
             attacker.Sleeping = true;
-            Attacking();
         }
 
         public void DamageHero(int damage, bool enemyHero = true)
@@ -427,7 +470,7 @@ namespace TextGame
             {
                 if (card.Health <= 0)
                 {
-                    Services.ScrollText(card.Name + "dies!");
+                    Services.ScrollText(card.Name + " dies!");
                     Die(card);
                 }
             }
@@ -604,6 +647,76 @@ namespace TextGame
 
                     _enemyCards.Add(_enemyDeck[num]);
                     _enemyDeck.RemoveAt(num);
+                }
+            }
+        }
+
+        public void EnemySpendMana()
+        {
+            if (_tunderCoin)
+            {
+                _enemyCards.RemoveAt(4);
+                Services.ScrollText("Tunder plays the coin", 600);
+                EnemyCurrentMana++;
+                _tunderCoin = false;
+            }
+
+            EnemyPlayCard();
+
+            int minCost = 10;
+
+            foreach (Card card in _enemyCards)
+            {
+                if (card.Cost < minCost)
+                    minCost = card.Cost;
+            }
+
+            if (EnemyCurrentMana >= minCost)
+                EnemySpendMana();
+        }
+
+        public void EnemyPlayCard()
+        {
+            Random rand = new Random();
+
+            Card card = _enemyCards[rand.Next(_enemyCards.Count)];
+
+            if (card.Cost <= EnemyCurrentMana)
+            {
+                Services.ScrollText("Tunder plays " + card.Name, 600);
+                EnemyCurrentMana -= card.Cost;
+                _enemyBoard.Add(card);
+                _enemyCards.Remove(card);
+
+                if (card.Charge)
+                {
+                    DamageHero(card.Attack, false);
+                    Services.ScrollText("He charges it at you and you take " + card.Attack + " damage", 600);
+                }
+                    
+            }
+        }
+
+        public void EnemyMakeAttacks()
+        {
+            Random rand = new Random();
+
+            Card[] tempAry = new Card[_enemyBoard.Count];
+            _enemyBoard.CopyTo(tempAry);
+
+            foreach (Card card in tempAry)
+            {
+                if (!card.Sleeping)
+                {
+                    Card targetCard;
+                    int target = rand.Next(_playerBoard.Count + 1);
+
+                    if (target == _playerBoard.Count)
+                        targetCard = null;
+                    else
+                        targetCard = _playerBoard[target];
+
+                    Swing(card, targetCard);
                 }
             }
         }
