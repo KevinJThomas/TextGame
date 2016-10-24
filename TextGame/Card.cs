@@ -25,6 +25,8 @@ namespace TextGame
         public bool Charge { get; set; } = false;
         public bool Windfury { get; set; } = false;
         public bool Poisoned { get; set; } = false;
+        public bool Enrage { get; set; } = false;
+        public bool EndOfTurn { get; set; } = false;
 
         public bool Sleeping { get; set; } = true;
 
