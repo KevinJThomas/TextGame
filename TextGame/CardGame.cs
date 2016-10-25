@@ -10,9 +10,8 @@ using System.Threading.Tasks;
 namespace TextGame
 {
     //TODO
-    //1) Add basic AI to play a turn
-    //2) Test webspinner deathrattle to make sure it's working properly
-    //3) Test heroes dying
+    //1) Add in functionality for specific minions such as taunt/battlecry/etc.
+    //2) Make a function to take a command?
     class CardGame : Scenario
     {
         Thread musicThread = new Thread(PlayMusic);
@@ -30,7 +29,7 @@ namespace TextGame
 
         public int PlayerHeroHealth { get; set; } = 30;
         public int EnemyHeroHealth { get; set; } = 30;
-        public int PlayerMana { get; set; } = 0;
+        public int PlayerMana { get; set; } = 10; //change back to 0 after testing
         public int PlayerCurrentMana { get; set; }
         public int EnemyMana { get; set; } = 0;
         public int EnemyCurrentMana { get; set; }
@@ -48,6 +47,17 @@ namespace TextGame
 
             AddWebspinnerToDeck(true, 30);
             AddWebspinnerToDeck(false, 30);
+
+            _playerCards.Add(
+                new Card("Desert Camel")
+                {
+                    Text = "Battlecry: Put a 1-cost minion from each deck into the battlefield",
+                    Type = "Beast",
+                    Cost = 3,
+                    Health = 4,
+                    Attack = 2,
+                    Battlecry = true
+                });
         }
 
         public static void PlayMusic()
@@ -179,8 +189,7 @@ namespace TextGame
                         Listen();
                         break;
                     case "read":
-                        //TODO: read cards
-                        Listen(); //remove when done
+                        ReadCards();
                         break;
                     case "count":
                         PrintCount();
@@ -250,10 +259,7 @@ namespace TextGame
             if (_playerCards.Count > 0)
             {
                 Services.FastScrollText("\nYour hand:             Mana: (" + PlayerCurrentMana + "/" + PlayerMana + ")");
-                foreach (Card card in _playerCards)
-                {
-                    Services.FastScrollText((_playerCards.IndexOf(card) + 1).ToString() + ") " + card.Name + " (" + card.Attack + "/" + card.Health + ") *" + card.Cost + "*");
-                }
+                PrintList(_playerCards);
                 Console.WriteLine();
             }
             else
@@ -273,10 +279,7 @@ namespace TextGame
                     tempList.Add(card);
             }
 
-            foreach (Card card in tempList)
-            {
-                Services.FastScrollText((tempList.IndexOf(card) + 1).ToString() + ") " + card.Name + " (" + card.Attack + "/" + card.Health + ")");
-            }
+            PrintList(tempList);
 
             return tempList;
         }
@@ -290,6 +293,85 @@ namespace TextGame
             Services.FastScrollText("read: view and select cards in your hand or on the board to read their text");
             Services.FastScrollText("count: print out a count of each player's hand");
             Services.FastScrollText("end turn: end your turn\n");
+        }
+
+        public void PrintList(List<Card> list)
+        {
+            foreach (Card card in list)
+                Services.FastScrollText((list.IndexOf(card) + 1).ToString() + ") " + card.Name + " (" + card.Attack + "/" + card.Health + ") *" + card.Cost + "*");
+        }
+
+        public void ReadCards()
+        {
+            if (!_gameOver)
+            {
+                List<Card> readableCards = new List<Card>();
+                List<string> alreadyListed = new List<string>();
+
+                foreach (Card card in _playerCards)
+                {
+                    if (!alreadyListed.Contains(card.Name))
+                    {
+                        readableCards.Add(card);
+                        alreadyListed.Add(card.Name);
+                    }
+                        
+                }
+                    
+
+                foreach (Card card in _playerBoard)
+                {
+                    if (!alreadyListed.Contains(card.Name))
+                    {
+                        readableCards.Add(card);
+                        alreadyListed.Add(card.Name);
+                    }
+                }
+
+                foreach (Card card in _enemyBoard)
+                {
+                    if (!alreadyListed.Contains(card.Name))
+                    {
+                        readableCards.Add(card);
+                        alreadyListed.Add(card.Name);
+                    }
+                }
+
+                Services.FastScrollText("(You can type 'back' at any point to navigate back to the main menu)");
+                PrintList(readableCards);
+
+                int cmd;
+                Console.Write("> ");
+                string input = Console.ReadLine();
+
+                if (Int32.TryParse(input, out cmd))
+                {
+                    if (cmd <= readableCards.Count && cmd > 0)
+                    {
+                        if (readableCards[cmd - 1].Text != "")
+                            Services.ScrollText("\n" + readableCards[cmd - 1].Text + "\n");
+                        else
+                            Services.ScrollText("-no text-");
+
+                        ReadCards();
+                    } 
+                    else
+                    {
+                        Services.ScrollText("Invalid input. Try again.", 500);
+                        ReadCards();
+                    }
+                }
+                else if (input == "back" || input == "exit")
+                {
+                    PrintBoard();
+                    Listen();
+                }
+                else
+                {
+                    Services.ScrollText("Invalid input. Try again.", 500);
+                    ReadCards();
+                }
+            }
         }
 
         public void PlayHand()
@@ -373,11 +455,8 @@ namespace TextGame
         public void ChooseTarget(Card card)
         {
             Services.ScrollText("\nSelect a target to attack with your " + card.Name + " (" + card.Attack + "/" + card.Health + ")");
-            
-            foreach (Card target in _enemyBoard)
-            {
-                Services.FastScrollText((_enemyBoard.IndexOf(target) + 1).ToString() + ") " + target.Name + " (" + target.Attack + "/" + target.Health + ")");
-            }
+
+            PrintList(_enemyBoard);
             Services.FastScrollText((_enemyBoard.Count + 1).ToString() + ") Enemy Hero");
             Console.Write("> ");
 
@@ -428,13 +507,13 @@ namespace TextGame
             {
                 if (_playerTurn)
                 {
-                    DamageHero(attacker.Attack);
                     Services.ScrollText(attacker.Name + " hits Tunder for " + attacker.Attack + " damage", 600);
+                    DamageHero(attacker.Attack);
                 }
                 else
                 {
-                    DamageHero(attacker.Attack, false);
                     Services.ScrollText(attacker.Name + " hits you for " + attacker.Attack + " damage", 600);
+                    DamageHero(attacker.Attack, false);
                 } 
             }
             else
@@ -454,7 +533,10 @@ namespace TextGame
             {
                 EnemyHeroHealth -= damage;
                 if (EnemyHeroHealth <= 0)
+                {
                     _player.LevelCompleted = true;
+                    _gameOver = true;
+                }
             }
             else
             {
@@ -577,8 +659,13 @@ namespace TextGame
                     if (PlayerCurrentMana >= card.Cost)
                     {
                         PlayerCurrentMana -= card.Cost;
+
+                        if (card.Battlecry)
+                            Battlecry(card);
+
                         _playerBoard.Add(card);
                         _playerCards.Remove(card);
+
                         Services.ScrollText("You play " + card.Name);
                     }
                     else
@@ -593,9 +680,15 @@ namespace TextGame
                         EnemyCurrentMana -= card.Cost;
                         _enemyBoard.Add(card);
                         _enemyCards.Remove(card);
+
+                        
+
                         Services.ScrollText("Your opponent plays " + card.Name);
                     }
                 }
+
+                if (card.Charge)
+                    card.Sleeping = false;
             }
             else
             {
@@ -616,6 +709,167 @@ namespace TextGame
                         }
                         break;
                 }
+            }
+        }
+
+        public void Battlecry(Card card)
+        {
+            switch (card.Name)
+            {
+                case "Hungry Crab":
+                    List<Card> murlocTargets = new List<Card>();
+                    bool isMurloc = false;
+
+                    foreach (Card minion in _enemyBoard)
+                    {
+                        if (minion.Type == "Murloc")
+                        {
+                            isMurloc = true;
+                            murlocTargets.Add(minion);
+                        }
+                    }
+                    if (isMurloc)
+                    {
+                        Services.ScrollText("Select a murloc to eat:");
+
+                        PrintList(murlocTargets);
+
+                        int cmd;
+                        Console.Write("> ");
+                        string input = Console.ReadLine();
+
+                        if (Int32.TryParse(input, out cmd))
+                        {
+                            if (cmd > 0 && cmd <= murlocTargets.Count)
+                            {
+                                _enemyBoard.Remove(murlocTargets[cmd - 1]);
+                                card.Attack += 2;
+                                card.Health += 2;
+                                Services.ScrollText("Your hungry crab eats " + murlocTargets[cmd - 1].Name);
+                            }
+                            else
+                            {
+                                Services.ScrollText("Invalid input. Try again.", 500);
+                                Battlecry(card);
+                            }
+                        }
+                        else
+                        {
+                            Services.ScrollText("Invalid input. Try again.", 500);
+                            Battlecry(card);
+                        }
+                    }
+                    break;
+                case "Jeweled Scarab":
+                    Discover(Cards.ThreeDrops());
+                    break;
+                case "King's Elekk":
+                    Services.ScrollText("A minion is revealed from both decks:\nYou: Webspinner (1)\nTunder: Webspinner (1)\n\nYou don't draw a card\n", 500);
+                    break;
+                case "Desert Camel":
+                    if (_playerDeck.Count > 0)
+                    {
+                        _playerBoard.Add(_playerDeck[_playerDeck.Count - 1]);
+                        _playerDeck.Remove(_playerDeck[_playerDeck.Count - 1]);
+                        Services.ScrollText("Desert camel pulls a webspinner out of your deck", 400);
+                    }
+                    if (_enemyDeck.Count > 0)
+                    {
+                        _enemyBoard.Add(_enemyDeck[_enemyDeck.Count - 1]);
+                        _enemyDeck.Remove(_enemyDeck[_enemyDeck.Count - 1]);
+                        Services.ScrollText("Desert camel pulls a webspinner out of Tunder's deck", 400);
+                    }
+                    break;
+                case "Ironbeak Owl":
+                    List<Card> allMinions = ListAllMinions();
+                    Silence(allMinions);
+                    break;
+
+            }
+        }
+
+        public List<Card> ListAllMinions()
+        {
+            List<Card> allMinions = new List<Card>();
+
+            foreach (Card card in _enemyBoard)
+                allMinions.Add(card);
+
+            foreach (Card card in _playerBoard)
+                allMinions.Add(card);
+
+            return allMinions;
+        }
+
+        public void Silence(List<Card> targets)
+        {
+            PrintList(targets);
+
+            int cmd;
+            Console.Write("> ");
+            string input = Console.ReadLine();
+
+            if (Int32.TryParse(input, out cmd))
+            {
+                if (cmd > 0 && cmd <= targets.Count)
+                {
+                    //TODO
+                }
+            }
+        }
+
+        public void Discover(List<Card> cardList)
+        {
+            List<Card> discoverOptions = new List<Card>();
+
+            Random rand = new Random();
+
+            int firstOption = rand.Next(cardList.Count);
+            discoverOptions.Add(cardList[firstOption]);
+            cardList.Remove(cardList[firstOption]);
+
+            int secondOption = rand.Next(cardList.Count);
+            discoverOptions.Add(cardList[secondOption]);
+            cardList.Remove(cardList[secondOption]);
+
+            int thirdOption = rand.Next(cardList.Count);
+            discoverOptions.Add(cardList[thirdOption]);
+            cardList.Remove(cardList[thirdOption]);
+
+            ChooseDiscover(discoverOptions);
+        }
+
+        public void ChooseDiscover(List<Card> options)
+        {
+            Services.FastScrollText("(You can type 'board' at any point to view the board while discovering)");
+            PrintList(options);
+
+            int cmd;
+            Console.Write("> ");
+            string input = Console.ReadLine();
+
+            if (Int32.TryParse(input, out cmd))
+            {
+                if (cmd > 0 && cmd <= options.Count)
+                {
+                    _playerCards.Add(options[cmd - 1]);
+                    Services.ScrollText("You choose " + options[cmd - 1].Name + " and put it into your hand", 600);
+                }
+                else
+                {
+                    Services.ScrollText("Invalid input. Try again.", 500);
+                    ChooseDiscover(options);
+                }
+            }
+            else if (input == "board")
+            {
+                PrintBoard();
+                ChooseDiscover(options);
+            }
+            else
+            {
+                Services.ScrollText("Invalid input. Try again.", 500);
+                ChooseDiscover(options);
             }
         }
 
