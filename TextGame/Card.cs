@@ -16,6 +16,10 @@ namespace TextGame
         public int Attack { get; set; }
         public int Health { get; set; }
 
+        public int BaseAttack { get; set; }
+        public int BaseHealth { get; set; }
+        public int BaseCost { get; set; }
+
         public bool Battlecry { get; set; } = false;
         public bool DeathRattle { get; set; } = false;
         public bool Adjacent { get; set; } = false;
