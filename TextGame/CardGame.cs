@@ -11,7 +11,6 @@ namespace TextGame
 {
     //TODO
     //1) Add in functionality for specific minions such as taunt/battlecry/etc.
-    //2) Make a function to take a command?
     class CardGame : Scenario
     {
         Thread musicThread = new Thread(PlayMusic);
@@ -48,14 +47,17 @@ namespace TextGame
             AddWebspinnerToDeck(true, 30);
             AddWebspinnerToDeck(false, 30);
 
-            _playerCards.Add(
-                new Card("Desert Camel")
+            _playerCards.Add( //testing only
+                new Card("Core Rager")
                 {
-                    Text = "Battlecry: Put a 1-cost minion from each deck into the battlefield",
+                    Text = "Battlecry: If your hand is empty, gain +3/+3",
                     Type = "Beast",
-                    Cost = 3,
+                    BaseCost = 4,
+                    Cost = 4,
+                    BaseHealth = 4,
                     Health = 4,
-                    Attack = 2,
+                    BaseAttack = 4,
+                    Attack = 4,
                     Battlecry = true
                 });
         }
@@ -259,7 +261,7 @@ namespace TextGame
             if (_playerCards.Count > 0)
             {
                 Services.FastScrollText("\nYour hand:             Mana: (" + PlayerCurrentMana + "/" + PlayerMana + ")");
-                PrintList(_playerCards);
+                PrintList(_playerCards, true);
                 Console.WriteLine();
             }
             else
@@ -279,7 +281,7 @@ namespace TextGame
                     tempList.Add(card);
             }
 
-            PrintList(tempList);
+            PrintList(tempList, true);
 
             return tempList;
         }
@@ -295,10 +297,68 @@ namespace TextGame
             Services.FastScrollText("end turn: end your turn\n");
         }
 
-        public void PrintList(List<Card> list)
+        public int PrintList(List<Card> list, bool noCmd = false, bool includeHero = false)
         {
-            foreach (Card card in list)
-                Services.FastScrollText((list.IndexOf(card) + 1).ToString() + ") " + card.Name + " (" + card.Attack + "/" + card.Health + ") *" + card.Cost + "*");
+            if (!noCmd)
+            {
+                foreach (Card card in list)
+                    Services.FastScrollText((list.IndexOf(card) + 1).ToString() + ") " + card.Name + " (" + card.Attack + "/" + card.Health + ") *" + card.Cost + "*");
+                if (includeHero)
+                    Services.FastScrollText((list.Count + 1).ToString() + ") Enemy Hero");
+
+                int cmd;
+                Console.Write("> ");
+                string input = Console.ReadLine();
+                
+                if (Int32.TryParse(input, out cmd))
+                {
+                    if (!includeHero)
+                    {
+                        if (cmd > 0 && cmd <= list.Count)
+                        {
+                            return cmd;
+                        }
+                        else
+                        {
+                            return 0;
+                        }
+                    }
+                    else
+                    {
+                        if (cmd > 0 && cmd <= list.Count + 1)
+                        {
+                            return cmd;
+                        }
+                        else
+                        {
+                            return 0;
+                        }
+                    }
+                }
+                else if (input == "back")
+                {
+                    return -1;
+                }
+                else if (input == "exit")
+                {
+                    return -2;
+                }
+                else if (input == "board")
+                {
+                    return -3;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            else
+            {
+                foreach (Card card in list)
+                    Services.FastScrollText((list.IndexOf(card) + 1).ToString() + ") " + card.Name + " (" + card.Attack + "/" + card.Health + ") *" + card.Cost + "*");
+                return 0;
+            }
+            
         }
 
         public void ReadCards()
@@ -338,30 +398,16 @@ namespace TextGame
                 }
 
                 Services.FastScrollText("(You can type 'back' at any point to navigate back to the main menu)");
-                PrintList(readableCards);
-
-                int cmd;
-                Console.Write("> ");
-                string input = Console.ReadLine();
-
-                if (Int32.TryParse(input, out cmd))
+                int cmd = PrintList(readableCards);
+                if (cmd > 0)
                 {
-                    if (cmd <= readableCards.Count && cmd > 0)
-                    {
-                        if (readableCards[cmd - 1].Text != "")
-                            Services.ScrollText("\n" + readableCards[cmd - 1].Text + "\n");
-                        else
-                            Services.ScrollText("-no text-");
-
-                        ReadCards();
-                    } 
+                    if (readableCards[cmd - 1].Text != "")
+                        Services.ScrollText("\n" + readableCards[cmd - 1].Text + "\n");
                     else
-                    {
-                        Services.ScrollText("Invalid input. Try again.", 500);
-                        ReadCards();
-                    }
+                        Services.ScrollText("-no text-");
+                    ReadCards();
                 }
-                else if (input == "back" || input == "exit")
+                else if (cmd == -1 || cmd == -2)
                 {
                     PrintBoard();
                     Listen();
@@ -456,40 +502,26 @@ namespace TextGame
         {
             Services.ScrollText("\nSelect a target to attack with your " + card.Name + " (" + card.Attack + "/" + card.Health + ")");
 
-            PrintList(_enemyBoard);
-            Services.FastScrollText((_enemyBoard.Count + 1).ToString() + ") Enemy Hero");
-            Console.Write("> ");
-
-            int cmd;
-            string input = Console.ReadLine();
-
-            if (Int32.TryParse(input, out cmd))
+            int cmd = PrintList(_enemyBoard, false, true);
+            if (cmd > 0)
             {
-                if (cmd <= _enemyBoard.Count + 1)
+                if (cmd != _enemyBoard.Count + 1)
                 {
-                    if (cmd != _enemyBoard.Count + 1)
-                    {
-                        Swing(card, _enemyBoard[cmd - 1]);
-                        Attacking();
-                    }
-                    else
-                    {
-                        Swing(card, null);
-                        Attacking();
-                    }
+                    Swing(card, _enemyBoard[cmd - 1]);
+                    Attacking();
                 }
                 else
                 {
-                    Services.ScrollText("Invalid input. Try again.", 500);
-                    ChooseTarget(card);
+                    Swing(card, null);
+                    Attacking();
                 }
             }
-            else if (input.ToLower() == "back")
+            else if (cmd == -1)
             {
                 PrintBoard();
                 Attacking();
             }
-            else if (input.ToLower() == "exit")
+            else if (cmd == -2)
             {
                 PrintBoard();
                 Listen();
@@ -561,27 +593,7 @@ namespace TextGame
         public void Die(Card card)
         {
             if (card.DeathRattle)
-            {
-                switch (card.Name)
-                {
-                    case "Webspinner":
-                        Random rand = new Random();
-                        Card[] tempArr = (Card[]) _allCards.Clone();
-
-                        Card randomBeast = tempArr[rand.Next(tempArr.Length)];
-
-                        if (_playerBoard.Contains(card))
-                        {
-                            _playerCards.Add(randomBeast);
-                            Services.ScrollText("Webspinner gives you a " + randomBeast.Name);
-                        }
-                        else if (_enemyBoard.Contains(card))
-                        {
-                            _enemyCards.Add(randomBeast);
-                        }
-                        break;
-                }
-            }
+                Deathrattle(card);
 
             if (_playerBoard.Contains(card))
                 _playerBoard.Remove(card);
@@ -627,8 +639,11 @@ namespace TextGame
                     _playerDeck.Add(new Card("Webspinner")
                     {
                         Text = "Deathrattle: Add a random beast to your hand",
+                        BaseCost = 1,
                         Cost = 1,
+                        BaseAttack = 1,
                         Attack = 1,
+                        BaseHealth = 1,
                         Health = 1,
                         DeathRattle = true
                     });
@@ -641,8 +656,11 @@ namespace TextGame
                     _enemyDeck.Add(new Card("Webspinner")
                     {
                         Text = "Deathrattle: Add a random beast to your hand",
+                        BaseCost = 1,
                         Cost = 1,
+                        BaseAttack = 1,
                         Attack = 1,
+                        BaseHealth = 1,
                         Health = 1,
                         DeathRattle = true
                     });
@@ -660,13 +678,13 @@ namespace TextGame
                     {
                         PlayerCurrentMana -= card.Cost;
 
-                        if (card.Battlecry)
-                            Battlecry(card);
-
+                        Services.ScrollText("You play " + card.Name);
+                        
                         _playerBoard.Add(card);
                         _playerCards.Remove(card);
 
-                        Services.ScrollText("You play " + card.Name);
+                        if (card.Battlecry)
+                            Battlecry(card);
                     }
                     else
                     {
@@ -708,6 +726,9 @@ namespace TextGame
                                 EnemyCurrentMana++;
                         }
                         break;
+                    case "Banana":
+                        //TODO: playing bananas
+                        break;
                 }
             }
         }
@@ -716,7 +737,7 @@ namespace TextGame
         {
             switch (card.Name)
             {
-                case "Hungry Crab":
+                case "Hungry Crab": //TODO: AI?
                     List<Card> murlocTargets = new List<Card>();
                     bool isMurloc = false;
 
@@ -732,26 +753,13 @@ namespace TextGame
                     {
                         Services.ScrollText("Select a murloc to eat:");
 
-                        PrintList(murlocTargets);
-
-                        int cmd;
-                        Console.Write("> ");
-                        string input = Console.ReadLine();
-
-                        if (Int32.TryParse(input, out cmd))
+                        int cmd = PrintList(murlocTargets);
+                        if (cmd > 0)
                         {
-                            if (cmd > 0 && cmd <= murlocTargets.Count)
-                            {
-                                _enemyBoard.Remove(murlocTargets[cmd - 1]);
-                                card.Attack += 2;
-                                card.Health += 2;
-                                Services.ScrollText("Your hungry crab eats " + murlocTargets[cmd - 1].Name);
-                            }
-                            else
-                            {
-                                Services.ScrollText("Invalid input. Try again.", 500);
-                                Battlecry(card);
-                            }
+                            _enemyBoard.Remove(murlocTargets[cmd - 1]);
+                            card.Attack += 2;
+                            card.Health += 2;
+                            Services.ScrollText("Your hungry crab eats " + murlocTargets[cmd - 1].Name);
                         }
                         else
                         {
@@ -760,11 +768,11 @@ namespace TextGame
                         }
                     }
                     break;
-                case "Jeweled Scarab":
+                case "Jeweled Scarab": //TODO: AI?
                     Discover(Cards.ThreeDrops());
                     break;
                 case "King's Elekk":
-                    Services.ScrollText("A minion is revealed from both decks:\nYou: Webspinner (1)\nTunder: Webspinner (1)\n\nYou don't draw a card\n", 500);
+                    Services.ScrollText("A minion is revealed from both decks:\nYou: Webspinner (1)\nTunder: Webspinner (1)\n\nA card is not drawn\n", 500);
                     break;
                 case "Desert Camel":
                     if (_playerDeck.Count > 0)
@@ -780,11 +788,215 @@ namespace TextGame
                         Services.ScrollText("Desert camel pulls a webspinner out of Tunder's deck", 400);
                     }
                     break;
-                case "Ironbeak Owl":
+                case "Ironbeak Owl": //TODO: AI?
                     List<Card> allMinions = ListAllMinions();
-                    Silence(allMinions);
+                    if (allMinions.Count > 0)
+                        Silence(allMinions);
                     break;
+                case "King Mukla":
+                    if (_playerTurn)
+                        GiveBananas(false, 2);
+                    else
+                        GiveBananas(true, 2);
+                    break;
+                case "Pantry Spider":
+                    if (_playerTurn)
+                    {
+                        _playerBoard.Add(new Card("Spider")
+                        {
+                            Cost = 3,
+                            BaseHealth = 3,
+                            Health = 3,
+                            BaseAttack = 1,
+                            Attack = 1
+                        });
+                    }
+                    else
+                    {
+                        _enemyBoard.Add(new Card("Spider")
+                        {
+                            Cost = 3,
+                            BaseHealth = 3,
+                            Health = 3,
+                            BaseAttack = 1,
+                            Attack = 1
+                        });
+                    }
+                    Services.ScrollText("It spawns a spider", 500);
+                    break;
+                case "Armored Warhorse":
+                    Services.ScrollText("A minion is revealed from both decks:\nYou: Webspinner (1)\nTunder: Webspinner (1)\n\nCharge is not given\n", 500);
+                    break;
+                case "Core Rager":
+                    if (_playerTurn)
+                    {
+                        if (_playerCards.Count == 0)
+                        {
+                            card.Attack += 3;
+                            card.Health += 3;
+                            Services.ScrollText("It gains +3/+3");
+                        }
+                    }
+                    else
+                    {
+                        if (_enemyCards.Count == 0)
+                        {
+                            card.Attack += 3;
+                            card.Health += 3;
+                            Services.ScrollText("It gains +3/+3");
+                        }
+                    }
+                    break;
+                case "Tomb Spider": //TODO: AI?
+                    List<Card> beasts = new List<Card>();
 
+                    foreach (Card beast in _allCards)
+                        beasts.Add(beast);
+
+                    Discover(beasts);
+                    break;
+                case "Stampeding Kodo":
+                    if (_playerTurn)
+                    {
+                        List<Card> kodoTargets = CanKodo();
+                        if (kodoTargets.Count > 0)
+                        {
+                            int cmd = PrintList(kodoTargets);
+                            if (cmd > 0)
+                            {
+                                Die(kodoTargets[cmd - 1]);
+                            }
+                            else
+                            {
+                                Battlecry(card);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        List<Card> kodoTargets = CanKodo();
+                        if (kodoTargets.Count > 0)
+                        {
+                            Random rand = new Random();
+                            Die(kodoTargets[rand.Next(kodoTargets.Count)]);
+                        }
+                    }
+                    break;
+                case "Mukla, Tyrant of the Vale":
+                    if (_playerTurn)
+                        GiveBananas(true, 2);
+                    else
+                        GiveBananas(false, 2);
+                    break;
+                case "Princess Huhuran":
+                    if (_playerTurn)
+                    {
+                        List<Card> deathrattles = ListDeathrattles();
+                        int cmd = PrintList(deathrattles);
+                        if (cmd > 0)
+                        {
+                            Deathrattle(deathrattles[cmd - 1]);
+                        }
+                        else
+                        {
+                            Services.ScrollText("Invalid input. Try again.");
+                            Battlecry(card);
+                        }
+                    }
+                    else
+                    {
+                        //TODO
+                    }
+                    break;
+            }
+        }
+
+        public void Deathrattle(Card card)
+        {
+            //TODO
+            switch (card.Name)
+            {
+                case "Webspinner":
+                    Random rand = new Random();
+                    Card[] tempArr = (Card[])_allCards.Clone();
+
+                    Card randomBeast = tempArr[rand.Next(tempArr.Length)];
+
+                    if (_playerBoard.Contains(card))
+                    {
+                        _playerCards.Add(randomBeast);
+                        Services.ScrollText("Webspinner gives you a " + randomBeast.Name);
+                    }
+                    else if (_enemyBoard.Contains(card))
+                    {
+                        _enemyCards.Add(randomBeast);
+                    }
+                    break;
+            }
+        }
+
+        public List<Card> ListDeathrattles()
+        {
+            List<Card> deathrattles = new List<Card>();
+
+            foreach (Card card in _playerBoard)
+            {
+                if (card.DeathRattle)
+                    deathrattles.Add(card);
+            }
+
+            return deathrattles;
+        }
+
+        public List<Card> CanKodo()
+        {
+            List<Card> kodoTargets = new List<Card>();
+            if (_playerTurn)
+            {
+                foreach (Card card in _enemyBoard)
+                {
+                    if (card.Attack <= 2)
+                        kodoTargets.Add(card);
+                }
+            }
+            else
+            {
+                foreach (Card card in _playerBoard)
+                {
+                    if (card.Attack <= 2)
+                        kodoTargets.Add(card);
+                }
+            }
+            return kodoTargets;
+        }
+
+        public void GiveBananas(bool toPlayer, int amount = 1)
+        {
+            if (toPlayer)
+            {
+                for (int i = 0; i < amount; i++)
+                {
+                    _playerCards.Add(new Card("Banana")
+                    {
+                        Text = "Give a minion +1/+1",
+                        Cost = 1,
+                        Spell = true
+                    });
+                }
+                Services.ScrollText("You receive " + amount + " banana(s)", 400);
+            }
+            else
+            {
+                for (int i = 0; i < amount; i++)
+                {
+                    _enemyCards.Add(new Card("Banana")
+                    {
+                        Text = "Give a minion +1/+1",
+                        Cost = 1,
+                        Spell = true
+                    });
+                }
+                Services.ScrollText("Tunder receives " + amount + " banana(s)", 400);
             }
         }
 
@@ -803,18 +1015,31 @@ namespace TextGame
 
         public void Silence(List<Card> targets)
         {
-            PrintList(targets);
+            Services.ScrollText("\nSelect a minion to silence:");
+            int cmd = PrintList(targets);
 
-            int cmd;
-            Console.Write("> ");
-            string input = Console.ReadLine();
-
-            if (Int32.TryParse(input, out cmd))
+            if (cmd > 0)
             {
-                if (cmd > 0 && cmd <= targets.Count)
-                {
-                    //TODO
-                }
+                targets[cmd - 1].Charge = false;
+                targets[cmd - 1].Adjacent = false;
+                targets[cmd - 1].Aura = false;
+                targets[cmd - 1].DeathRattle = false;
+                targets[cmd - 1].EndOfTurn = false;
+                targets[cmd - 1].Enrage = false;
+                targets[cmd - 1].Poisoned = false;
+                targets[cmd - 1].Taunt = false;
+                targets[cmd - 1].Windfury = false;
+                targets[cmd - 1].Attack = targets[cmd - 1].BaseAttack;
+
+                if (targets[cmd - 1].BaseHealth < targets[cmd - 1].Health)
+                    targets[cmd - 1].Health = targets[cmd - 1].BaseHealth;
+
+                Services.ScrollText(targets[cmd - 1].Name + " is silenced!");
+            }
+            else
+            {
+                Services.ScrollText("Invalid input. Try again.", 500);
+                Silence(targets);
             }
         }
 
@@ -842,26 +1067,13 @@ namespace TextGame
         public void ChooseDiscover(List<Card> options)
         {
             Services.FastScrollText("(You can type 'board' at any point to view the board while discovering)");
-            PrintList(options);
-
-            int cmd;
-            Console.Write("> ");
-            string input = Console.ReadLine();
-
-            if (Int32.TryParse(input, out cmd))
+            int cmd = PrintList(options);
+            if (cmd > 0)
             {
-                if (cmd > 0 && cmd <= options.Count)
-                {
-                    _playerCards.Add(options[cmd - 1]);
-                    Services.ScrollText("You choose " + options[cmd - 1].Name + " and put it into your hand", 600);
-                }
-                else
-                {
-                    Services.ScrollText("Invalid input. Try again.", 500);
-                    ChooseDiscover(options);
-                }
+                _playerCards.Add(options[cmd - 1]);
+                Services.ScrollText("You choose " + options[cmd - 1].Name + " and put it into your hand", 600);
             }
-            else if (input == "board")
+            else if (cmd == -3)
             {
                 PrintBoard();
                 ChooseDiscover(options);
