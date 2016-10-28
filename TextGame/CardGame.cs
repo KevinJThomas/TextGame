@@ -10,10 +10,15 @@ using System.Threading.Tasks;
 namespace TextGame
 {
     //TODO
-    //1) Add in functionality for specific minions such as taunt/battlecry/etc.
+    //1) Add webspinner to GetCards() and OneDrops()
+    //2) Add functionality for using bananas
+    //3) Currently only 1 copy of each minion - help
+    //4) After killing Tunder if got stuck in an infinite loop (Invalid input. Try Again.) While choosing targets to attack
     class CardGame : Scenario
     {
         Thread musicThread = new Thread(PlayMusic);
+
+        Random rand = new Random();
 
         Card[] _allCards = Cards.GetCards();
 
@@ -28,7 +33,7 @@ namespace TextGame
 
         public int PlayerHeroHealth { get; set; } = 30;
         public int EnemyHeroHealth { get; set; } = 30;
-        public int PlayerMana { get; set; } = 10; //change back to 0 after testing
+        public int PlayerMana { get; set; } = 0;
         public int PlayerCurrentMana { get; set; }
         public int EnemyMana { get; set; } = 0;
         public int EnemyCurrentMana { get; set; }
@@ -39,6 +44,9 @@ namespace TextGame
         bool _tunderCoin;
         bool _gameOver = false;
 
+        bool _playerRhyno = false;
+        bool _enemyRhyno = false;
+
         public CardGame(Player player) : base(player)
         {
             _player = player;
@@ -46,20 +54,6 @@ namespace TextGame
 
             AddWebspinnerToDeck(true, 30);
             AddWebspinnerToDeck(false, 30);
-
-            _playerCards.Add( //testing only
-                new Card("Core Rager")
-                {
-                    Text = "Battlecry: If your hand is empty, gain +3/+3",
-                    Type = "Beast",
-                    BaseCost = 4,
-                    Cost = 4,
-                    BaseHealth = 4,
-                    Health = 4,
-                    BaseAttack = 4,
-                    Attack = 4,
-                    Battlecry = true
-                });
         }
 
         public static void PlayMusic()
@@ -75,19 +69,19 @@ namespace TextGame
 
         public void Start()
         {
-            //Services.ScrollText("You are sitting across the table from a tough-looking dwarf.", 1200);
-            //Services.ScrollText(". . .", 500);
-            //Services.ScrollText("Oh hello there! My name is Tunder the Great.", 800);
-            //Services.ScrollText("I hope you're ready to lose! I've never lost a card game in my life.", 800);
-            //Services.ScrollText("\nIn case you don't know, here are the rules of the game:", 600);
-            //Services.FastScrollText("1) You draw one card at the beginning of each turn");
-            //Services.FastScrollText("2) You have a limited amount on mana each turn, which will increase by 1 each turn");
-            //Services.FastScrollText("3) You'll start with 1 mana on turn 1, and once you reach 10 mana it will stop increasing");
-            //Services.FastScrollText("4) Each player has 30 health, and the first player to bring the opponent to 0 health wins");
-            //Services.FastScrollText("5) The attacking player chooses each minion's target", 6000);
-            //Services.ScrollText("\n. . .", 500);
-            //Services.ScrollText("Tunder takes two 30 card decks out of his leather sack and hands one to you.", 1100);
-            //Services.ScrollText("He takes a coin out of his pocket, flips it in the air, and catches it on the back of his hand.", 1100);
+            Services.ScrollText("You are sitting across the table from a tough-looking dwarf.", 1200);
+            Services.ScrollText(". . .", 500);
+            Services.ScrollText("Oh hello there! My name is Tunder the Great.", 800);
+            Services.ScrollText("I hope you're ready to lose! I've never lost a card game in my life.", 800);
+            Services.ScrollText("\nIn case you don't know, here are the rules of the game:", 600);
+            Services.FastScrollText("1) You draw one card at the beginning of each turn");
+            Services.FastScrollText("2) You have a limited amount of mana each turn, which will increase by 1 each turn");
+            Services.FastScrollText("3) You'll start with 1 mana on turn 1, and once you reach 10 mana it will stop increasing");
+            Services.FastScrollText("4) Each player has 30 health, and the first player to bring the opponent to 0 health wins");
+            Services.FastScrollText("5) The attacking player chooses each minion's target", 6000);
+            Services.ScrollText("\n. . .", 500);
+            Services.ScrollText("Tunder takes two 30 card decks out of his leather sack and hands one to you.", 1100);
+            Services.ScrollText("He takes a coin out of his pocket, flips it in the air, and catches it on the back of his hand.", 1100);
 
             if (GoingFirst())
             {
@@ -133,7 +127,10 @@ namespace TextGame
             PlayerCurrentMana = PlayerMana; //refill empty mana crystals for the turn
 
             foreach (Card card in _playerBoard)
-                card.Sleeping = false;
+                if (card.Windfury)
+                    card.Attacks = 2;
+                else
+                    card.Attacks = 1;
 
             DrawCard();
             PrintBoard();
@@ -150,13 +147,16 @@ namespace TextGame
             EnemyCurrentMana = EnemyMana; //refill empty mana crystals for the turn
 
             foreach (Card card in _enemyBoard)
-                card.Sleeping = false;
+                if (card.Windfury)
+                    card.Attacks = 2;
+                else
+                    card.Attacks = 1;
 
             DrawCard(false);
-            Services.ScrollText("ENEMY PLAYING TURN...", 500); //testing only
             EnemyMakeAttacks();
             EnemySpendMana();
             Services.ScrollText("Tunder ends his turn", 600);
+            EndOfTurn();
             StartTurn();
         }
 
@@ -198,6 +198,7 @@ namespace TextGame
                         Listen();
                         break;
                     case "end turn":
+                        EndOfTurn(false);
                         EnemyTurn();
                         break;
                     default:
@@ -246,7 +247,7 @@ namespace TextGame
             }
             else
             {
-                Services.ScrollText("The board is empty\n");
+                Services.ScrollText("\nThe board is empty\n");
             }
         }
 
@@ -277,7 +278,7 @@ namespace TextGame
             
             foreach (Card card in _playerBoard)
             {
-                if (!card.Sleeping)
+                if (card.Attacks > 0)
                     tempList.Add(card);
             }
 
@@ -502,21 +503,52 @@ namespace TextGame
         {
             Services.ScrollText("\nSelect a target to attack with your " + card.Name + " (" + card.Attack + "/" + card.Health + ")");
 
-            int cmd = PrintList(_enemyBoard, false, true);
-            if (cmd > 0)
+            List<Card> tauntList = new List<Card>();
+            foreach (Card target in _enemyBoard)
             {
-                if (cmd != _enemyBoard.Count + 1)
+                if (target.Taunt)
+                    tauntList.Add(target);
+            }
+
+            int cmd;
+
+            if (tauntList.Count == 0)
+            {
+                cmd = PrintList(_enemyBoard, false, true);
+                if (cmd > 0)
                 {
-                    Swing(card, _enemyBoard[cmd - 1]);
-                    Attacking();
+                    if (cmd != _enemyBoard.Count + 1)
+                    {
+                        Swing(card, _enemyBoard[cmd - 1]);
+                        Attacking();
+                    }
+                    else
+                    {
+                        Swing(card, null);
+                        Attacking();
+                    }
                 }
-                else
+                
+            }
+            else
+            {
+                cmd = PrintList(tauntList);
+                if (cmd > 0)
                 {
-                    Swing(card, null);
-                    Attacking();
+                    if (cmd != tauntList.Count + 1)
+                    {
+                        Swing(card, tauntList[cmd - 1]);
+                        Attacking();
+                    }
+                    else
+                    {
+                        Swing(card, null);
+                        Attacking();
+                    }
                 }
             }
-            else if (cmd == -1)
+
+            if (cmd == -1)
             {
                 PrintBoard();
                 Attacking();
@@ -531,6 +563,7 @@ namespace TextGame
                 Services.ScrollText("Invalid input. Try again.", 500);
                 ChooseTarget(card);
             }
+
         }
 
         public void Swing(Card attacker, Card defender)
@@ -550,13 +583,22 @@ namespace TextGame
             }
             else
             {
-                defender.Health -= attacker.Attack;
-                attacker.Health -= defender.Attack;
                 Services.ScrollText(attacker.Name + " attacks " + defender.Name, 600);
+
+                if (!attacker.Poisoned)
+                    defender.Health -= attacker.Attack;
+                else
+                    Die(defender);
+
+                if (!defender.Poisoned)
+                    attacker.Health -= defender.Attack;
+                else
+                    Die(attacker);
+                
                 DeathCheck(new List<Card> { attacker, defender });
             }
 
-            attacker.Sleeping = true;
+            attacker.Attacks--;
         }
 
         public void DamageHero(int damage, bool enemyHero = true)
@@ -594,6 +636,8 @@ namespace TextGame
         {
             if (card.DeathRattle)
                 Deathrattle(card);
+            if (card.Aura)
+                StopAura(card);
 
             if (_playerBoard.Contains(card))
                 _playerBoard.Remove(card);
@@ -607,7 +651,7 @@ namespace TextGame
             {
                 foreach (Card card in _playerBoard)
                 {
-                    if (!card.Sleeping)
+                    if (card.Attacks > 0)
                         return true;
                 }
                 return false;
@@ -617,7 +661,6 @@ namespace TextGame
 
         public bool GoingFirst()
         {
-            Random rand = new Random();
             int first = rand.Next(2);
 
             if (first == 1)
@@ -685,6 +728,8 @@ namespace TextGame
 
                         if (card.Battlecry)
                             Battlecry(card);
+                        if (card.Aura)
+                            Aura(card);
                     }
                     else
                     {
@@ -706,7 +751,13 @@ namespace TextGame
                 }
 
                 if (card.Charge)
-                    card.Sleeping = false;
+                {
+                    if (card.Windfury)
+                        card.Attacks = 2;
+                    else
+                        card.Attacks = 1;
+                }
+                    
             }
             else
             {
@@ -733,43 +784,119 @@ namespace TextGame
             }
         }
 
+        public void Aura(Card card)
+        {
+            switch (card.Name)
+            {
+                case "Timber Wolf":
+                    if (_playerBoard.Contains(card))
+                    {
+                        foreach (Card beast in _playerBoard)
+                            if (beast.Type == "Beast" && beast != card)
+                                beast.Attack++;
+                    }
+                    else
+                    {
+                        foreach (Card enemyBeast in _playerBoard)
+                            if (enemyBeast.Type == "Beast" && enemyBeast != card)
+                                enemyBeast.Attack++;
+                    }
+                    break;
+                case "Tundra Rhyno":
+                    if (_playerBoard.Contains(card))
+                        _playerRhyno = true;
+                    else
+                        _enemyRhyno = true;
+                    break;
+            }
+        }
+
+        public void StopAura(Card card)
+        {
+            switch (card.Name)
+            {
+                case "Timber Wolf":
+                    if (_playerBoard.Contains(card))
+                    {
+                        foreach (Card beast in _playerBoard)
+                            beast.Attack--;
+                    } 
+                    else
+                    {
+                        foreach (Card enemyBeast in _playerBoard)
+                            enemyBeast.Attack--;
+                    }
+                    break;
+                case "Tundra Rhyno":
+                    if (_playerBoard.Contains(card))
+                    {
+                        bool noRhyno = true;
+
+                        foreach (Card minion in _playerBoard)
+                            if (minion.Name == "Tundra Rhyno")
+                                noRhyno = false;
+
+                        if (noRhyno)
+                            _playerRhyno = false;
+                    }
+                    else
+                    {
+                        bool noRhyno = true;
+
+                        foreach (Card minion in _enemyBoard)
+                            if (minion.Name == "Tundra Rhyno")
+                                noRhyno = false;
+
+                        if (noRhyno)
+                            _enemyRhyno = false;
+                    }
+                    break;
+            }
+        }
+
         public void Battlecry(Card card)
         {
             switch (card.Name)
             {
-                case "Hungry Crab": //TODO: AI?
-                    List<Card> murlocTargets = new List<Card>();
-                    bool isMurloc = false;
-
-                    foreach (Card minion in _enemyBoard)
+                case "Hungry Crab":
+                    if (_playerTurn)
                     {
-                        if (minion.Type == "Murloc")
-                        {
-                            isMurloc = true;
-                            murlocTargets.Add(minion);
-                        }
-                    }
-                    if (isMurloc)
-                    {
-                        Services.ScrollText("Select a murloc to eat:");
+                        List<Card> murlocTargets = new List<Card>();
+                        bool isMurloc = false;
 
-                        int cmd = PrintList(murlocTargets);
-                        if (cmd > 0)
+                        foreach (Card minion in _enemyBoard)
                         {
-                            _enemyBoard.Remove(murlocTargets[cmd - 1]);
-                            card.Attack += 2;
-                            card.Health += 2;
-                            Services.ScrollText("Your hungry crab eats " + murlocTargets[cmd - 1].Name);
+                            if (minion.Type == "Murloc")
+                            {
+                                isMurloc = true;
+                                murlocTargets.Add(minion);
+                            }
                         }
-                        else
+                        if (isMurloc)
                         {
-                            Services.ScrollText("Invalid input. Try again.", 500);
-                            Battlecry(card);
+                            Services.ScrollText("Select a murloc to eat:");
+
+                            int cmd = PrintList(murlocTargets);
+                            if (cmd > 0)
+                            {
+                                _enemyBoard.Remove(murlocTargets[cmd - 1]);
+                                card.Attack += 2;
+                                card.Health += 2;
+                                Services.ScrollText("Your hungry crab eats " + murlocTargets[cmd - 1].Name);
+                            }
+                            else
+                            {
+                                Services.ScrollText("Invalid input. Try again.", 500);
+                                Battlecry(card);
+                            }
                         }
                     }
                     break;
-                case "Jeweled Scarab": //TODO: AI?
-                    Discover(Cards.ThreeDrops());
+                case "Jeweled Scarab":
+                    if (_playerTurn)
+                        Discover(Cards.ThreeDrops());
+                    else
+                        _enemyCards.Add(Cards.ThreeDrops()[rand.Next(Cards.ThreeDrops().Count)]);
                     break;
                 case "King's Elekk":
                     Services.ScrollText("A minion is revealed from both decks:\nYou: Webspinner (1)\nTunder: Webspinner (1)\n\nA card is not drawn\n", 500);
@@ -788,10 +915,13 @@ namespace TextGame
                         Services.ScrollText("Desert camel pulls a webspinner out of Tunder's deck", 400);
                     }
                     break;
-                case "Ironbeak Owl": //TODO: AI?
-                    List<Card> allMinions = ListAllMinions();
-                    if (allMinions.Count > 0)
-                        Silence(allMinions);
+                case "Ironbeak Owl":
+                    if (_playerTurn)
+                    {
+                        List<Card> allMinions = ListAllMinions();
+                        if (allMinions.Count > 0)
+                            Silence(allMinions);
+                    }
                     break;
                 case "King Mukla":
                     if (_playerTurn)
@@ -847,13 +977,21 @@ namespace TextGame
                         }
                     }
                     break;
-                case "Tomb Spider": //TODO: AI?
-                    List<Card> beasts = new List<Card>();
+                case "Tomb Spider":
+                    if (_playerTurn)
+                    {
+                        List<Card> beasts = new List<Card>();
 
-                    foreach (Card beast in _allCards)
-                        beasts.Add(beast);
+                        foreach (Card beast in _allCards)
+                            beasts.Add(beast);
 
-                    Discover(beasts);
+                        Discover(beasts);
+                    }
+                    else
+                    {
+                        _enemyCards.Add(_allCards[_allCards.Length]);
+                    }
+                    
                     break;
                 case "Stampeding Kodo":
                     if (_playerTurn)
@@ -876,10 +1014,7 @@ namespace TextGame
                     {
                         List<Card> kodoTargets = CanKodo();
                         if (kodoTargets.Count > 0)
-                        {
-                            Random rand = new Random();
                             Die(kodoTargets[rand.Next(kodoTargets.Count)]);
-                        }
                     }
                     break;
                 case "Mukla, Tyrant of the Vale":
@@ -905,7 +1040,14 @@ namespace TextGame
                     }
                     else
                     {
-                        //TODO
+                        List<Card> deathrattles = new List<Card>();
+
+                        foreach (Card deathrattle in _enemyBoard)
+                            if (deathrattle.DeathRattle)
+                                deathrattles.Add(deathrattle);
+
+                        if (deathrattles.Count > 0)
+                            Deathrattle(deathrattles[rand.Next(deathrattles.Count)]);
                     }
                     break;
             }
@@ -913,11 +1055,9 @@ namespace TextGame
 
         public void Deathrattle(Card card)
         {
-            //TODO
             switch (card.Name)
             {
                 case "Webspinner":
-                    Random rand = new Random();
                     Card[] tempArr = (Card[])_allCards.Clone();
 
                     Card randomBeast = tempArr[rand.Next(tempArr.Length)];
@@ -932,6 +1072,255 @@ namespace TextGame
                         _enemyCards.Add(randomBeast);
                     }
                     break;
+                case "Fiery Bat":
+                    if (_playerBoard.Contains(card))
+                    {
+                        int target = rand.Next(_enemyBoard.Count + 1);
+                        
+                        if (target != _enemyBoard.Count)
+                        {
+                            _enemyBoard[target].Health -= 1;
+                            Services.ScrollText("Fiery bat's deathrattle deals 1 damage to " + _enemyBoard[target].Name, 400);
+                            DeathCheck(new List<Card> { _enemyBoard[target] });
+                        }
+                        else
+                        {
+                            Services.ScrollText("Fiery bat's deathrattle deals 1 damage to Tunder", 400);
+                            DamageHero(1);
+                        }
+                    }
+                    else
+                    {
+                        int target = rand.Next(_playerBoard.Count + 1);
+
+                        if (target != _playerBoard.Count)
+                        {
+                            _playerBoard[target].Health -= 1;
+                            Services.ScrollText("Fiery bat's deathrattle deals 1 damage to " + _playerBoard[target].Name, 400);
+                            DeathCheck(new List<Card> { _playerBoard[target] });
+                        }
+                        else
+                        {
+                            Services.ScrollText("Fiery bat's deathrattle deals 1 damage to Tunder", 400);
+                            DamageHero(1);
+                        }
+                    }
+                    break;
+                case "Huge Toad":
+                    if (_playerBoard.Contains(card))
+                    {
+                        int target = rand.Next(_enemyBoard.Count + 1);
+
+                        if (target != _enemyBoard.Count)
+                        {
+                            _enemyBoard[target].Health -= 1;
+                            Services.ScrollText("Huge Toad's deathrattle deals 1 damage to " + _enemyBoard[target].Name, 400);
+                            DeathCheck(new List<Card> { _enemyBoard[target] });
+                        }
+                        else
+                        {
+                            Services.ScrollText("Huge Toad's deathrattle deals 1 damage to Tunder", 400);
+                            DamageHero(1);
+                        }
+                    }
+                    else
+                    {
+                        int target = rand.Next(_playerBoard.Count + 1);
+
+                        if (target != _playerBoard.Count)
+                        {
+                            _playerBoard[target].Health -= 1;
+                            Services.ScrollText("Huge Toad's deathrattle deals 1 damage to " + _playerBoard[target].Name, 400);
+                            DeathCheck(new List<Card> { _playerBoard[target] });
+                        }
+                        else
+                        {
+                            Services.ScrollText("Huge Toad's deathrattle deals 1 damage to Tunder", 400);
+                            DamageHero(1);
+                        }
+                    }
+                    break;
+                case "Kindly Grandmother":
+                    if (_playerBoard.Contains(card))
+                    {
+                        _playerBoard.Add(new Card("Kindly Grandmother")
+                        {
+                            Text = "Deathrattle: Summon a 3/2 Big Bad Wolf",
+                            Type = "Beast",
+                            BaseCost = 2,
+                            Cost = 2,
+                            BaseHealth = 1,
+                            Health = 1,
+                            BaseAttack = 1,
+                            Attack = 1,
+                            DeathRattle = true
+                        });
+                        
+                    }
+                    else
+                    {
+                        _enemyBoard.Add(new Card("Kindly Grandmother")
+                        {
+                            Text = "Deathrattle: Summon a 3/2 Big Bad Wolf",
+                            Type = "Beast",
+                            BaseCost = 2,
+                            Cost = 2,
+                            BaseHealth = 1,
+                            Health = 1,
+                            BaseAttack = 1,
+                            Attack = 1,
+                            DeathRattle = true
+                        });
+                    }
+                    Services.ScrollText("Kindly Grandmother summons a Big Bad Wolf", 400);
+                    break;
+                case "Mounted Raptor":
+                    if (_playerTurn)
+                    {
+                        Card spawn = Cards.OneDrops()[rand.Next(Cards.OneDrops().Count)];
+                        _playerBoard.Add(spawn);
+                        Services.ScrollText("Mounted raptor spawns you a " + spawn.Name);
+                    }
+                    else
+                    {
+                        Card spawn = Cards.OneDrops()[rand.Next(Cards.OneDrops().Count)];
+                        _enemyBoard.Add(spawn);
+                        Services.ScrollText("Mounted raptor spawns Tunder a " + spawn.Name);
+                    } 
+                    break;
+                case "Infested Wolf":
+                    if (_playerTurn)
+                    {
+                        _playerBoard.Add(new Card("Spider")
+                        {
+                            Type = "Beast",
+                            BaseCost = 1,
+                            Cost = 1,
+                            BaseHealth = 1,
+                            Health = 1,
+                            BaseAttack = 1,
+                            Attack = 1
+                        });
+
+                        _playerBoard.Add(new Card("Spider")
+                        {
+                            Type = "Beast",
+                            BaseCost = 1,
+                            Cost = 1,
+                            BaseHealth = 1,
+                            Health = 1,
+                            BaseAttack = 1,
+                            Attack = 1
+                        });
+                        Services.ScrollText("Infested Wolf spawns you two spiders");
+                    }
+                    else
+                    {
+                        _enemyBoard.Add(new Card("Spider")
+                        {
+                            Type = "Beast",
+                            BaseCost = 1,
+                            Cost = 1,
+                            BaseHealth = 1,
+                            Health = 1,
+                            BaseAttack = 1,
+                            Attack = 1
+                        });
+
+                        _enemyBoard.Add(new Card("Spider")
+                        {
+                            Type = "Beast",
+                            BaseCost = 1,
+                            Cost = 1,
+                            BaseHealth = 1,
+                            Health = 1,
+                            BaseAttack = 1,
+                            Attack = 1
+                        });
+                        Services.ScrollText("Infested Wolf spawns Tunder two spiders");
+                    }
+                    break;
+                case "The Beast":
+                    if (!_playerTurn)
+                    {
+                        _playerBoard.Add(new Card("Finkle Einhorn")
+                        {
+                            BaseCost = 3,
+                            Cost = 3,
+                            BaseHealth = 3,
+                            Health = 3,
+                            BaseAttack = 3,
+                            Attack = 3
+                        });
+                        Services.ScrollText("The Beast spawns you Finkle Einhorn");
+                    }
+                    else
+                    {
+                        _enemyBoard.Add(new Card("Finkle Einhorn")
+                        {
+                            BaseCost = 3,
+                            Cost = 3,
+                            BaseHealth = 3,
+                            Health = 3,
+                            BaseAttack = 3,
+                            Attack = 3
+                        });
+                        Services.ScrollText("The Beast spawns Tunder Finkle Einhorn");
+                    }
+                    break;
+                case "Savannah Highmane":
+                    if (_playerTurn)
+                    {
+                        _playerBoard.Add(new Card("Hyena")
+                        {
+                            Type = "Beast",
+                            BaseCost = 2,
+                            Cost = 2,
+                            BaseHealth = 2,
+                            Health = 2,
+                            BaseAttack = 2,
+                            Attack = 2
+                        });
+
+                        _playerBoard.Add(new Card("Hyena")
+                        {
+                            Type = "Beast",
+                            BaseCost = 2,
+                            Cost = 2,
+                            BaseHealth = 2,
+                            Health = 2,
+                            BaseAttack = 2,
+                            Attack = 2
+                        });
+                        Services.ScrollText("Savannah Highmane spawns you two hyenas");
+                    }
+                    else
+                    {
+                        _enemyBoard.Add(new Card("Hyena")
+                        {
+                            Type = "Beast",
+                            BaseCost = 2,
+                            Cost = 2,
+                            BaseHealth = 2,
+                            Health = 2,
+                            BaseAttack = 2,
+                            Attack = 2
+                        });
+
+                        _enemyBoard.Add(new Card("Hyena")
+                        {
+                            Type = "Beast",
+                            BaseCost = 2,
+                            Cost = 2,
+                            BaseHealth = 2,
+                            Health = 2,
+                            BaseAttack = 2,
+                            Attack = 2
+                        });
+                        Services.ScrollText("Savannah Highmane spawns Tunder two hyenas");
+                    }
+                    break;
+                    
             }
         }
 
@@ -940,10 +1329,8 @@ namespace TextGame
             List<Card> deathrattles = new List<Card>();
 
             foreach (Card card in _playerBoard)
-            {
                 if (card.DeathRattle)
                     deathrattles.Add(card);
-            }
 
             return deathrattles;
         }
@@ -951,22 +1338,16 @@ namespace TextGame
         public List<Card> CanKodo()
         {
             List<Card> kodoTargets = new List<Card>();
+
             if (_playerTurn)
-            {
                 foreach (Card card in _enemyBoard)
-                {
                     if (card.Attack <= 2)
                         kodoTargets.Add(card);
-                }
-            }
             else
-            {
-                foreach (Card card in _playerBoard)
-                {
-                    if (card.Attack <= 2)
-                        kodoTargets.Add(card);
-                }
-            }
+                foreach (Card smallCard in _playerBoard)
+                    if (smallCard.Attack <= 2)
+                        kodoTargets.Add(smallCard);
+
             return kodoTargets;
         }
 
@@ -1047,8 +1428,6 @@ namespace TextGame
         {
             List<Card> discoverOptions = new List<Card>();
 
-            Random rand = new Random();
-
             int firstOption = rand.Next(cardList.Count);
             discoverOptions.Add(cardList[firstOption]);
             cardList.Remove(cardList[firstOption]);
@@ -1087,8 +1466,6 @@ namespace TextGame
 
         public void DrawCard(bool player = true, int amount = 1)
         {
-            Random rand = new Random();
-
             if (player)
             {
                 for (int i = 0; i < amount; i++)
@@ -1143,8 +1520,6 @@ namespace TextGame
 
         public void EnemyPlayCard()
         {
-            Random rand = new Random();
-
             Card card = _enemyCards[rand.Next(_enemyCards.Count)];
 
             if (card.Cost <= EnemyCurrentMana)
@@ -1165,25 +1540,76 @@ namespace TextGame
 
         public void EnemyMakeAttacks()
         {
-            Random rand = new Random();
-
             Card[] tempAry = new Card[_enemyBoard.Count];
             _enemyBoard.CopyTo(tempAry);
 
             foreach (Card card in tempAry)
             {
-                if (!card.Sleeping)
+                if (card.Attacks > 0)
                 {
-                    Card targetCard;
-                    int target = rand.Next(_playerBoard.Count + 1);
+                    List<Card> tauntList = new List<Card>();
 
-                    if (target == _playerBoard.Count)
-                        targetCard = null;
+                    foreach (Card minion in _playerBoard)
+                        if (minion.Taunt)
+                            tauntList.Add(minion);
+
+                    Card targetCard;
+
+                    if (tauntList.Count == 0)
+                    {
+                        int target = rand.Next(_playerBoard.Count + 1);
+
+                        if (target == _playerBoard.Count)
+                            targetCard = null;
+                        else
+                            targetCard = _playerBoard[target];
+                    }
                     else
-                        targetCard = _playerBoard[target];
+                    {
+                        int target = rand.Next(tauntList.Count);
+
+                        targetCard = tauntList[target];
+                    }
 
                     Swing(card, targetCard);
                 }
+            }
+        }
+
+        public void EndOfTurn(bool Tunder = true)
+        {
+            if (Tunder)
+            {
+                foreach (Card card in _enemyBoard)
+                    if (card.EndOfTurn)
+                        ProcEndOfTurn(card);
+            }
+            else
+            {
+                foreach (Card card in _enemyBoard)
+                    if (card.EndOfTurn)
+                        ProcEndOfTurn(card);
+            }
+        }
+
+        public void ProcEndOfTurn(Card card)
+        {
+            switch (card.Name)
+            {
+                case "Dreadscale":
+                    foreach (Card minion in _playerBoard)
+                        if (minion != card)
+                            minion.Health--;
+
+                    foreach (Card enemyMinion in _enemyBoard)
+                        if (enemyMinion != card)
+                            enemyMinion.Health--;
+
+                    Services.ScrollText("Dreadscale deals 1 damage to all other minions", 500);
+
+                    DeathCheck(_playerBoard);
+                    DeathCheck(_enemyBoard);
+                    break;
             }
         }
     }

@@ -164,7 +164,7 @@ namespace TextGame
                 },
                 new Card("Kindly Grandmother")
                 {
-                    Text = "Summon a 3/2 Big Bad Wolf",
+                    Text = "Deathrattle: Summon a 3/2 Big Bad Wolf",
                     Type = "Beast",
                     BaseCost = 2,
                     Cost = 2,
@@ -474,6 +474,7 @@ namespace TextGame
                     Health = 5,
                     BaseAttack = 2,
                     Attack = 2,
+                    Charge = true,
                     Aura = true
                 },
                 new Card("Mukla, Tyrant of the Vale")
@@ -701,6 +702,108 @@ namespace TextGame
                     Health = 4,
                     Attack = 1,
                     Taunt = true
+                }
+            };
+            return cards;
+        }
+
+        public static List<Card> OneDrops()
+        {
+            List<Card> cards = new List<Card>()
+            {
+                new Card("Angry Chicken")
+                {
+                    Text = "Enrage: +5 attack",
+                    Type = "Beast",
+                    BaseCost = 1,
+                    Cost = 1,
+                    BaseHealth = 1,
+                    Health = 1,
+                    BaseAttack = 1,
+                    Attack = 1,
+                    Enrage = true
+                },
+                new Card("Enchanted Raven")
+                {
+                    Type = "Beast",
+                    BaseCost = 1,
+                    Cost = 1,
+                    BaseHealth = 2,
+                    Health = 2,
+                    BaseAttack = 2,
+                    Attack = 2
+                },
+                new Card("Fiery Bat")
+                {
+                    Text = "Deathrattle: Deal 1 damage to a random enemy",
+                    Type = "Beast",
+                    BaseCost = 1,
+                    Cost = 1,
+                    BaseHealth = 1,
+                    Health = 1,
+                    BaseAttack = 2,
+                    Attack = 2,
+                    DeathRattle = true
+                },
+                new Card("Hungry Crab")
+                {
+                    Text = "Battlecry: Destroy a murloc and gain +2/+2",
+                    Type = "Beast",
+                    BaseCost = 1,
+                    Cost = 1,
+                    BaseHealth = 2,
+                    Health = 2,
+                    BaseAttack = 1,
+                    Attack = 1,
+                    Battlecry = true
+                },
+                new Card("Pit Snake")
+                {
+                    Text = "Destroy any minion damage by this minion",
+                    Type = "Beast",
+                    BaseCost = 1,
+                    Cost = 1,
+                    BaseHealth = 1,
+                    Health = 1,
+                    BaseAttack = 2,
+                    Attack = 2,
+                    Poisoned = true
+                },
+                new Card("Stonetusk Boar")
+                {
+                    Text = "Charge",
+                    Type = "Beast",
+                    BaseCost = 1,
+                    Cost = 1,
+                    BaseHealth = 1,
+                    Health = 1,
+                    BaseAttack = 1,
+                    Attack = 1,
+                    Charge = true
+                },
+                new Card("Timber Wolf")
+                {
+                    Text = "All beasts have +1 attack",
+                    Type = "Beast",
+                    BaseCost = 1,
+                    Cost = 1,
+                    BaseHealth = 1,
+                    Health = 1,
+                    BaseAttack = 1,
+                    Attack = 1,
+                    Aura = true
+                },
+                new Card("Young Dragonhawk")
+                {
+                    Text = "Windfury",
+                    Type = "Beast",
+                    BaseCost = 1,
+                    Cost = 1,
+                    BaseHealth = 1,
+                    Health = 1,
+                    BaseAttack = 1,
+                    Attack = 1,
+                    Windfury = true
                 }
             };
             return cards;
