@@ -10,10 +10,7 @@ using System.Threading.Tasks;
 namespace TextGame
 {
     //TODO
-    //1) Add webspinner to GetCards() and OneDrops()
-    //2) Add functionality for using bananas
-    //3) Currently only 1 copy of each minion - help
-    //4) After killing Tunder if got stuck in an infinite loop (Invalid input. Try Again.) While choosing targets to attack
+    //1) Change text in a few 'invalid input's to see what is looping.. probably PrintList().. change tunder health to 10-15 to make testing faster
     class CardGame : Scenario
     {
         Thread musicThread = new Thread(PlayMusic);
@@ -54,6 +51,19 @@ namespace TextGame
 
             AddWebspinnerToDeck(true, 30);
             AddWebspinnerToDeck(false, 30);
+
+            if (player.DifficultyLevel == 3)
+            {
+                PlayerHeroHealth = 25;
+                EnemyHeroHealth = 40;
+                EnemyMana = 1;
+            }
+            else if (player.DifficultyLevel == 4)
+            {
+                PlayerHeroHealth = 15;
+                EnemyHeroHealth = 50;
+                EnemyMana = 4;
+            }
         }
 
         public static void PlayMusic()
@@ -69,19 +79,19 @@ namespace TextGame
 
         public void Start()
         {
-            Services.ScrollText("You are sitting across the table from a tough-looking dwarf.", 1200);
-            Services.ScrollText(". . .", 500);
-            Services.ScrollText("Oh hello there! My name is Tunder the Great.", 800);
-            Services.ScrollText("I hope you're ready to lose! I've never lost a card game in my life.", 800);
-            Services.ScrollText("\nIn case you don't know, here are the rules of the game:", 600);
-            Services.FastScrollText("1) You draw one card at the beginning of each turn");
-            Services.FastScrollText("2) You have a limited amount of mana each turn, which will increase by 1 each turn");
-            Services.FastScrollText("3) You'll start with 1 mana on turn 1, and once you reach 10 mana it will stop increasing");
-            Services.FastScrollText("4) Each player has 30 health, and the first player to bring the opponent to 0 health wins");
-            Services.FastScrollText("5) The attacking player chooses each minion's target", 6000);
-            Services.ScrollText("\n. . .", 500);
-            Services.ScrollText("Tunder takes two 30 card decks out of his leather sack and hands one to you.", 1100);
-            Services.ScrollText("He takes a coin out of his pocket, flips it in the air, and catches it on the back of his hand.", 1100);
+            //Services.ScrollText("You are sitting across the table from a tough-looking dwarf.", 1200);
+            //Services.ScrollText(". . .", 500);
+            //Services.ScrollText("Oh hello there! My name is Tunder the Great.", 800);
+            //Services.ScrollText("I hope you're ready to lose! I've never lost a card game in my life.", 800);
+            //Services.ScrollText("\nIn case you don't know, here are the rules of the game:", 600);
+            //Services.FastScrollText("1) You draw one card at the beginning of each turn");
+            //Services.FastScrollText("2) You have a limited amount of mana each turn, which will increase by 1 each turn");
+            //Services.FastScrollText("3) You'll start with 1 mana on turn 1, and once you reach 10 mana it will stop increasing");
+            //Services.FastScrollText("4) Each player has 30 health, and the first player to bring the opponent to 0 health wins");
+            //Services.FastScrollText("5) The attacking player chooses each minion's target", 6000);
+            //Services.ScrollText("\n. . .", 500);
+            //Services.ScrollText("Tunder takes two 30 card decks out of his leather sack and hands one to you.", 1100);
+            //Services.ScrollText("He takes a coin out of his pocket, flips it in the air, and catches it on the back of his hand.", 1100);
 
             if (GoingFirst())
             {
@@ -214,7 +224,7 @@ namespace TextGame
             if (_playerBoard.Count != 0 || _enemyBoard.Count != 0)
             {
                 Console.WriteLine();
-                Services.FastScrollText(" - OPPONENT - (" + EnemyHeroHealth + ")");
+                Services.FastScrollText(" - TUNDER - (" + EnemyHeroHealth + ")");
                 if (_enemyBoard.Count > 0)
                 {
                     foreach (Card card in _enemyBoard)
@@ -501,69 +511,71 @@ namespace TextGame
 
         public void ChooseTarget(Card card)
         {
-            Services.ScrollText("\nSelect a target to attack with your " + card.Name + " (" + card.Attack + "/" + card.Health + ")");
-
-            List<Card> tauntList = new List<Card>();
-            foreach (Card target in _enemyBoard)
+            if (!_gameOver)
             {
-                if (target.Taunt)
-                    tauntList.Add(target);
-            }
+                Services.ScrollText("\nSelect a target to attack with your " + card.Name + " (" + card.Attack + "/" + card.Health + ")");
 
-            int cmd;
-
-            if (tauntList.Count == 0)
-            {
-                cmd = PrintList(_enemyBoard, false, true);
-                if (cmd > 0)
+                List<Card> tauntList = new List<Card>();
+                foreach (Card target in _enemyBoard)
                 {
-                    if (cmd != _enemyBoard.Count + 1)
-                    {
-                        Swing(card, _enemyBoard[cmd - 1]);
-                        Attacking();
-                    }
-                    else
-                    {
-                        Swing(card, null);
-                        Attacking();
-                    }
+                    if (target.Taunt)
+                        tauntList.Add(target);
                 }
+
+                int cmd;
+
+                if (tauntList.Count == 0)
+                {
+                    cmd = PrintList(_enemyBoard, false, true);
+                    if (cmd > 0)
+                    {
+                        if (cmd != _enemyBoard.Count + 1)
+                        {
+                            Swing(card, _enemyBoard[cmd - 1]);
+                            Attacking();
+                        }
+                        else
+                        {
+                            Swing(card, null);
+                            Attacking();
+                        }
+                    }
                 
-            }
-            else
-            {
-                cmd = PrintList(tauntList);
-                if (cmd > 0)
+                }
+                else
                 {
-                    if (cmd != tauntList.Count + 1)
+                    cmd = PrintList(tauntList);
+                    if (cmd > 0)
                     {
-                        Swing(card, tauntList[cmd - 1]);
-                        Attacking();
-                    }
-                    else
-                    {
-                        Swing(card, null);
-                        Attacking();
+                        if (cmd != tauntList.Count + 1)
+                        {
+                            Swing(card, tauntList[cmd - 1]);
+                            Attacking();
+                        }
+                        else
+                        {
+                            Swing(card, null);
+                            Attacking();
+                        }
                     }
                 }
-            }
 
-            if (cmd == -1)
-            {
-                PrintBoard();
-                Attacking();
+                if (cmd == -1)
+                {
+                    PrintBoard();
+                    Attacking();
+                }
+                else if (cmd == -2)
+                {
+                    PrintBoard();
+                    Listen();
+                }
+                else
+                {
+                    Services.ScrollText("Invalid input. Try again.", 500);
+                    ChooseTarget(card);
+                }
             }
-            else if (cmd == -2)
-            {
-                PrintBoard();
-                Listen();
-            }
-            else
-            {
-                Services.ScrollText("Invalid input. Try again.", 500);
-                ChooseTarget(card);
-            }
-
         }
 
         public void Swing(Card attacker, Card defender)
@@ -588,13 +600,20 @@ namespace TextGame
                 if (!attacker.Poisoned)
                     defender.Health -= attacker.Attack;
                 else
+                {
                     Die(defender);
+                    Services.ScrollText(defender.Name + " dies!", 400);
+                }
+                    
 
                 if (!defender.Poisoned)
                     attacker.Health -= defender.Attack;
                 else
+                {
                     Die(attacker);
-                
+                    Services.ScrollText(attacker.Name + " dies!", 400);
+                }
+
                 DeathCheck(new List<Card> { attacker, defender });
             }
 
@@ -692,7 +711,7 @@ namespace TextGame
                     });
                 }
             }
-            else if (!player)
+            else
             {
                 for (int i = 0; i < num; i++)
                 {
@@ -730,6 +749,13 @@ namespace TextGame
                             Battlecry(card);
                         if (card.Aura)
                             Aura(card);
+                        if (_playerRhyno)
+                        {
+                            if (card.Windfury)
+                                card.Attacks = 2;
+                            else
+                                card.Attacks = 1;
+                        }
                     }
                     else
                     {
@@ -743,8 +769,6 @@ namespace TextGame
                         EnemyCurrentMana -= card.Cost;
                         _enemyBoard.Add(card);
                         _enemyCards.Remove(card);
-
-                        
 
                         Services.ScrollText("Your opponent plays " + card.Name);
                     }
@@ -778,9 +802,66 @@ namespace TextGame
                         }
                         break;
                     case "Banana":
-                        //TODO: playing bananas
+                        if (_playerTurn)
+                        {
+                            if (PlayerCurrentMana >= 1)
+                            {
+                                bool used;
+                                BananaTarget(out used);
+
+                                if (used)
+                                {
+                                    PlayerCurrentMana--;
+                                    _playerCards.Remove(card);
+                                }
+                            }
+                            else
+                            {
+                                Services.ScrollText("You don't have enough mana", 400);
+                            }
+                        }
+                        else
+                        {
+                            if (_enemyBoard.Count > 0)
+                            {
+                                int minion = rand.Next(_enemyBoard.Count);
+                                _enemyBoard[minion].Attack++;
+                                _enemyBoard[minion].Health++;
+                                _enemyCards.Remove(card);
+                            }
+                            EnemyCurrentMana--;
+                        }
                         break;
                 }
+            }
+        }
+
+        public void BananaTarget(out bool used)
+        {
+            if (_playerBoard.Count > 0)
+            {
+                int cmd = PrintList(_playerBoard);
+
+                if (cmd > 0)
+                {
+                    _playerBoard[cmd - 1].Attack++;
+                    _playerBoard[cmd - 1].Health++;
+                    used = true;
+                }
+                else if (cmd == -1 || cmd == -2)
+                {
+                    used = false;
+                }
+                else
+                {
+                    used = false;
+                    BananaTarget(out used);
+                }
+            }
+            else
+            {
+                Services.ScrollText("You have no minions to buff with a banana", 400);
+                used = false;
             }
         }
 
@@ -1058,9 +1139,9 @@ namespace TextGame
             switch (card.Name)
             {
                 case "Webspinner":
-                    Card[] tempArr = (Card[])_allCards.Clone();
+                    Card[] cards = Cards.GetCards();
 
-                    Card randomBeast = tempArr[rand.Next(tempArr.Length)];
+                    Card randomBeast = cards[rand.Next(cards.Length)];
 
                     if (_playerBoard.Contains(card))
                     {
@@ -1473,7 +1554,7 @@ namespace TextGame
                     int num = rand.Next(_playerDeck.Count);
 
                     if (!_mulliganStage)
-                        Services.ScrollText("You draw a " + _playerDeck[num].Name);
+                        Services.ScrollText("You draw a " + _playerDeck[num].Name, 400);
 
                     _playerCards.Add(_playerDeck[num]);
                     _playerDeck.RemoveAt(num);
@@ -1486,7 +1567,7 @@ namespace TextGame
                     int num = rand.Next(_enemyDeck.Count);
 
                     if (!_mulliganStage)
-                        Services.ScrollText("The opponent draws a " + _enemyDeck[num].Name);
+                        Services.ScrollText("Tunder draws a card", 400);
 
                     _enemyCards.Add(_enemyDeck[num]);
                     _enemyDeck.RemoveAt(num);
@@ -1586,7 +1667,7 @@ namespace TextGame
             }
             else
             {
-                foreach (Card card in _enemyBoard)
+                foreach (Card card in _playerBoard)
                     if (card.EndOfTurn)
                         ProcEndOfTurn(card);
             }

@@ -94,6 +94,17 @@ namespace TextGame
                     Attack = 1,
                     Aura = true
                 },
+                new Card("Webspinner")
+                {
+                    Text = "Deathrattle: Add a random beast to your hand",
+                    BaseCost = 1,
+                    Cost = 1,
+                    BaseAttack = 1,
+                    Attack = 1,
+                    BaseHealth = 1,
+                    Health = 1,
+                    DeathRattle = true
+                },
                 new Card("Young Dragonhawk")
                 {
                     Text = "Windfury",
@@ -792,6 +803,17 @@ namespace TextGame
                     BaseAttack = 1,
                     Attack = 1,
                     Aura = true
+                },
+                new Card("Webspinner")
+                {
+                    Text = "Deathrattle: Add a random beast to your hand",
+                    BaseCost = 1,
+                    Cost = 1,
+                    BaseAttack = 1,
+                    Attack = 1,
+                    BaseHealth = 1,
+                    Health = 1,
+                    DeathRattle = true
                 },
                 new Card("Young Dragonhawk")
                 {
